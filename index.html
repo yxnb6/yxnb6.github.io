@@ -2,231 +2,815 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PC28 预测走势</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>PC28 · 凤凰智测 | 三组预测系统</title>
     <style>
-        /* 全局样式 */
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: "Arial", sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            font-size: 14px;
-            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
         }
 
-        /* 顶部标签样式 */
+        body {
+            background-color: #f5f7fb;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        /* 登录界面 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: white;
+            padding: 28px 24px;
+            border-radius: 24px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+        }
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        .login-sub {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 14px;
+            background: #f8fafc;
+            outline: none;
+        }
+        .login-input:focus {
+            border-color: #3b82f6;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #ffffff;
+            min-height: 100vh;
+            border-left: 1px solid #eef2f6;
+            border-right: 1px solid #eef2f6;
+            display: none;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: white;
+            border-bottom: 1px solid #eef2f6;
+            font-size: 13px;
+            color: #5b6e8c;
+        }
+        .live-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
+        .sync-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 12px;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+        .countdown-box {
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-family: monospace;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #cbd5e1;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 选项卡 (三组预测 / 两组预测 / 历史记录) */
         .tabs {
             display: flex;
-            border-bottom: 1px solid #ddd;
-            background-color: #f9f9f9;
+            border-bottom: 1px solid #eef2f6;
+            background: white;
         }
-
         .tab {
             flex: 1;
             text-align: center;
-            padding: 12px 0;
-            cursor: pointer;
-            border: none;
-            background: none;
+            padding: 14px 0;
             font-size: 15px;
-            color: #555;
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
         }
-
         .tab.active {
-            background-color: #3B82F6;
-            color: #fff;
-            font-weight: bold;
+            color: #0f172a;
+            border-bottom-color: #0f172a;
         }
 
-        .tab:hover {
-            background-color: #e6f2ff;
-        }
-
-        /* 面板样式 */
+        /* 面板切换 */
         .panel {
             display: none;
-            padding: 16px;
+            animation: fadeIn 0.25s ease;
         }
-
         .panel.active {
             display: block;
         }
-
-        /* 表格样式 */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 20px;
+            margin: 16px;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
+        }
+
+        /* 当期开奖卡片 */
+        .draw-card {
             text-align: center;
+            padding: 20px 16px;
         }
-
-        .table th {
-            background-color: #f9f9f9;
-            font-weight: bold;
-            color: #555;
+        .issue-text {
+            font-size: 13px;
+            color: #5b6e8c;
+            margin-bottom: 14px;
         }
-
-        /* 样式 - 红色数字球 */
-        .number-ball {
-            display: inline-flex;
-            width: 32px;
-            height: 32px;
+        .balls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0;
+        }
+        .ball {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background-color: #ef4444;
-            color: #fff;
-            font-size: 14px;
+            background: #ef4444;
+            color: white;
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-size: 26px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .ball.sum {
+            background: #3b82f6;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 6px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .type-ds { background: #dbeafe; color: #1e40af; }
+        .type-dd { background: #fee2e2; color: #b91c1c; }
+        .type-xs { background: #d1fae5; color: #065f46; }
+        .type-xd { background: #fed7aa; color: #9a3412; }
+
+        /* 算法切换器 */
+        .algo-switch {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 0 16px;
+            border-bottom: 1px solid #f0f4f9;
+            flex-wrap: wrap;
+        }
+        .algo-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .algo-btn.active {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: white;
         }
 
-        /* 样式 - 预测按钮 */
-        .predict-btn {
-            display: inline-block;
-            padding: 6px 12px;
+        /* 预测行 */
+        .predict-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .predict-label {
+            font-weight: 500;
+            color: #334155;
+        }
+        .kill-value {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .group-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .group-badge {
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+        }
+        .accuracy-tip {
+            background: #f8fafc;
+            margin: 12px 16px 16px;
+            padding: 10px;
+            border-radius: 40px;
+            text-align: center;
             font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-            border-radius: 16px;
-            cursor: default;
+            color: #475569;
         }
 
-        .predict-btn.blue {
-            background-color: #3b82f6;
+        /* 历史表格 */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 0 0 16px 0;
         }
-
-        .predict-btn.red {
-            background-color: #ef4444;
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
         }
-
-        /* 样式 - 结果标志 */
-        .result-circle {
-            display: inline-block;
+        .history-table th {
+            background: #f8fafc;
+            padding: 12px 6px;
+            color: #5b6e8c;
+            font-weight: 500;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .history-table td {
+            padding: 10px 4px;
+            text-align: center;
+            border-bottom: 1px solid #f0f4f9;
+        }
+        .history-balls {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .history-ball {
             width: 28px;
             height: 28px;
             border-radius: 50%;
+            background: #ef4444;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-size: 12px;
-            color: #fff;
-            font-weight: bold;
-            line-height: 28px;
-            text-align: center;
+            font-weight: 600;
+        }
+        .history-sum {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        .pred-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .hit-yes { color: #10b981; font-weight: 700; }
+        .hit-no { color: #ef4444; font-weight: 700; }
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 12px;
+            margin: 0 16px 16px auto;
+            display: block;
+            cursor: pointer;
         }
 
-        .result-circle.correct {
-            background-color: #22c55e;
+        /* 统计卡片 (嵌入历史记录底部) */
+        .stats-grid {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+            border-radius: 20px;
+            margin: 0 16px 20px;
         }
-
-        .result-circle.wrong {
-            background-color: #ef4444;
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        .footer-placeholder {
+            height: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- 顶部标签 -->
-    <div class="tabs">
-        <button class="tab active" data-panel="predict">预测</button>
-        <button class="tab" data-panel="trend">走势</button>
-        <button class="tab" data-panel="stats">统计</button>
+<!-- 登录界面 -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <div class="login-title">凤凰智测</div>
+        <div class="login-sub">PC28 · 三组预测系统</div>
+        <input type="text" id="loginUsername" class="login-input" placeholder="用户名" value="鱼少">
+        <input type="password" id="loginPassword" class="login-input" placeholder="密码">
+        <button id="doLoginBtn" class="login-btn">验证登录</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+
+<div id="appContainer" class="app-container">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="live-area">
+            <span class="live-dot"></span>
+            <span id="apiStatus">连接中</span>
+            <button id="syncBtn" class="sync-btn">刷新</button>
+        </div>
+        <div class="countdown-box">
+            <span>⏱️</span>
+            <span id="countdownText">--:--:--</span>
+            <span id="loadingSpinner" style="display: none;"><span class="spinner"></span></span>
+        </div>
     </div>
 
-    <!-- 面板内容 -->
-    <div id="content">
-        <!-- 预测面板 -->
-        <div id="predictPanel" class="panel active">
-            <table class="table">
+    <!-- 选项卡 -->
+    <div class="tabs">
+        <div class="tab active" data-panel="predict3">三组预测</div>
+        <div class="tab" data-panel="predict2">两组预测</div>
+        <div class="tab" data-panel="history">历史记录</div>
+    </div>
+
+    <!-- 三组预测面板 -->
+    <div id="predict3Panel" class="panel active">
+        <div class="card draw-card">
+            <div class="issue-text">第 <span id="currentIssue">------</span> 期</div>
+            <div class="balls">
+                <span class="ball" id="ball1">--</span><span>+</span>
+                <span class="ball" id="ball2">--</span><span>+</span>
+                <span class="ball" id="ball3">--</span><span>=</span>
+                <span class="ball sum" id="sumBall">--</span>
+            </div>
+            <div><span id="resultType" class="type-badge">--</span></div>
+        </div>
+
+        <div class="card">
+            <div class="algo-switch" id="algoSwitch">
+                <button class="algo-btn" data-algo="weighted">🎯 加权综合</button>
+                <button class="algo-btn" data-algo="mix">⚖️ 冷热混合</button>
+                <button class="algo-btn" data-algo="cross">🧬 高频交叉</button>
+                <button class="algo-btn active" data-algo="crack">🔥 凤凰融合</button>
+            </div>
+            <div>
+                <div class="predict-row">
+                    <span class="predict-label">🔪 杀组 (排除)</span>
+                    <span class="kill-value" id="killGroup">--</span>
+                </div>
+                <div class="predict-row">
+                    <span class="predict-label">🛡️ 三组稳健 (推荐)</span>
+                    <div class="group-buttons">
+                        <span class="group-badge" style="background:#3b82f6;" id="triple1">--</span>
+                        <span class="group-badge" style="background:#ef4444;" id="triple2">--</span>
+                        <span class="group-badge" style="background:#10b981;" id="triple3">--</span>
+                    </div>
+                </div>
+                <div class="accuracy-tip">
+                    📊 杀组历史准确率: <strong id="killAccuracy" style="color:#10b981;">--%</strong>
+                    <span style="margin-left: 10px;">实时算法引擎</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 两组预测面板 -->
+    <div id="predict2Panel" class="panel">
+        <div class="card draw-card">
+            <div class="issue-text">第 <span id="currentIssue2">------</span> 期</div>
+            <div class="balls">
+                <span class="ball" id="ball1_2">--</span><span>+</span>
+                <span class="ball" id="ball2_2">--</span><span>+</span>
+                <span class="ball" id="ball3_2">--</span><span>=</span>
+                <span class="ball sum" id="sumBall2">--</span>
+            </div>
+            <div><span id="resultType2" class="type-badge">--</span></div>
+        </div>
+        <div class="card">
+            <div class="predict-row">
+                <span class="predict-label">⚡ 两组暴击 (最可能)</span>
+                <div class="group-buttons">
+                    <span class="group-badge" style="background:#3b82f6;" id="double1">--</span>
+                    <span class="group-badge" style="background:#ef4444;" id="double2">--</span>
+                </div>
+            </div>
+            <div class="accuracy-tip">
+                📊 基于当前算法 <span id="algoHint">凤凰融合</span> 实时生成
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史记录面板 -->
+    <div id="historyPanel" class="panel">
+        <div class="table-wrapper">
+            <table class="history-table">
                 <thead>
-                    <tr>
-                        <th>期号</th>
-                        <th>号码</th>
-                        <th>预测</th>
-                        <th>结果</th>
-                    </tr>
+                    <tr><th>期号</th><th>开奖号码</th><th>和值</th><th>大小单双</th><th>杀组预测</th><th>命中</th></tr>
                 </thead>
-                <tbody id="predictTableBody"></tbody>
+                <tbody id="historyBody">
+                    <tr><td colspan="6" style="text-align:center; padding:30px;">加载中...</td></tr>
+                </tbody>
             </table>
         </div>
-
-        <!-- 走势面板 -->
-        <div id="trendPanel" class="panel">
-            <p>走势数据加载中...</p>
-        </div>
-
-        <!-- 统计面板 -->
-        <div id="statsPanel" class="panel">
-            <p>统计数据加载中...</p>
+        <button id="clearHistoryBtn" class="clear-btn">清空历史记录</button>
+        <!-- 遗漏统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-item"><span>📈 大数未开</span><strong id="missBig">--</strong> 期</div>
+            <div class="stat-item"><span>📉 小数未开</span><strong id="missSmall">--</strong> 期</div>
+            <div class="stat-item"><span>🔴 单数未开</span><strong id="missOdd">--</strong> 期</div>
+            <div class="stat-item"><span>🔵 双数未开</span><strong id="missEven">--</strong> 期</div>
+            <div class="stat-item"><span>🎯 大单未开</span><strong id="missDaDan">--</strong> 期</div>
+            <div class="stat-item"><span>🎯 大双未开</span><strong id="missDaShuang">--</strong> 期</div>
+            <div class="stat-item"><span>🎯 小单未开</span><strong id="missXiaoDan">--</strong> 期</div>
+            <div class="stat-item"><span>🎯 小双未开</span><strong id="missXiaoShuang">--</strong> 期</div>
         </div>
     </div>
+    <div class="footer-placeholder"></div>
+</div>
 
-    <script>
-        // 页面切换功能
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function () {
-                // 切换标签样式
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-
-                // 切换面板显示
-                const target = this.dataset.panel;
-                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-                document.getElementById(target + 'Panel').classList.add('active');
-            });
-        });
-
-        // 模拟数据加载【您可以替换为实际的预测数据】
-        const mockData = [
-            { issue: 34123, numbers: [8, 13, 5], prediction: '双', result: true },
-            { issue: 34124, numbers: [6, 7, 4], prediction: '单', result: false },
-            { issue: 34125, numbers: [9, 2, 14], prediction: '单', result: true },
-            { issue: 34126, numbers: [10, 3, 1], prediction: '双', result: true },
-        ];
-
-        // 算法：基于奇偶判断的预测
-        function generatePrediction(numbers) {
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            return sum % 2 === 0 ? '双' : '单'; // 偶数和 -> 双，奇数和 -> 单
+<script>
+    // ==================== 认证 (鱼少 / 1201314) ====================
+    const LOGIN_USER = "鱼少";
+    const LOGIN_PASS = "1201314";
+    const loginOverlay = document.getElementById('loginOverlay');
+    const appContainer = document.getElementById('appContainer');
+    const loginError = document.getElementById('loginError');
+    document.getElementById('doLoginBtn').onclick = () => {
+        const user = document.getElementById('loginUsername').value.trim();
+        const pwd = document.getElementById('loginPassword').value.trim();
+        if (user === LOGIN_USER && pwd === LOGIN_PASS) {
+            loginOverlay.style.display = 'none';
+            appContainer.style.display = 'block';
+            startApp();
+        } else {
+            loginError.innerText = '❌ 用户名或密码错误';
         }
+    };
+    document.getElementById('loginPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('doLoginBtn').click(); });
 
-        // 渲染表格
-        function renderTableRows(data) {
-            const body = document.getElementById('predictTableBody');
-            body.innerHTML = '';
+    // ==================== 全局变量 & API ====================
+    const API_BASE = 'https://pc28.ai';
+    const ALL_TYPES = ['大双', '大单', '小双', '小单'];
+    let historyRecords = [];      // { issue, numbers, sum, type, kill, hit }
+    let currentIssue = null;
+    let pollTimer = null, cdTimer = null;
+    let currentAlgo = 'crack';
+    let isRefreshing = false;
 
-            data.forEach(row => {
-                const { issue, numbers, prediction, result } = row;
+    // 辅助函数
+    function getTypeFromCombination(comb) {
+        if (comb === '大单') return '大单';
+        if (comb === '大双') return '大双';
+        if (comb === '小单') return '小单';
+        if (comb === '小双') return '小双';
+        return '大双';
+    }
+    function getTypeClass(type) {
+        if (type === '大双') return 'type-ds';
+        if (type === '大单') return 'type-dd';
+        if (type === '小双') return 'type-xs';
+        return 'type-xd';
+    }
+    function computeThreeNumbers(kenoArr) {
+        if (!kenoArr || kenoArr.length !== 20) return [0,0,0];
+        const idx1 = [1,4,7,10,13,16]; let s1=0; for(let i of idx1) s1+=kenoArr[i];
+        const idx2 = [2,5,8,11,14,17]; let s2=0; for(let i of idx2) s2+=kenoArr[i];
+        const idx3 = [3,6,9,12,15,18]; let s3=0; for(let i of idx3) s3+=kenoArr[i];
+        return [s1%10, s2%10, s3%10];
+    }
+    async function fetchLatestDraw() {
+        try {
+            const kjRes = await fetch(`${API_BASE}/api/kj.json?nbr=1`, { cache: "no-store" });
+            if (!kjRes.ok) throw new Error();
+            const kjData = await kjRes.json();
+            if (kjData.message !== 'success' || !kjData.data || kjData.data.length === 0) throw new Error();
+            const latest = kjData.data[0];
+            const issue = latest.nbr;
+            const combination = latest.combination;
+            const sum = parseInt(latest.number, 10);
+            const type = getTypeFromCombination(combination);
+            const kenoRes = await fetch(`${API_BASE}/api/keno.json?nbr=1`, { cache: "no-store" });
+            let numbers = [0,0,0];
+            let countdown = '00:00';
+            if (kenoRes.ok) {
+                const kenoData = await kenoRes.json();
+                if (kenoData.message === 'success' && kenoData.data && kenoData.data.length) {
+                    const nbrsStr = kenoData.data[0].nbrs;
+                    if (nbrsStr) {
+                        const arr = nbrsStr.split(',').map(v => parseInt(v.trim(), 10));
+                        if (arr.length === 20) numbers = computeThreeNumbers(arr);
+                    }
+                }
+                if (kenoData.countdown) countdown = kenoData.countdown;
+            }
+            return { issue, numbers, sum, type, countdown };
+        } catch(e) { console.warn(e); return null; }
+    }
 
-                const numberBalls = numbers.map(num => `<span class="number-ball">${num}</span>`).join('');
-                const predictionClass = prediction === '双' ? 'blue' : 'red';
-                const resultClass = result ? 'correct' : 'wrong';
-                const resultText = result ? '中' : '错';
-
-                body.innerHTML += `
-                    <tr>
-                        <td>${issue}</td>
-                        <td>${numberBalls}</td>
-                        <td><span class="predict-btn ${predictionClass}">${prediction}</span></td>
-                        <td><span class="result-circle ${resultClass}">${resultText}</span></td>
-                    </tr>
-                `;
-            });
+    // ========== 算法核心 ==========
+    function getStats() {
+        const cnt = { '大双':0,'大单':0,'小双':0,'小单':0 };
+        const limit = Math.min(historyRecords.length, 30);
+        for(let i=0;i<limit;i++) cnt[historyRecords[i].type]++;
+        const last = { '大双':null,'大单':null,'小双':null,'小单':null };
+        for(let i=0;i<historyRecords.length;i++) { const t=historyRecords[i].type; if(last[t]==null) last[t]=i; }
+        return { cnt, last, limit };
+    }
+    function weightedAlgorithm() {
+        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
+        const { cnt, last, limit } = getStats();
+        const score = {};
+        for(let k of ALL_TYPES) { const hot=cnt[k]/limit; const miss=1/(last[k]+1); score[k]=hot*0.6+miss*0.4; }
+        const sorted = Object.entries(score).sort((a,b)=>b[1]-a[1]);
+        return { kill:sorted[3][0], double:[sorted[0][0],sorted[1][0]], triple:[sorted[0][0],sorted[1][0],sorted[2][0]] };
+    }
+    function mixAlgorithm() {
+        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
+        const { cnt, last } = getStats();
+        const hot=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+        const cold=Object.entries(last).sort((a,b)=>b[1]-a[1]);
+        const double=[hot[0][0], cold[0][0]];
+        const triple=[hot[0][0], cold[0][0], cold[1][0]];
+        const kill=cold[3]?cold[3][0]:'小单';
+        return { kill, double, triple };
+    }
+    function crossAlgorithm() {
+        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
+        const { cnt, last, limit } = getStats();
+        const score={};
+        for(let k of ALL_TYPES) {
+            const hot=cnt[k]/limit;
+            const miss=1/(last[k]+1);
+            let trend=0;
+            for(let i=0;i<Math.min(historyRecords.length,5);i++) if(historyRecords[i].type===k) { trend+=0.15; break; }
+            score[k]=hot*0.5+miss*0.3+trend;
         }
+        const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
+        return { kill:sorted[3][0], double:[sorted[0][0],sorted[1][0]], triple:[sorted[0][0],sorted[1][0],sorted[2][0]] };
+    }
+    function crackFusionAlgorithm() {
+        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
+        const w = weightedAlgorithm(), m = mixAlgorithm(), c = crossAlgorithm();
+        const votes = [w.kill, m.kill, c.kill];
+        const cntVote = {}; for(let v of votes) cntVote[v] = (cntVote[v]||0)+1;
+        const finalKill = Object.entries(cntVote).sort((a,b)=>b[1]-a[1])[0][0];
+        const doubleCands = [w.double[0], w.double[1], m.double[0], m.double[1], c.double[0], c.double[1]];
+        const doubleFreq = {}; for(let d of doubleCands) if(d !== finalKill) doubleFreq[d] = (doubleFreq[d]||0)+1;
+        const sortedDouble = Object.entries(doubleFreq).sort((a,b)=>b[1]-a[1]);
+        let d1 = sortedDouble[0]?.[0] || '大双', d2 = sortedDouble[1]?.[0] || '大单';
+        if(d1 === d2) d2 = (d1 === '大双'?'大单':'大双');
+        const tripleCands = [...w.triple, ...m.triple, ...c.triple];
+        const tripleFreq = {}; for(let t of tripleCands) if(t !== finalKill) tripleFreq[t] = (tripleFreq[t]||0)+1;
+        const sortedTriple = Object.entries(tripleFreq).sort((a,b)=>b[1]-a[1]);
+        let t1 = sortedTriple[0]?.[0] || '大双', t2 = sortedTriple[1]?.[0] || '大单', t3 = sortedTriple[2]?.[0] || '小双';
+        const tripleSet = [...new Set([t1,t2,t3])];
+        while(tripleSet.length < 3) tripleSet.push(ALL_TYPES.find(t => !tripleSet.includes(t) && t !== finalKill));
+        return { kill: finalKill, double: [d1, d2], triple: tripleSet.slice(0,3) };
+    }
+    function getCurrentPredictions() {
+        if(currentAlgo === 'weighted') return weightedAlgorithm();
+        if(currentAlgo === 'mix') return mixAlgorithm();
+        if(currentAlgo === 'cross') return crossAlgorithm();
+        return crackFusionAlgorithm();
+    }
 
-        // 初始加载模拟数据
-        function init() {
-            const processedData = mockData.map(row => ({
-                ...row,
-                prediction: generatePrediction(row.numbers), // 调用算法生成预测
-            }));
-            renderTableRows(processedData);
+    function updateAllPredictUI() {
+        const pred = getCurrentPredictions();
+        // 三组预测面板
+        document.getElementById('killGroup').innerText = pred.kill;
+        document.getElementById('triple1').innerText = pred.triple[0];
+        document.getElementById('triple2').innerText = pred.triple[1];
+        document.getElementById('triple3').innerText = pred.triple[2];
+        // 两组预测面板
+        document.getElementById('double1').innerText = pred.double[0];
+        document.getElementById('double2').innerText = pred.double[1];
+        document.getElementById('algoHint').innerText = 
+            currentAlgo === 'weighted' ? '加权综合' : currentAlgo === 'mix' ? '冷热混合' : currentAlgo === 'cross' ? '高频交叉' : '凤凰融合';
+        // 准确率
+        if(historyRecords.length){
+            const hitCount = historyRecords.filter(r=>r.hit).length;
+            document.getElementById('killAccuracy').innerHTML = Math.round((hitCount/historyRecords.length)*100)+'%';
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    async function addHistoryRecord(issue, numbers, sum, type) {
+        if(historyRecords.some(r=>r.issue===issue)) return false;
+        const { kill } = getCurrentPredictions();
+        const hit = (kill !== type);
+        historyRecords.unshift({ issue, numbers:[...numbers], sum, type, kill, hit, time:Date.now() });
+        if(historyRecords.length>500) historyRecords.pop();
+        saveToLocal();
+        renderHistoryTable();
+        updateMissStats();
+        return true;
+    }
+
+    function renderHistoryTable() {
+        const tbody = document.getElementById('historyBody');
+        if(historyRecords.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center; padding:30px;">暂无开奖数据</td></tr>'; return; }
+        let html = '';
+        const showList = historyRecords.slice(0, 20);
+        for(let r of showList){
+            const numberHtml = `<div class="history-balls"><span class="history-ball">${r.numbers[0]}</span><span class="history-ball">${r.numbers[1]}</span><span class="history-ball">${r.numbers[2]}</span><span class="history-sum">${r.sum}</span></div>`;
+            const hitClass = r.hit ? 'hit-yes' : 'hit-no';
+            const hitText = r.hit ? '✓ 中' : '✗ 错';
+            html += `<tr><td>${r.issue}</td><td>${numberHtml}</td><td>${r.sum}</td><td>${r.type}</td><td><span class="pred-tag">${r.kill}</span></td><td class="${hitClass}">${hitText}</td></tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+
+    function updateMissStats() {
+        if(historyRecords.length===0) return;
+        const lastIdx = { '大双':null,'大单':null,'小双':null,'小单':null };
+        for(let i=0;i<historyRecords.length;i++){ const t=historyRecords[i].type; if(lastIdx[t]==null) lastIdx[t]=i; }
+        document.getElementById('missDaShuang').innerText = lastIdx['大双']!==null?lastIdx['大双']:historyRecords.length;
+        document.getElementById('missDaDan').innerText = lastIdx['大单']!==null?lastIdx['大单']:historyRecords.length;
+        document.getElementById('missXiaoShuang').innerText = lastIdx['小双']!==null?lastIdx['小双']:historyRecords.length;
+        document.getElementById('missXiaoDan').innerText = lastIdx['小单']!==null?lastIdx['小单']:historyRecords.length;
+        let big=null,small=null,odd=null,even=null;
+        for(let i=0;i<historyRecords.length;i++){ const t=historyRecords[i].type;
+            if((t==='大双'||t==='大单') && big===null) big=i;
+            if((t==='小双'||t==='小单') && small===null) small=i;
+            if((t==='大单'||t==='小单') && odd===null) odd=i;
+            if((t==='大双'||t==='小双') && even===null) even=i;
+        }
+        document.getElementById('missBig').innerText = big!==null?big:historyRecords.length;
+        document.getElementById('missSmall').innerText = small!==null?small:historyRecords.length;
+        document.getElementById('missOdd').innerText = odd!==null?odd:historyRecords.length;
+        document.getElementById('missEven').innerText = even!==null?even:historyRecords.length;
+    }
+
+    function saveToLocal() { localStorage.setItem('pc28_final_v1', JSON.stringify(historyRecords.slice(0,500))); renderHistoryTable(); updateMissStats(); }
+    function loadLocalHistory() {
+        const stored = localStorage.getItem('pc28_final_v1');
+        if(stored) try{ historyRecords=JSON.parse(stored); }catch(e){ historyRecords=[]; }
+        renderHistoryTable(); updateMissStats();
+        if(historyRecords.length>0){ const last=historyRecords[0]; updateDisplayAll(last.issue,last.numbers,last.sum,last.type); currentIssue=last.issue; }
+    }
+    function updateDisplayAll(issue, numbers, sum, type) {
+        // 更新两个面板的开奖信息
+        document.getElementById('currentIssue').innerText = issue;
+        document.getElementById('ball1').innerText = numbers[0];
+        document.getElementById('ball2').innerText = numbers[1];
+        document.getElementById('ball3').innerText = numbers[2];
+        document.getElementById('sumBall').innerText = sum;
+        const typeEl = document.getElementById('resultType');
+        typeEl.innerText = type;
+        typeEl.className = `type-badge ${getTypeClass(type)}`;
+        // 两组预测面板同步
+        document.getElementById('currentIssue2').innerText = issue;
+        document.getElementById('ball1_2').innerText = numbers[0];
+        document.getElementById('ball2_2').innerText = numbers[1];
+        document.getElementById('ball3_2').innerText = numbers[2];
+        document.getElementById('sumBall2').innerText = sum;
+        const typeEl2 = document.getElementById('resultType2');
+        typeEl2.innerText = type;
+        typeEl2.className = `type-badge ${getTypeClass(type)}`;
+    }
+
+    async function refreshAll() {
+        const statusSpan = document.getElementById('apiStatus');
+        const spinner = document.getElementById('loadingSpinner');
+        if(!isRefreshing){ isRefreshing=true; spinner.style.display='inline-flex'; }
+        statusSpan.innerText = '同步中...';
+        try{
+            const draw = await fetchLatestDraw();
+            if(!draw) throw new Error();
+            const { issue, numbers, sum, type, countdown } = draw;
+            if(countdown) document.getElementById('countdownText').innerText = countdown;
+            if(issue && issue !== currentIssue){
+                currentIssue = issue;
+                await addHistoryRecord(issue, numbers, sum, type);
+                updateDisplayAll(issue, numbers, sum, type);
+                statusSpan.innerText = `✅ 期号 ${issue}`;
+            } else { statusSpan.innerText = `✅ 最新 ${issue||'--'}`; if(issue) updateDisplayAll(issue, numbers, sum, type); }
+            updateAllPredictUI();
+            renderHistoryTable();
+            updateMissStats();
+        } catch(e){ statusSpan.innerText = '⚠️ 重试'; } finally { setTimeout(()=>{ spinner.style.display='none'; isRefreshing=false; },500); }
+    }
+    async function updateCountdownOnly() {
+        try{ const res = await fetch(`${API_BASE}/api/keno.json?nbr=1`,{cache:"no-store"}); if(res.ok){ const data=await res.json(); if(data.countdown) document.getElementById('countdownText').innerText=data.countdown; if(data.countdown==='00:00:00') refreshAll(); } } catch(e){}
+    }
+
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        const panels = {
+            predict3: document.getElementById('predict3Panel'),
+            predict2: document.getElementById('predict2Panel'),
+            history: document.getElementById('historyPanel')
+        };
+        tabs.forEach(tab => { tab.addEventListener('click',()=>{ const target=tab.dataset.panel; tabs.forEach(t=>t.classList.remove('active')); tab.classList.add('active'); Object.values(panels).forEach(p=>p.classList.remove('active')); panels[target].classList.add('active'); }); });
+    }
+    function initAlgoSwitch() {
+        const btns = document.querySelectorAll('.algo-btn');
+        btns.forEach(btn => { btn.addEventListener('click',()=>{ btns.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentAlgo = btn.dataset.algo; updateAllPredictUI(); }); });
+    }
+
+    function startApp() {
+        loadLocalHistory();
+        refreshAll();
+        if(pollTimer) clearInterval(pollTimer); pollTimer = setInterval(refreshAll, 18000);
+        if(cdTimer) clearInterval(cdTimer); cdTimer = setInterval(updateCountdownOnly, 1000);
+        initTabs(); initAlgoSwitch();
+        document.getElementById('syncBtn').onclick = () => refreshAll();
+        document.getElementById('clearHistoryBtn').onclick = () => { if(confirm('清空所有历史记录？准确率将重置')){ historyRecords=[]; saveToLocal(); currentIssue=null; updateDisplayAll('------',['--','--','--'],'--','大双'); refreshAll(); } };
+    }
+</script>
 </body>
 </html>
