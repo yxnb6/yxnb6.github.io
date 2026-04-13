@@ -61,6 +61,29 @@
         th { background: var(--ios-bg); padding: 14px 6px; font-size: 13px; font-weight: 500; color: var(--ios-text-tertiary); text-align: center; }
         td { padding: 14px 6px; font-size: 14px; text-align: center; border-bottom: 0.5px solid var(--ios-line); }
         .ball-sm { display: inline-block; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; background: var(--ios-orange); color: #fff; font-size: 14px; margin: 0 2px; font-weight: 500; }
+
+        /* 预测记录表格 —— 禁止横向滚动，固定列宽，手机一屏显示 */
+        #record-panel .table-wrapper {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        #record-panel table {
+            table-layout: fixed;
+            min-width: 0;
+            width: 100%;
+        }
+        #record-panel th, #record-panel td {
+            word-break: break-word;
+            padding: 12px 4px;
+            font-size: 13px;
+        }
+        /* 列宽分配：算法12% 期号13% 开奖35% 组合20% 结果20% */
+        #record-panel th:nth-child(1) { width: 12%; }
+        #record-panel th:nth-child(2) { width: 13%; }
+        #record-panel th:nth-child(3) { width: 35%; }
+        #record-panel th:nth-child(4) { width: 20%; }
+        #record-panel th:nth-child(5) { width: 20%; }
+
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
         .algorithm-panel { display: none; }
@@ -120,7 +143,6 @@
 
         <!-- AI预测 (5大算法) -->
         <div class="tab-panel" id="predict-panel">
-            <!-- 和值数字预测 -->
             <div class="card sum-predict-item"><div class="card-header"><div class="card-title">🎲 热门和值预测</div></div><div class="card-content"><div id="sumPredict"></div></div></div>
             <div class="card"><div class="card-content">
                 <div class="segmented-control algorithm-switch" id="algorithmControl">
@@ -130,15 +152,10 @@
                     <span data-algo="bayesian">贝叶斯</span>
                     <span data-algo="ensemble">集成学习</span>
                 </div>
-                <!-- 权威加权（冷热遗漏） -->
                 <div class="algorithm-panel active" id="weighted-panel"><div class="predict-item"><div class="predict-title">🔥 冷热遗漏加权 (热度60% + 遗漏40%)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="weighted-double"></div></div><div><div>⭐ 单门</div><div id="weighted-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="weighted-bar" style="width:0%"></div></div></div></div>
-                <!-- 马尔可夫 -->
                 <div class="algorithm-panel" id="markov-panel"><div class="predict-item"><div class="predict-title">🔮 马尔可夫链</div><div class="double-single-row"><div><div>🎯 双门</div><div id="markov-double"></div></div><div><div>⭐ 单门</div><div id="markov-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="markov-bar" style="width:0%"></div></div></div></div>
-                <!-- 蒙特卡洛 -->
                 <div class="algorithm-panel" id="montecarlo-panel"><div class="predict-item"><div class="predict-title">🎲 蒙特卡洛</div><div class="double-single-row"><div><div>🎯 双门</div><div id="montecarlo-double"></div></div><div><div>⭐ 单门</div><div id="montecarlo-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="montecarlo-bar" style="width:0%"></div></div></div></div>
-                <!-- 贝叶斯 -->
                 <div class="algorithm-panel" id="bayesian-panel"><div class="predict-item"><div class="predict-title">📐 贝叶斯推断</div><div class="double-single-row"><div><div>🎯 双门</div><div id="bayesian-double"></div></div><div><div>⭐ 单门</div><div id="bayesian-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="bayesian-bar" style="width:0%"></div></div></div></div>
-                <!-- 集成学习 -->
                 <div class="algorithm-panel" id="ensemble-panel"><div class="predict-item"><div class="predict-title">🤖 集成学习</div><div class="double-single-row"><div><div>🎯 双门</div><div id="ensemble-double"></div></div><div><div>⭐ 单门</div><div id="ensemble-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="ensemble-bar" style="width:0%"></div></div></div></div>
             </div></div>
             <div class="card"><div class="card-header"><div class="card-title">📊 模型胜率对比 (排序)</div></div><div class="card-content"><div id="modelWinrate"></div></div></div>
@@ -147,10 +164,12 @@
         <!-- 遗漏统计 -->
         <div class="tab-panel" id="miss-panel"><div class="card"><div class="card-header"><div class="card-title">组合遗漏</div></div><div class="card-content"><div id="comboMiss"></div></div></div></div>
 
-        <!-- 预测记录 -->
+        <!-- 预测记录 (已优化：不横滑、精简列) -->
         <div class="tab-panel" id="record-panel">
             <div class="btn-group"><button class="btn success" onclick="loadPredictHistory()">🔄 刷新</button><button class="btn danger" onclick="clearPredictHistory()">🗑️ 清空</button><button class="btn primary" onclick="exportRecords()">📤 导出TXT</button></div>
-            <div class="card"><div class="card-header"><div class="card-title">📋 预测历史</div><div class="card-subtitle" id="recordCount"></div></div><div class="card-content"><div class="record-algo-tabs" id="recordAlgoTabs"></div><div class="table-wrapper"><table><thead><tr><th>算法</th><th>期号</th><th>号码</th><th>组合</th><th>结果</th><th>时间</th></tr></thead><tbody id="recordTable"></tbody></table></div><div id="algoWinrateDetail" style="margin-top:16px;"></div></div></div>
+            <div class="card"><div class="card-header"><div class="card-title">📋 预测历史</div><div class="card-subtitle" id="recordCount"></div></div><div class="card-content"><div class="record-algo-tabs" id="recordAlgoTabs"></div>
+            <div class="table-wrapper"><table><thead><tr><th>算法</th><th>期号</th><th>开奖(号码/和值)</th><th>组合</th><th>结果</th></tr></thead><tbody id="recordTable"></tbody></table></div>
+            <div id="algoWinrateDetail" style="margin-top:16px;"></div></div></div>
         </div>
     </div>
     <div class="footer">自用版 · 禁止泄露<br>© 2026 鱼少PC28</div>
@@ -186,31 +205,48 @@
                 const sumVal = parseInt(latest.num);
                 const {dx,ds,combo} = getSumInfo(sumVal);
                 const timeStr = `${latest.date} ${latest.time}`;
-                const periodChanged = latestPeriod && latestPeriod !== curPeriod;
+                
+                // 判断期号是否变化 (不开奖不动)
+                const periodChanged = (latestPeriod && latestPeriod !== curPeriod) || !latestPeriod;
+                
                 if(periodChanged){
-                    savePredictRecord(latestPeriod, combo, [n1,n2,n3], sumVal);
-                    isOpening = false; clearInterval(openingPolling);
+                    // 期号变化 → 保存上一期预测记录，更新数字与动画
+                    if(latestPeriod) {
+                        savePredictRecord(latestPeriod, combo, [n1,n2,n3], sumVal, timeStr);
+                    }
+                    isOpening = false; 
+                    clearInterval(openingPolling);
                     $('timerLabel').innerText = '下期开奖倒计时';
                     $('resultCard').classList.remove('opening-glow');
                     $('resultBalls').classList.remove('bouncing');
+                    
+                    // 更新开奖显示 (仅当新期号)
+                    updateBallsWithAnimation(n1,n2,n3,sumVal);
+                    $('issue').innerText = curPeriod; 
+                    $('sumExpression').innerText = `${n1}+${n2}+${n3}=${sumVal}`;
+                    $('combo').innerText = combo; $('dx').innerText = dx; $('ds').innerText = ds;
+                    $('openTime').innerText = timeStr;
+                    latestPeriod = curPeriod;
+                } else {
+                    // 期号未变：只更新时间/倒计时，数字不动
+                    $('openTime').innerText = timeStr;
                 }
-                latestPeriod = curPeriod;
+
                 if(json.countdown && !isOpening){
                     const p = json.countdown.split(':');
                     countdownSeconds = p.length===2 ? parseInt(p[0])*60+parseInt(p[1]) : 210;
                     $('count').innerText = fmtTime(countdownSeconds);
                 }
-                updateBallsWithAnimation(n1,n2,n3,sumVal);
-                $('issue').innerText = curPeriod; $('sumExpression').innerText = `${n1}+${n2}+${n3}=${sumVal}`;
-                $('combo').innerText = combo; $('dx').innerText = dx; $('ds').innerText = ds;
-                $('openTime').innerText = timeStr;
                 $('apiTip').innerHTML = '✅ 已同步';
+                
+                // 更新历史数据 (无论期号是否变化都需要最新列表用于预测)
                 historyData = json.data.map(item => {
                     const [a,b,c] = item.number.split('+').map(Number);
                     const s = parseInt(item.num);
                     const info = getSumInfo(s);
                     return { period: item.nbr, numbers:[a,b,c], sum:s, combo:info.combo, time:`${item.date} ${item.time}` };
                 }).sort((a,b)=> parseInt(b.period)-parseInt(a.period));
+                
                 renderHistoryTable(); calcStatistics(); runAllPredictions(); renderMiss(); updateModelWinrate(); loadPredictHistory();
                 drawComboChart();
                 if(manual) { $('apiTip').innerHTML='✅ 刷新成功'; setTimeout(()=>$('apiTip').innerHTML='✅ 已同步',2000); }
@@ -229,30 +265,29 @@
     function runAllPredictions(){
         if(historyData.length<10) return;
         const comboSeq = historyData.map(d=>d.combo);
-        // 1. 权威加权 (冷热遗漏)
         const freq = {大单:0,大双:0,小单:0,小双:0}; historyData.slice(0,50).forEach(d=>freq[d.combo]++);
         const miss = {大单:0,大双:0,小单:0,小双:0};
         for(let d of historyData){ for(let c in miss) if(d.combo!==c) miss[c]++; else break; }
         let scores = {}; combos.forEach(c=> scores[c] = freq[c]*0.6 + miss[c]*0.4);
         setPrediction('weighted', scores);
-        // 2. 马尔可夫
+        
         const trans = {}; for(let i=1;i<comboSeq.length;i++){ const p=comboSeq[i-1],c=comboSeq[i]; if(!trans[p]) trans[p]={}; trans[p][c]=(trans[p][c]||0)+1; }
         let last = comboSeq[0]; let probs = {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         if(trans[last]){ let sum=0; for(let c in trans[last]) sum+=trans[last][c]; for(let c in trans[last]) probs[c]=trans[last][c]/sum; }
         setPrediction('markov', probs);
-        // 3. 蒙特卡洛
+        
         const sim = {大单:0,大双:0,小单:0,小双:0}; for(let i=0;i<10000;i++){ const r=Math.random(); let cum=0; for(let c of combos){ cum+=freq[c]/historyData.length; if(r<cum){ sim[c]++; break; } } }
         for(let c in sim) sim[c]/=10000; setPrediction('montecarlo', sim);
-        // 4. 贝叶斯
+        
         const like = {大单:0,大双:0,小单:0,小双:0}; historyData.slice(0,20).forEach(d=>like[d.combo]++);
         let post = {}; combos.forEach(c=> post[c] = (like[c]/20)*0.25); setPrediction('bayesian', post);
-        // 5. 集成投票
+        
         let vote = {大单:0,大双:0,小单:0,小双:0};
         ['weighted','markov','montecarlo','bayesian'].forEach(k=>{ const p=predictions[k]; vote[p.single] += p.conf; });
         const sortedVote = Object.entries(vote).sort((a,b)=>b[1]-a[1]);
         predictions.ensemble.double = sortedVote.slice(0,2).map(c=>c[0]); predictions.ensemble.single = sortedVote[0][0];
         predictions.ensemble.conf = Math.min(0.95, sortedVote[0][1]/2.5); updateUI('ensemble');
-        // 和值预测
+        
         const sumFreq = {}; historyData.slice(0,30).forEach(d=>sumFreq[d.sum]=(sumFreq[d.sum]||0)+1);
         const hotSums = Object.entries(sumFreq).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
         $('sumPredict').innerHTML = hotSums.map(s=>`<span class="tag orange">${s}</span>`).join(' ');
@@ -270,8 +305,7 @@
         $(`${key}-bar`).style.width = (predictions[key].conf*100)+'%';
     }
 
-    function savePredictRecord(period, actualCombo, numbers, sum){
-        const timeStr = historyData[0]?.time || new Date().toLocaleString();
+    function savePredictRecord(period, actualCombo, numbers, sum, timeStr){
         ['weighted','markov','montecarlo','bayesian','ensemble'].forEach(algo => {
             const pred = predictions[algo]; if(!pred) return;
             const hit = pred.double.includes(actualCombo) || pred.single === actualCombo;
@@ -313,30 +347,36 @@
         Object.values(cnt).forEach((v,i)=>{ const angle=(v/total)*2*Math.PI; ctx.fillStyle=colors[i]; ctx.beginPath(); ctx.arc(w/2,h/2,70,start,start+angle); ctx.lineTo(w/2,h/2); ctx.fill(); start+=angle; });
     }
 
-    // 记录管理
+    // 记录管理 (精简列：算法、期号、开奖、组合、结果)
     let currentRecordAlgo = 'all';
     function loadPredictHistory(){
         const tbody = $('recordTable'); let records = []; try { records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e){ records = []; }
         $('recordCount').innerText = `共${records.length}条`;
-        const algoSet = new Set(records.map(r=>r.algorithm)); const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
+        const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
+        const algoSet = new Set(records.map(r=>r.algorithm));
         const tabsHtml = `<span class="algo-tab ${currentRecordAlgo==='all'?'active':''}" data-algo="all">全部</span>` + Array.from(algoSet).map(a=>`<span class="algo-tab ${currentRecordAlgo===a?'active':''}" data-algo="${a}">${algoMap[a]||a}</span>`).join('');
         $('recordAlgoTabs').innerHTML = tabsHtml;
         document.querySelectorAll('.algo-tab').forEach(t=>t.addEventListener('click', function(){ currentRecordAlgo = this.dataset.algo; loadPredictHistory(); }));
         let filtered = currentRecordAlgo==='all' ? records : records.filter(r=>r.algorithm===currentRecordAlgo);
-        let html = ''; filtered.slice(0,50).forEach(r=>{ const hitEmoji = r.hit ? '🀄️' : '🍉'; html += `<tr><td>${algoMap[r.algorithm]||r.algorithm}</td><td>${r.period}</td><td>${r.numbers} (${r.sum})</td><td>${r.combo}</td><td class="hit-emoji">${hitEmoji}</td><td>${r.time}</td></tr>`; });
-        tbody.innerHTML = html || '<tr><td colspan="6">暂无记录</td></tr>';
+        let html = ''; 
+        filtered.slice(0,50).forEach(r=>{ 
+            const hitEmoji = r.hit ? '🀄️' : '🍉'; 
+            html += `<tr><td>${algoMap[r.algorithm]||r.algorithm}</td><td>${r.period}</td><td>${r.numbers} (${r.sum})</td><td>${r.combo}</td><td class="hit-emoji">${hitEmoji}</td></tr>`; 
+        });
+        tbody.innerHTML = html || '<tr><td colspan="5">暂无记录</td></tr>';
+        
         const algoStats = {}; records.forEach(r=>{ if(!algoStats[r.algorithm]) algoStats[r.algorithm]={total:0,hit:0}; algoStats[r.algorithm].total++; if(r.hit) algoStats[r.algorithm].hit++; });
         let statsHtml = ''; for(let a in algoStats){ const rate = (algoStats[a].hit/algoStats[a].total*100).toFixed(1); statsHtml += `<span class="tag">${algoMap[a]||a} ${rate}%</span> `; }
         $('algoWinrateDetail').innerHTML = statsHtml || '暂无数据';
         updateModelWinrate();
     }
-    function clearPredictHistory(){ if(confirm('清空？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); } }
-    function exportRecords(){
+    window.clearPredictHistory = function(){ if(confirm('清空？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); } };
+    window.exportRecords = function(){
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
         let txt = '鱼少PC28 预测记录 (自用版)\n算法\t期号\t号码\t和值\t组合\t命中\t时间\n';
         records.forEach(r=>{ txt += `${algoMap[r.algorithm]||r.algorithm}\t${r.period}\t${r.numbers}\t${r.sum}\t${r.combo}\t${r.hit?'中':'不中'}\t${r.time}\n`; });
         const blob = new Blob([txt], {type:'text/plain;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pc28_记录.txt`; a.click();
-    }
+    };
 
     function updateModelWinrate(){
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
@@ -350,7 +390,6 @@
         $('modelWinrate').innerHTML = html;
     }
 
-    // 倒计时动画
     function startCountdown(){ if(timer)clearInterval(timer); timer=setInterval(()=>{ if(isOpening)return; if(countdownSeconds<=0){ isOpening=true; $('timerLabel').innerText='开奖中🔔'; $('count').innerText='开奖中'; $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); $('resultBalls').classList.add('bouncing'); startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); if(countdownSeconds<=30&&!autoRefresh) startAutoRefresh(5000); } },1000); }
     function startOpeningPolling(){ if(openingPolling)clearInterval(openingPolling); openingPolling=setInterval(()=>loadData(),1500); }
     function startAutoRefresh(interval=15000){ if(autoRefresh)clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(); },interval); }
@@ -370,8 +409,7 @@
             currentAlgo = this.dataset.algo;
         }));
     };
-    window.loadData = loadData; window.loadPredictHistory = loadPredictHistory; window.clearPredictHistory = clearPredictHistory;
-    window.exportRecords = exportRecords;
+    window.loadData = loadData; window.loadPredictHistory = loadPredictHistory;
 })();
 </script>
 </body>
