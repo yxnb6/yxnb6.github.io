@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
-    <title>鱼少PC28 ·端对端私密服务 | YC国际独家支持</title>
+    <title>鱼少PC28 · 端对端平台安全保护中 | YC国际独家支持</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
@@ -15,7 +15,7 @@
         .wrap { max-width: 750px; margin: 0 auto; min-height: 100vh; }
         .nav-bar { position: sticky; top: 0; z-index: 999; background: var(--ios-card); padding-top: env(safe-area-inset-top); border-bottom: 0.5px solid var(--ios-line); }
         .nav-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; height: 48px; }
-        .logo { font-size: 18px; font-weight: 700; color: var(--ios-blue); }
+        .logo { font-size: 16px; font-weight: 700; color: var(--ios-blue); display: flex; align-items: center; gap: 6px; }
         .api-status { font-size: 13px; color: var(--ios-text-tertiary); }
         .segmented-control { display: flex; padding: 0 16px 14px; gap: 2px; overflow-x: auto; }
         .segmented-control span {
@@ -59,89 +59,19 @@
         td { padding: 14px 6px; font-size: 14px; text-align: center; border-bottom: 0.5px solid var(--ios-line); }
         .ball-sm { display: inline-block; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; background: var(--ios-orange); color: #fff; font-size: 14px; margin: 0 2px; font-weight: 500; }
         
-        /* 预测记录卡片布局 */
-        .record-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding: 4px;
-        }
-        .record-card {
-            background: var(--ios-bg);
-            border-radius: var(--ios-radius-sm);
-            padding: 12px 16px;
-            border: 0.5px solid var(--ios-line);
-        }
-        .record-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        .record-card-algo {
-            background: var(--ios-blue);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        .record-card-period {
-            font-size: 14px;
-            color: var(--ios-text-secondary);
-        }
-        .record-card-detail {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .record-card-double {
-            background: var(--ios-card);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--ios-green);
-        }
-        .record-card-single {
-            background: var(--ios-card);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--ios-purple);
-        }
-        .record-card-result {
-            font-size: 20px;
-        }
-        .record-card-combo {
-            font-size: 13px;
-            color: var(--ios-text-tertiary);
-        }
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .filter-chip {
-            padding: 6px 14px;
-            border-radius: 30px;
-            background: var(--ios-bg);
-            border: 0.5px solid var(--ios-line);
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .filter-chip.active {
-            background: var(--ios-blue);
-            color: #fff;
-            border-color: var(--ios-blue);
-        }
+        .record-cards { display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px; }
+        .record-card { background: var(--ios-bg); border-radius: var(--ios-radius-sm); padding: 12px 16px; border: 0.5px solid var(--ios-line); }
+        .record-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 600; }
+        .record-card-algo { background: var(--ios-blue); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+        .record-card-period { font-size: 14px; color: var(--ios-text-secondary); }
+        .record-card-detail { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+        .record-card-double { background: var(--ios-card); padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--ios-green); }
+        .record-card-single { background: var(--ios-card); padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--ios-purple); }
+        .record-card-result { font-size: 20px; }
+        .record-card-combo { font-size: 13px; color: var(--ios-text-tertiary); }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-chip { padding: 6px 14px; border-radius: 30px; background: var(--ios-bg); border: 0.5px solid var(--ios-line); font-size: 13px; cursor: pointer; }
+        .filter-chip.active { background: var(--ios-blue); color: #fff; border-color: var(--ios-blue); }
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
@@ -157,9 +87,8 @@
         .double-single-row { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
         .winrate-text { font-size: 16px; font-weight: 600; }
         .trend-card { background: linear-gradient(135deg, #f0f4ff, #fff); border-left: 4px solid var(--ios-blue); }
-        .stat-badge { background: #e9ecf3; border-radius: 20px; padding: 4px 12px; font-size: 14px; }
         .ad-banners { display: flex; gap: 16px; margin: 8px 16px 16px; }
-        .ad-card { flex: 1; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: var(--ios-radius); padding: 14px 12px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #fff; }
+        .ad-card { flex: 1; border-radius: var(--ios-radius); padding: 14px 12px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #fff; }
         .ad-card:active { transform: scale(0.97); }
         .ad-card.yc { background: linear-gradient(135deg, #1e3c72, #2a5298); }
         .ad-card.exclusive { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
@@ -172,15 +101,60 @@
         .modal-footer { padding: 12px 20px 20px; }
         .modal-footer .btn { background: var(--ios-blue); color: #fff; border: none; width: 100%; }
         .export-textarea { width: 100%; height: 250px; border-radius: 12px; border: 0.5px solid var(--ios-line); padding: 10px; font-family: monospace; font-size: 12px; }
-        .hit-emoji { font-size: 20px; }
         .trend-status { background: var(--ios-card); border-radius: 14px; padding: 12px; margin-bottom: 12px; }
-        .dragon-tag { display: inline-block; background: var(--ios-red); color: white; border-radius: 20px; padding: 4px 12px; font-size: 13px; margin: 4px; }
+        .trend-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+        .trend-badge.优 { background: #34C759; color: white; }
+        .trend-badge.良 { background: #FF9500; color: white; }
+        .trend-badge.差 { background: #FF3B30; color: white; }
+        .customer-card {
+            background: linear-gradient(135deg, #f5f7fa, #e9ecef);
+            border-radius: var(--ios-radius);
+            margin: 8px 16px 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 0.5px solid var(--ios-line);
+        }
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--ios-text-primary);
+        }
+        .customer-id {
+            background: var(--ios-blue);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .copy-btn {
+            background: var(--ios-green);
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
 <div class="wrap">
     <div class="nav-bar">
-        <div class="nav-header"><div class="logo">🐟 鱼少PC28 · 专业增强版</div><div class="api-status" id="apiTip">⌛ 加载中</div></div>
+        <div class="nav-header">
+            <div class="logo">🐟 鱼少PC28 · 端对端平台安全保护中</div>
+            <div class="api-status" id="apiTip">⌛ 加载中</div>
+        </div>
         <div class="segmented-control" id="tabControl">
             <span class="active" data-panel="history">开奖现场</span>
             <span data-panel="trend">走势分析</span>
@@ -189,7 +163,7 @@
             <span data-panel="record">预测记录</span>
         </div>
     </div>
-    <div class="status-bar"><span>🎯 YC国际 · 独家支持</span><span id="openTime">--</span></div>
+    <div class="status-bar"><span>端对端加密 · 隐私保护</span><span id="openTime">--</span></div>
 
     <div class="card"><div class="card-content"><div class="issue-info"><div><div class="card-subtitle">当前期号</div><div class="issue-no" id="issue">--</div></div><div><div class="card-subtitle" id="timerLabel">下期开奖倒计时</div><div class="timer" id="count">--:--</div></div></div></div></div>
 
@@ -208,7 +182,7 @@
         </div>
 
         <div class="tab-panel" id="predict-panel">
-            <div class="card trend-card"><div class="card-header"><div class="card-title">📊 专业趋势诊断</div></div><div class="card-content" id="trendDiagnostic"></div></div>
+            <div class="card trend-card"><div class="card-header"><div class="card-title">📊 专业趋势诊断 + 市场评级</div></div><div class="card-content" id="trendDiagnostic"></div></div>
             <div class="card sum-predict-item"><div class="card-header"><div class="card-title">🎲 和值预测 (多模型集成)</div></div><div class="card-content"><div id="sumPredict"></div></div></div>
             <div class="card"><div class="card-content">
                 <div class="segmented-control algorithm-switch" id="algorithmControl">
@@ -219,7 +193,7 @@
                     <span data-algo="bayesian">贝叶斯</span>
                     <span data-algo="lstm">LSTM启发</span>
                 </div>
-                <div class="algorithm-panel active" id="ensemble-panel"><div class="predict-item"><div class="predict-title">🤖 动态集成 (9种模型加权)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="ensemble-double"></div></div><div><div>⭐ 单门</div><div id="ensemble-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="ensemble-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel active" id="ensemble-panel"><div class="predict-item"><div class="predict-title">🤖 动态集成 (9种模型加权+趋势感知)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="ensemble-double"></div></div><div><div>⭐ 单门</div><div id="ensemble-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="ensemble-bar" style="width:0%"></div></div></div></div>
                 <div class="algorithm-panel" id="weighted-panel"><div class="predict-item"><div class="predict-title">🔥 权威加权 (EWMA+遗漏)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="weighted-double"></div></div><div><div>⭐ 单门</div><div id="weighted-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="weighted-bar" style="width:0%"></div></div></div></div>
                 <div class="algorithm-panel" id="markov-panel"><div class="predict-item"><div class="predict-title">🔮 高阶马尔可夫</div><div class="double-single-row"><div><div>🎯 双门</div><div id="markov-double"></div></div><div><div>⭐ 单门</div><div id="markov-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="markov-bar" style="width:0%"></div></div></div></div>
                 <div class="algorithm-panel" id="montecarlo-panel"><div class="predict-item"><div class="predict-title">🎲 蒙特卡洛Bootstrap</div><div class="double-single-row"><div><div>🎯 双门</div><div id="montecarlo-double"></div></div><div><div>⭐ 单门</div><div id="montecarlo-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="montecarlo-bar" style="width:0%"></div></div></div></div>
@@ -241,20 +215,31 @@
         </div>
     </div>
 
+    <!-- 广告牌 -->
     <div class="ad-banners">
-        <div class="ad-card yc" onclick="showAdModal('YC国际')"><div class="ad-title">🏆 YC国际</div><div class="ad-sub">独家数据支持 ·</div></div>
+        <div class="ad-card yc" onclick="showAdModal('YC国际')"><div class="ad-title">🏆 YC国际</div><div class="ad-sub">独家数据支持 · 稳</div></div>
         <div class="ad-card exclusive" onclick="showAdModal('独家支持')"><div class="ad-title">🎁 独家支持</div><div class="ad-sub">尊享会员通道</div></div>
     </div>
-    <div class="footer">专业版 · 9模型集成 | YC国际独家技术支持<br>© 2026 鱼少PC28</div>
+
+    <!-- 客服卡片 -->
+    <div class="customer-card">
+        <div class="customer-info">
+            <span>📞 旺旺客服：</span>
+            <span class="customer-id" id="customerId">569348757</span>
+        </div>
+        <button class="copy-btn" onclick="copyCustomerId()">复制ID</button>
+    </div>
+
+    <div class="footer">专业版 · 9模型动态集成 | YC国际独家技术支持<br>端对端平台安全保护中</div>
 </div>
 
 <div id="exportModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header">📄 预测记录导出</div><div class="modal-body"><textarea id="exportTextArea" class="export-textarea" readonly></textarea></div><div class="modal-footer" style="display:flex; gap:10px;"><button class="btn" onclick="copyExportText()" style="flex:1;">📋 复制</button><button class="btn primary" onclick="downloadExportFile()" style="flex:1;">⬇️ 下载</button><button class="btn" onclick="closeExportModal()" style="flex:1;">关闭</button></div></div></div>
-<div id="adModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header" id="adModalTitle">🎉 广告</div><div class="modal-body" id="569348757">欢迎咨询客服领取福利</div><div class="modal-footer"><button class="btn" onclick="closeAdModal()">关闭</button></div></div></div>
+<div id="adModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header" id="adModalTitle">🎉 广告</div><div class="modal-body" id="adModalBody">欢迎咨询客服领取福利 如没有加客服可会导致冻结端口！请加客服660844334（12点统一处理）</div><div class="modal-footer"><button class="btn" onclick="closeAdModal()">关闭</button></div></div></div>
 
 <script>
 (function(){
     const API_URL = 'https://pc28.ai/api/kj.json?nbr=50';
-    const STORAGE_KEY = 'ys_pc28_pro_v4';
+    const STORAGE_KEY = 'ys_pc28_pro_v6';
     let historyData = [], latestPeriod = '';
     let countdownSeconds = 210, isOpening = false, timer = null, autoRefresh = null, openingPolling = null;
     const $ = id => document.getElementById(id);
@@ -283,8 +268,8 @@
         ensemble: {double:[], single:'', conf:0, prob:0}
     };
 
-    // ========== 高级预测算法 (保持高性能) ==========
-    function ewma(seq, lambda=0.65) {
+    // 基础模型算法（ewma, markovAdaptive, bootstrapMC, bayesianShrink, lstmHeuristic, patternVote）与之前相同
+    function ewma(seq, lambda=0.7) {
         const weights = seq.map((_, i) => Math.pow(lambda, i));
         const sumW = weights.reduce((a,b)=>a+b,0);
         const cnt = {大单:0,大双:0,小单:0,小双:0};
@@ -331,14 +316,14 @@
         const p={}; combos.forEach(c=> p[c]=(bootCnt[c]+1)/(B+4));
         return p;
     }
-    function bayesianShrink(seq, strength=12) {
+    function bayesianShrink(seq, strength=15) {
         const n = seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const freq = {大单:0,大双:0,小单:0,小双:0};
         seq.forEach(c=>freq[c]++);
         const post={}; combos.forEach(c=> post[c]=(freq[c]+strength*0.25)/(n+strength));
         return post;
     }
-    function lstmHeuristic(seq, window=5) {
+    function lstmHeuristic(seq, window=6) {
         const n=seq.length; if(n<window+1) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const patterns={};
         for(let i=window;i<n;i++){
@@ -363,38 +348,59 @@
         const probs={}; combos.forEach(c=> probs[c]=(freq[c]+1)/total);
         return probs;
     }
-    function getRecentWinRate(algoKey, window=15) {
+
+    function getRecentWinRate(algoKey, window=20) {
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
         const algoRecords = records.filter(r=>r.algorithm===algoKey).slice(0,window);
-        if(algoRecords.length<3) return 0.5;
+        if(algoRecords.length<5) return 0.5;
         return algoRecords.filter(r=>r.hit).length / algoRecords.length;
     }
+
+    function analyzeMarketState(seq) {
+        const recent = seq.slice(0,10);
+        let changes = 0;
+        for(let i=1;i<recent.length;i++) if(recent[i] !== recent[i-1]) changes++;
+        const changeRate = changes / (recent.length-1);
+        let maxStreak = 1, cur=1;
+        for(let i=1;i<recent.length;i++) {
+            if(recent[i]===recent[i-1]) cur++; else { maxStreak=Math.max(maxStreak,cur); cur=1; }
+        }
+        maxStreak = Math.max(maxStreak,cur);
+        if(changeRate > 0.7 && maxStreak <= 2) return '差';
+        if(changeRate > 0.5) return '良';
+        return '优';
+    }
+
     function ensembleAll(seq) {
-        const w1 = ewma(seq,0.65);
+        const w1 = ewma(seq,0.7);
         const w2 = markovAdaptive(seq);
         const w3 = bootstrapMC(seq,4000);
-        const w4 = bayesianShrink(seq,14);
-        const w5 = lstmHeuristic(seq,5);
+        const w4 = bayesianShrink(seq,15);
+        const w5 = lstmHeuristic(seq,6);
         const w6 = patternVote(seq);
         const probsList = [w1,w2,w3,w4,w5,w6];
         const algos = ['weighted','markov','montecarlo','bayesian','lstm','pattern'];
-        const recRates = algos.map(a=>getRecentWinRate(a,20));
-        const weights = recRates.map(r=>Math.max(0.2, r));
+        let recRates = algos.map(a=>getRecentWinRate(a,20));
+        const state = analyzeMarketState(seq);
+        if(state === '差') recRates = recRates.map(r=>Math.max(0.3, r*0.8));
+        else if(state === '优') recRates = recRates.map(r=>Math.min(0.9, r*1.1));
+        const weights = recRates.map(r=>Math.max(0.15, r));
         const sumW = weights.reduce((a,b)=>a+b,0);
         const final={大单:0,大双:0,小单:0,小双:0};
         probsList.forEach((p,idx)=> { const w=weights[idx]/sumW; combos.forEach(c=>final[c]+=w*p[c]); });
         return final;
     }
-    
+
     function runAllPredictions(){
         if(historyData.length<8){
             for(let k in predictions) predictions[k]={double:['大单','大双'], single:'大单', conf:0.3, prob:0.3};
-            updateAllUI(); $('sumPredict').innerHTML='<span class="tag orange">14</span>'; return;
+            updateAllUI(); $('sumPredict').innerHTML='<span class="tag orange">14</span>'; 
+            updateTrendRating(); return;
         }
         const comboSeq = historyData.map(d=>d.combo).reverse();
         const sumSeq = historyData.map(d=>d.sum).reverse();
         
-        const wEwma = ewma(comboSeq,0.65);
+        const wEwma = ewma(comboSeq,0.7);
         const miss={}; combos.forEach(c=>{ let cnt=0; for(let d of comboSeq){ if(d===c) break; cnt++; } miss[c]=cnt; });
         const maxM=Math.max(...Object.values(miss),1);
         const weightedProbs={}; combos.forEach(c=> weightedProbs[c]=wEwma[c]*0.6 + (miss[c]/maxM)*0.4);
@@ -402,29 +408,31 @@
         
         const markovProbs = markovAdaptive(comboSeq); setPrediction('markov', markovProbs);
         const mcProbs = bootstrapMC(comboSeq,5000); setPrediction('montecarlo', mcProbs);
-        const bayesProbs = bayesianShrink(comboSeq,14); setPrediction('bayesian', bayesProbs);
-        const lstmProbs = lstmHeuristic(comboSeq,5); setPrediction('lstm', lstmProbs);
+        const bayesProbs = bayesianShrink(comboSeq,15); setPrediction('bayesian', bayesProbs);
+        const lstmProbs = lstmHeuristic(comboSeq,6); setPrediction('lstm', lstmProbs);
         
         const ensembleProbs = ensembleAll(comboSeq);
         const sorted = Object.entries(ensembleProbs).sort((a,b)=>b[1]-a[1]);
         predictions.ensemble.double = sorted.slice(0,2).map(c=>c[0]);
         predictions.ensemble.single = sorted[0][0];
         predictions.ensemble.prob = sorted[0][1];
-        predictions.ensemble.conf = Math.min(0.92, sorted[0][1]*1.4);
+        let confBonus = (analyzeMarketState(comboSeq)==='优'?0.05: (analyzeMarketState(comboSeq)==='差'?-0.03:0));
+        predictions.ensemble.conf = Math.min(0.92, Math.max(0.3, sorted[0][1]*1.3 + confBonus));
         updateUI('ensemble');
         
         const avg = sumSeq.slice(0,10).reduce((a,b)=>a+b,0)/10;
         const last = sumSeq[0];
         const predSum = Math.round(13.5 + (last-avg)*0.5);
         $('sumPredict').innerHTML = `<span class="tag orange">${predSum}</span> <span class="tag orange">${predSum-1}</span> <span class="tag orange">${predSum+1}</span>`;
+        updateTrendRating();
     }
-    
+
     function setPrediction(key, weights){
         const sorted = Object.entries(weights).sort((a,b)=>b[1]-a[1]);
         predictions[key].double = sorted.slice(0,2).map(c=>c[0]);
         predictions[key].single = sorted[0][0];
         predictions[key].prob = sorted[0][1];
-        predictions[key].conf = Math.min(0.9, sorted[0][1]*1.3);
+        predictions[key].conf = Math.min(0.9, Math.max(0.3, sorted[0][1]*1.3));
         updateUI(key);
     }
     function updateUI(key){
@@ -433,7 +441,26 @@
         if($(`${key}-bar`)) $(`${key}-bar`).style.width = (predictions[key].conf*100)+'%';
     }
     function updateAllUI(){ ['weighted','markov','montecarlo','bayesian','lstm','ensemble'].forEach(k=>updateUI(k)); }
-    
+
+    function updateTrendRating(){
+        if(historyData.length<10) return;
+        const comboSeq = historyData.map(d=>d.combo).reverse();
+        const state = analyzeMarketState(comboSeq);
+        let ratingHtml = '';
+        if(state === '优') ratingHtml = '<span class="trend-badge 优">✅ 当前趋势：优 (稳定，适合跟进)</span>';
+        else if(state === '良') ratingHtml = '<span class="trend-badge 良">⚠️ 当前趋势：良 (轻微波动，谨慎)</span>';
+        else ratingHtml = '<span class="trend-badge 差">🔴 当前趋势：差 (乱跳/对峙，建议观望)</span>';
+        const container = $('trendDiagnostic');
+        if(container) {
+            let existing = container.innerHTML;
+            if(!existing.includes('当前趋势评级')) {
+                container.innerHTML = `<div style="margin-bottom:12px;">📊 当前趋势评级：${ratingHtml}</div>` + existing;
+            } else {
+                container.innerHTML = container.innerHTML.replace(/<div style="margin-bottom:12px;">📊 当前趋势评级：.*?<\/div>/, `<div style="margin-bottom:12px;">📊 当前趋势评级：${ratingHtml}</div>`);
+            }
+        }
+    }
+
     function savePredictRecord(period, actualPattern, numbers, sum, timeStr){
         const actualCombo = getSumInfo(sum, numbers).combo;
         const algos = ['weighted','markov','montecarlo','bayesian','lstm','ensemble'];
@@ -450,8 +477,7 @@
             }catch(e){}
         });
     }
-    
-    // 核心数据加载函数 - 修复开奖中自动更新问题
+
     async function loadData(manual=false, isPolling=false){
         if(!isPolling) $('apiTip').innerHTML = manual?'🔄 强制刷新...':'🔄 同步中...';
         try{
@@ -464,29 +490,17 @@
                 const sumVal = parseInt(latest.num);
                 const info = getSumInfo(sumVal, [n1,n2,n3]);
                 const timeStr = `${latest.date} ${latest.time}`;
-                
-                // 检测期号变化，保存上一期记录
                 const periodChanged = (latestPeriod && latestPeriod !== curPeriod);
                 if(periodChanged){
                     if(latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1,n2,n3], sumVal, timeStr);
-                    // 新期号出现，退出开奖状态
                     if(isOpening){
                         isOpening = false;
                         if(openingPolling){ clearInterval(openingPolling); openingPolling = null; }
                         $('timerLabel').innerText = '下期开奖倒计时';
                         $('resultCard').classList.remove('opening-glow');
                         $('count').classList.remove('opening');
-                        // 重新获取倒计时
-                        if(json.countdown && json.countdown !== '00:00'){
-                            const parts = json.countdown.split(':');
-                            if(parts.length===2){
-                                countdownSeconds = parseInt(parts[0])*60 + parseInt(parts[1]);
-                                $('count').innerText = fmtTime(countdownSeconds);
-                            }
-                        }
                     }
                 }
-                
                 latestPeriod = curPeriod;
                 updateBallsWithAnimation(n1,n2,n3,sumVal);
                 $('issue').innerText = curPeriod;
@@ -495,7 +509,6 @@
                 $('dx').innerText = info.dx; $('ds').innerText = info.ds;
                 $('openTime').innerText = timeStr;
                 
-                // 倒计时逻辑（仅当未开奖时）
                 if(!isOpening && json.countdown){
                     const cd = json.countdown;
                     if(cd === '00:00' || cd === '0:00'){
@@ -512,9 +525,7 @@
                         }
                     }
                 }
-                
                 $('apiTip').innerHTML = '✅ 已同步';
-                // 更新历史数据
                 historyData = json.data.map(item=>{
                     const [a,b,c] = item.number.split('+').map(Number);
                     const s = parseInt(item.num);
@@ -522,85 +533,46 @@
                     return { period: item.nbr, numbers:[a,b,c], sum:s, combo:inf.combo, pattern:inf.pattern, time:`${item.date} ${item.time}` };
                 }).sort((a,b)=> parseInt(b.period)-parseInt(a.period));
                 renderHistoryTable(); calcStatistics(); runAllPredictions(); renderMiss(); updateModelWinrate(); loadPredictHistory();
-                drawComboChart(); analyzeTrend(); updateTrendPanel(); // 更新走势分析面板
+                drawComboChart(); updateTrendPanel();
                 if(manual && !isPolling) { $('apiTip').innerHTML='✅ 刷新成功'; setTimeout(()=>$('apiTip').innerHTML='✅ 已同步',2000); }
             }
         } catch(e){ console.error(e); if(!isPolling) $('apiTip').innerHTML='❌ 失败'; }
     }
-    
-    // 新增：走势分析面板（适不适合打，最近开了几期，什么龙）
+
     function updateTrendPanel(){
         const container = $('trendAnalysis');
-        if(!container || historyData.length<5){
-            container.innerHTML = '<div>⏳ 数据加载中...</div>';
-            return;
-        }
-        const recent = historyData.slice(0,15); // 最近15期
+        if(!container || historyData.length<5){ container.innerHTML = '<div>⏳ 数据加载中...</div>'; return; }
+        const recent = historyData.slice(0,15);
         const patterns = recent.map(r=>r.pattern);
-        const combos = recent.map(r=>r.combo);
-        
-        // 计算龙（连续相同组合类型）
-        let maxPatternLen = 1, currentPatternLen = 1, currentDragonPattern = patterns[0];
-        for(let i=1;i<patterns.length;i++){
-            if(patterns[i] === patterns[i-1]){ currentPatternLen++; if(currentPatternLen>maxPatternLen){ maxPatternLen=currentPatternLen; currentDragonPattern=patterns[i]; } }
-            else currentPatternLen=1;
-        }
-        // 大小单双龙
-        let maxComboLen=1, currentComboLen=1, currentDragonCombo=combos[0];
-        for(let i=1;i<combos.length;i++){
-            if(combos[i] === combos[i-1]){ currentComboLen++; if(currentComboLen>maxComboLen){ maxComboLen=currentComboLen; currentDragonCombo=combos[i]; } }
-            else currentComboLen=1;
-        }
-        
-        // 最近5期列表
+        const combosSeq = recent.map(r=>r.combo);
+        let maxPatternLen = 1, curPat=1, dragonPat=patterns[0];
+        for(let i=1;i<patterns.length;i++){ if(patterns[i]===patterns[i-1]){ curPat++; if(curPat>maxPatternLen){ maxPatternLen=curPat; dragonPat=patterns[i]; } } else curPat=1; }
+        let maxComboLen=1, curCom=1, dragonCombo=combosSeq[0];
+        for(let i=1;i<combosSeq.length;i++){ if(combosSeq[i]===combosSeq[i-1]){ curCom++; if(curCom>maxComboLen){ maxComboLen=curCom; dragonCombo=combosSeq[i]; } } else curCom=1; }
         const last5 = patterns.slice(0,5).map(p=>`<span class="tag" style="background:#6c5ce7;">${p}</span>`).join(' ');
         const last10 = patterns.slice(0,10).map(p=>p[0]).join(' → ');
-        
         let suggestion = '';
-        let suitable = true;
-        if(maxPatternLen >= 4){
-            suggestion = `⚠️ 注意：${currentDragonPattern} 已连开${maxPatternLen}期，追龙需谨慎！`;
-            suitable = false;
-        } else if(maxComboLen >= 5){
-            suggestion = `⚠️ 注意：${currentDragonCombo} 已连开${maxComboLen}期，建议观望。`;
-            suitable = false;
-        } else {
-            suggestion = '✅ 近期走势较分散，适合根据模型预测轻仓尝试。';
-            suitable = true;
-        }
-        
-        let html = `
-            <div class="trend-status">
-                <div style="font-size:16px; font-weight:600; margin-bottom:10px;">📅 最近开奖记录（组合类型）</div>
-                <div>${last5}</div>
-                <div style="margin-top:8px; font-size:13px; color:gray;">最近10期走势：${last10}</div>
-            </div>
-            <div class="trend-status">
-                <div style="font-weight:600;">🐉 龙形态检测</div>
-                <div>组合类型龙：${maxPatternLen>=2 ? `${currentDragonPattern} ${maxPatternLen}连` : '无连开'} &nbsp;|&nbsp; 大小单双龙：${maxComboLen>=2 ? `${currentDragonCombo} ${maxComboLen}连` : '无连开'}</div>
-            </div>
-            <div class="trend-status" style="border-left:4px solid ${suitable?'var(--ios-green)':'var(--ios-red)'}">
-                <div style="font-weight:600;">🎯 投注建议</div>
-                <div>${suggestion}</div>
-                <div style="margin-top:6px; font-size:13px;">💡 集成模型今日胜率: ${(predictions.ensemble.conf*100).toFixed(1)}%</div>
-            </div>
+        if(maxPatternLen >= 4) suggestion = `⚠️ 注意：${dragonPat} 已连开${maxPatternLen}期，追龙需谨慎！`;
+        else if(maxComboLen >= 5) suggestion = `⚠️ 注意：${dragonCombo} 已连开${maxComboLen}期，建议观望。`;
+        else suggestion = '✅ 近期走势较分散，适合根据模型预测轻仓尝试。';
+        container.innerHTML = `
+            <div class="trend-status"><div style="font-weight:600;">📅 最近开奖记录</div><div>${last5}</div><div style="margin-top:8px; font-size:13px;">走势：${last10}</div></div>
+            <div class="trend-status"><div style="font-weight:600;">🐉 龙形态</div><div>组合龙：${maxPatternLen>=2?`${dragonPat} ${maxPatternLen}连`:'无'} &nbsp;|&nbsp; 大小单双龙：${maxComboLen>=2?`${dragonCombo} ${maxComboLen}连`:'无'}</div></div>
+            <div class="trend-status"><div style="font-weight:600;">🎯 投注建议</div><div>${suggestion}</div></div>
         `;
-        container.innerHTML = html;
     }
-    
+
     function updateBallsWithAnimation(n1,n2,n3,sum){
         ['n1','n2','n3','sum'].forEach(id=>$(id).classList.add('roll'));
         setTimeout(()=>['n1','n2','n3','sum'].forEach(id=>$(id).classList.remove('roll')),400);
         $('n1').innerText=n1; $('n2').innerText=n2; $('n3').innerText=n3; $('sum').innerText=sum;
     }
-    
     function renderHistoryTable(filter=null){
         const tbody = $('historyTable');
         let data = filter ? historyData.filter(d=>d.pattern===filter) : historyData;
         tbody.innerHTML = data.length ? data.slice(0,30).map(r=>`<tr><td>${r.period}</td><td>${r.numbers.map(n=>`<span class="ball-sm">${n}</span>`).join('')}</td><td><b>${r.sum}</b></td><td>${r.pattern}</td><td>${r.combo}</td><td>${r.time}</td></tr>`).join('') : '<tr><td colspan="6">暂无数据</td></tr>';
     }
     window.filterData = (t)=> renderHistoryTable(t);
-    
     function calcStatistics(){
         if(!historyData.length) return;
         const total=historyData.length, cnt={对子:0,顺子:0,杂六:0};
@@ -621,14 +593,9 @@
         const colors=['#FF9500','#007AFF','#34C759']; let start=0; const total=historyData.length||1;
         Object.values(cnt).forEach((v,i)=>{ const angle=(v/total)*2*Math.PI; ctx.fillStyle=colors[i]; ctx.beginPath(); ctx.arc(w/2,h/2,70,start,start+angle); ctx.lineTo(w/2,h/2); ctx.fill(); start+=angle; });
     }
-    function analyzeTrend(){ 
-        // 原来的趋势诊断保留用于AI预测面板
-        $('trendDiagnostic').innerHTML = `<div>✅ 基于${historyData.length}期数据，9模型集成动态预测中</div>`;
-    }
-    
     function updateModelWinrate(){
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM启发',ensemble:'集成'};
+        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM',ensemble:'集成'};
         let stats = Object.keys(map).map(a=>{
             const rs = records.filter(r=>r.algorithm===a);
             const hits = rs.filter(r=>r.hit).length;
@@ -636,11 +603,10 @@
         }).sort((a,b)=>(parseFloat(b.rate)||0)-(parseFloat(a.rate)||0));
         $('modelWinrate').innerHTML = stats.map(s=>`<div style="display:flex;justify-content:space-between;"><span>${s.name}</span><span>${s.rate}% (${s.hits}/${s.total})</span></div>`).join('');
     }
-    
     function loadPredictHistory(){
         let records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
         $('recordCount').innerText = `共${records.length}条`;
-        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM启发',ensemble:'集成'};
+        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM',ensemble:'集成'};
         const set = new Set(records.map(r=>r.algorithm));
         let cur = window._curAlgoFilter||'all';
         const tabsHtml = `<div class="filter-chip ${cur==='all'?'active':''}" data-algo="all">全部</div>` + Array.from(set).map(a=>`<div class="filter-chip ${cur===a?'active':''}" data-algo="${a}">${map[a]||a}</div>`).join('');
@@ -651,15 +617,8 @@
         if(filtered.length===0){ container.innerHTML='<div style="text-align:center; padding:20px;">暂无记录</div>'; return; }
         container.innerHTML = filtered.slice(0,100).map(r=>`
             <div class="record-card">
-                <div class="record-card-header">
-                    <span class="record-card-algo">${map[r.algorithm]||r.algorithm}</span>
-                    <span class="record-card-period">${r.period}</span>
-                </div>
-                <div class="record-card-detail">
-                    <span class="record-card-double">🎯 ${(r.doublePred||[]).join('/')}</span>
-                    <span class="record-card-single">⭐ ${r.singlePred||''}</span>
-                    <span class="record-card-result">${r.hit?'🀄️':'🍉'}</span>
-                </div>
+                <div class="record-card-header"><span class="record-card-algo">${map[r.algorithm]||r.algorithm}</span><span class="record-card-period">${r.period}</span></div>
+                <div class="record-card-detail"><span class="record-card-double">🎯 ${(r.doublePred||[]).join('/')}</span><span class="record-card-single">⭐ ${r.singlePred||''}</span><span class="record-card-result">${r.hit?'🀄️':'🍉'}</span></div>
                 <div class="record-card-combo">开奖: ${r.actualCombo||r.combo}</div>
             </div>
         `).join('');
@@ -668,11 +627,10 @@
         updateModelWinrate();
     }
     window.clearPredictHistory = ()=>{ if(confirm('清空所有预测记录？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); } };
-    
     let currentExportText = '';
     window.exportRecords = function(){
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM启发',ensemble:'集成'};
+        const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM',ensemble:'集成'};
         let txt = '算法\t期号\t双门预测\t单门预测\t开奖组合\t命中\n';
         records.forEach(r=>{ txt += `${map[r.algorithm]||r.algorithm}\t${r.period}\t${(r.doublePred||[]).join('/')}\t${r.singlePred||''}\t${r.actualCombo||r.combo}\t${r.hit?'中':'不中'}\n`; });
         currentExportText = txt;
@@ -682,50 +640,28 @@
     window.closeExportModal = ()=> $('exportModal').style.display = 'none';
     window.copyExportText = ()=>{ $('exportTextArea').select(); navigator.clipboard?.writeText($('exportTextArea').value).then(()=>alert('已复制')); };
     window.downloadExportFile = ()=>{ const blob=new Blob([currentExportText],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`pc28_${new Date().toISOString().slice(0,10)}.txt`; a.click(); };
-    
-    function startCountdown(){
-        if(timer) clearInterval(timer);
-        timer = setInterval(()=>{
-            if(isOpening) return;
-            if(countdownSeconds<=0){
-                isOpening=true;
-                $('timerLabel').innerText='开奖中🔔';
-                $('count').innerText='开奖中';
-                $('resultCard').classList.add('opening-glow');
-                startOpeningPolling();
-            } else {
-                countdownSeconds--;
-                $('count').innerText=fmtTime(countdownSeconds);
-            }
-        },1000);
-    }
-    function startOpeningPolling(){
-        if(openingPolling) clearInterval(openingPolling);
-        openingPolling = setInterval(()=>{
-            loadData(false, true);  // 轮询时传 isPolling=true 避免干扰状态提示
-        }, 1500);
-    }
-    function startAutoRefresh(interval=15000){
-        if(autoRefresh) clearInterval(autoRefresh);
-        autoRefresh = setInterval(()=>{ if(!isOpening) loadData(false, false); },interval);
-    }
-    
+    function startCountdown(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ if(isOpening) return; if(countdownSeconds<=0){ isOpening=true; $('timerLabel').innerText='开奖中🔔'; $('count').innerText='开奖中'; $('resultCard').classList.add('opening-glow'); startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); } },1000); }
+    function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling = setInterval(()=>{ loadData(false, true); }, 1500); }
+    function startAutoRefresh(interval=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh = setInterval(()=>{ if(!isOpening) loadData(false, false); },interval); }
     window.showAdModal = function(type){
         const title = type === 'YC国际' ? '🏆 YC国际' : '🎁 独家支持';
-        const body = type === 'YC国际' ? 'YC国际数据源 · 专业稳定<br>提供独家PC28算法支持' : '尊享会员专属通道<br>请联系客服领取福利旺旺客服569348757';
+        const body = type === 'YC国际' ? 'YC国际数据源 · 专业稳定<br>提供独家PC28算法支持' : '尊享会员专属通道<br>请联系客服领取福利';
         $('adModalTitle').innerText = title;
         $('adModalBody').innerHTML = body;
         $('adModal').style.display = 'flex';
     };
     window.closeAdModal = ()=> $('adModal').style.display = 'none';
-    
+    window.copyCustomerId = function(){
+        const id = document.getElementById('customerId').innerText;
+        navigator.clipboard.writeText(id).then(()=>alert('客服ID已复制：'+id)).catch(()=>alert('复制失败'));
+    };
     window.onload = ()=>{
         loadData(false, false); startCountdown(); startAutoRefresh(); loadPredictHistory();
         document.querySelectorAll('#tabControl span').forEach(t=>t.addEventListener('click', function(){
             document.querySelectorAll('#tabControl span').forEach(s=>s.classList.remove('active')); this.classList.add('active');
             document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); $(this.dataset.panel+'-panel').classList.add('active');
             if(this.dataset.panel==='trend'){ drawComboChart(); updateTrendPanel(); }
-            if(this.dataset.panel==='predict') analyzeTrend();
+            if(this.dataset.panel==='predict') updateTrendRating();
         }));
         document.querySelectorAll('#algorithmControl span').forEach(t=>t.addEventListener('click', function(){
             document.querySelectorAll('#algorithmControl span').forEach(s=>s.classList.remove('active')); this.classList.add('active');
