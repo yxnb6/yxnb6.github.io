@@ -239,7 +239,7 @@
 <script>
 (function(){
     const API_URL = 'https://pc28.ai/api/kj.json?nbr=50';
-    const STORAGE_KEY = 'ys_pc28_pro_v6';
+    const STORAGE_KEY = 'ys_pc28_pro_v7';  // 更新版本号
     let historyData = [], latestPeriod = '';
     let countdownSeconds = 210, isOpening = false, timer = null, autoRefresh = null, openingPolling = null;
     const $ = id => document.getElementById(id);
@@ -268,14 +268,15 @@
         ensemble: {double:[], single:'', conf:0, prob:0}
     };
 
-    function ewma(seq, lambda=0.7) {
+    // 基础模型算法 (与之前相同，省略具体实现以保证长度，实际功能完整)
+    function ewma(seq, lambda=0.7) { /* 完整实现 */ 
         const weights = seq.map((_, i) => Math.pow(lambda, i));
         const sumW = weights.reduce((a,b)=>a+b,0);
         const cnt = {大单:0,大双:0,小单:0,小双:0};
         seq.forEach((c, i) => cnt[c] += weights[i] / sumW);
         return cnt;
     }
-    function markovAdaptive(seq) {
+    function markovAdaptive(seq) { /* 完整实现 */ 
         const n = seq.length; if(n<5) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         let bestOrder=1, bestScore=-Infinity;
         for(let o=1; o<=Math.min(4,n-2); o++){
@@ -303,7 +304,7 @@
         }
         return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
     }
-    function bootstrapMC(seq, B=5000) {
+    function bootstrapMC(seq, B=5000) { /* 完整实现 */ 
         const n = seq.length; if(n<5) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const bootCnt = {大单:0,大双:0,小单:0,小双:0};
         for(let b=0;b<B;b++){
@@ -315,14 +316,14 @@
         const p={}; combos.forEach(c=> p[c]=(bootCnt[c]+1)/(B+4));
         return p;
     }
-    function bayesianShrink(seq, strength=15) {
+    function bayesianShrink(seq, strength=15) { /* 完整实现 */ 
         const n = seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const freq = {大单:0,大双:0,小单:0,小双:0};
         seq.forEach(c=>freq[c]++);
         const post={}; combos.forEach(c=> post[c]=(freq[c]+strength*0.25)/(n+strength));
         return post;
     }
-    function lstmHeuristic(seq, window=6) {
+    function lstmHeuristic(seq, window=6) { /* 完整实现 */ 
         const n=seq.length; if(n<window+1) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const patterns={};
         for(let i=window;i<n;i++){
@@ -338,7 +339,7 @@
         }
         return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
     }
-    function patternVote(seq) {
+    function patternVote(seq) { /* 完整实现 */ 
         const n=seq.length; if(n<10) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
         const freq={大单:0,大双:0,小单:0,小双:0};
         for(let i=0;i<n-1;i++) if(seq[i]===seq[i+1]) freq[seq[i+1]]+=2;
@@ -470,7 +471,9 @@
             try{
                 let records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
                 if(!records.some(r=>r.period===period && r.algorithm===algo)){
-                    records.unshift(record); if(records.length>300) records=records.slice(0,300);
+                    records.unshift(record);
+                    // 限制最多保存100期
+                    if(records.length > 100) records = records.slice(0,100);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 }
             }catch(e){}
@@ -492,6 +495,8 @@
                 const periodChanged = (latestPeriod && latestPeriod !== curPeriod);
                 if(periodChanged){
                     if(latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1,n2,n3], sumVal, timeStr);
+                    // 新期号出现，立即刷新预测记录面板
+                    loadPredictHistory();
                     if(isOpening){
                         isOpening = false;
                         if(openingPolling){ clearInterval(openingPolling); openingPolling = null; }
@@ -531,7 +536,9 @@
                     const inf = getSumInfo(s, [a,b,c]);
                     return { period: item.nbr, numbers:[a,b,c], sum:s, combo:inf.combo, pattern:inf.pattern, time:`${item.date} ${item.time}` };
                 }).sort((a,b)=> parseInt(b.period)-parseInt(a.period));
-                renderHistoryTable(); calcStatistics(); runAllPredictions(); renderMiss(); updateModelWinrate(); loadPredictHistory();
+                renderHistoryTable(); calcStatistics(); runAllPredictions(); renderMiss(); updateModelWinrate(); 
+                // 再次确保记录面板已更新
+                loadPredictHistory();
                 drawComboChart(); updateTrendPanel();
                 if(manual && !isPolling) { $('apiTip').innerHTML='✅ 刷新成功'; setTimeout(()=>$('apiTip').innerHTML='✅ 已同步',2000); }
             }
@@ -604,7 +611,7 @@
     }
     function loadPredictHistory(){
         let records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-        $('recordCount').innerText = `共${records.length}条`;
+        $('recordCount').innerText = `共${records.length}条 (最多100期)`;
         const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM',ensemble:'集成'};
         const set = new Set(records.map(r=>r.algorithm));
         let cur = window._curAlgoFilter||'all';
@@ -643,7 +650,6 @@
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling = setInterval(()=>{ loadData(false, true); }, 1500); }
     function startAutoRefresh(interval=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh = setInterval(()=>{ if(!isOpening) loadData(false, false); },interval); }
     
-    // 修改广告弹窗内容：独家支持增加客服提示
     window.showAdModal = function(type){
         const title = type === 'YC国际' ? '🏆 YC国际' : '🎁 独家支持';
         let body = '';
