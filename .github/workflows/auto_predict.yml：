@@ -1,0 +1,93 @@
+name: 自动预测
+
+on:
+  schedule:
+    - cron: '*/3 * * * *'  # 每3分钟
+  workflow_dispatch:
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 获取数据并预测
+        run: |
+          # 获取开奖数据
+          curl -s "https://pc28.ai/api/kj.json?nbr=50" > kj.json
+          
+          # 运行 Node.js 脚本
+          node -e "
+          const fs = require('fs');
+          const kj = JSON.parse(fs.readFileSync('kj.json'));
+          const history = kj.data.map(d => {
+              const [a,b,c] = d.number.split('+').map(Number);
+              const s = parseInt(d.num);
+              return { period: d.nbr, sum: s, combo: (s>13?'大':'小')+(s%2?'单':'双') };
+          });
+          
+          // 预测
+          const seq = history.map(d => d.combo);
+          const freq = {大单:0,大双:0,小单:0,小双:0};
+          seq.slice(0,15).forEach((c,i) => freq[c] += Math.pow(0.85,i));
+          const total = Object.values(freq).reduce((a,b)=>a+b,0);
+          const probs = {};
+          ['大单','大双','小单','小双'].forEach(c => probs[c] = freq[c]/total);
+          const sorted = Object.entries(probs).sort((a,b)=>b[1]-a[1]);
+          
+          const prediction = {
+              period: history[0].period,
+              time: new Date().toLocaleString('zh-CN'),
+              single: sorted[0][0],
+              double: [sorted[0][0], sorted[1][0]],
+              probs: probs
+          };
+          
+          // 读取现有数据
+          let oldData = { predictions: [] };
+          try {
+              const https = require('https');
+              const getGist = () => new Promise((resolve, reject) => {
+                  https.get({
+                      hostname: 'api.github.com',
+                      path: '/gists/ff10b9019cf3d0cab558ff802e320361',
+                      headers: {
+                          'Authorization': 'Bearer ' + process.env.GIST_TOKEN,
+                          'User-Agent': 'PC28'
+                      }
+                  }, res => {
+                      let data = '';
+                      res.on('data', c => data += c);
+                      res.on('end', () => resolve(JSON.parse(data)));
+                  }).on('error', reject);
+              });
+              const gist = await getGist();
+              if (gist.files['pc28_data.json']) {
+                  oldData = JSON.parse(gist.files['pc28_data.json'].content);
+              }
+          } catch(e) {}
+          
+          oldData.predictions.unshift(prediction);
+          if (oldData.predictions.length > 50) oldData.predictions = oldData.predictions.slice(0,50);
+          oldData.lastUpdate = new Date().toISOString();
+          
+          // 更新 Gist
+          const https = require('https');
+          const updateGist = () => new Promise((resolve, reject) => {
+              const req = https.request({
+                  method: 'PATCH',
+                  hostname: 'api.github.com',
+                  path: '/gists/ff10b9019cf3d0cab558ff802e320361',
+                  headers: {
+                      'Authorization': 'Bearer ' + process.env.GIST_TOKEN,
+                      'Content-Type': 'application/json',
+                      'User-Agent': 'PC28'
+                  }
+              }, res => resolve());
+              req.on('error', reject);
+              req.write(JSON.stringify({ files: { 'pc28_data.json': { content: JSON.stringify(oldData) } } }));
+              req.end();
+          });
+          await updateGist();
+          console.log('✅ 预测完成:', prediction.single);
+          "
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
