@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: 运行
+      - name: 运行预测
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: node auto_predict.js
