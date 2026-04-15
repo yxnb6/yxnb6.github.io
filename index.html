@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
-    <title>鱼少PC28 · 云端同步版 | YC国际独家支持</title>
+    <title>鱼少PC28 · 云端同步版</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
@@ -253,7 +253,6 @@
             <button class="btn success" onclick="copySelectedExport()">📋 复制</button>
             <button class="btn primary" onclick="copyAllExport()">📑 全部复制</button>
             <button class="btn primary" onclick="downloadSelectedExport()">⬇️ 下载</button>
-            <button class="btn cloud" onclick="exportBackupJSON()">💾 备份JSON</button>
         </div>
     </div>
 </div>
@@ -262,9 +261,9 @@
 <script>
 (function(){
     const API_URL = 'https://pc28.ai/api/kj.json?nbr=50';
-    const STORAGE_KEY = 'ys_pc28_cloud_v3';
+    const STORAGE_KEY = 'ys_pc28_cloud_v5';
     
-    // GitHub 云端同步配置 - 新 Token
+    // GitHub 配置 - 直接内置
     const GITHUB_CONFIG = {
         gistId: 'ff10b9019cf3d0cab558ff802e320361',
         gistFilename: 'pc28_data.json',
@@ -290,7 +289,7 @@
     let predictions = {};
     Object.keys(algoNames).forEach(k => predictions[k] = {double:[], single:'', conf:0, prob:0, secondProb:0, allProbs:{}});
 
-    // ==================== 云端同步功能 ====================
+    // 云端同步功能
     function updateSyncStatus(status, isError = false) {
         const dot = $('syncDot'), text = $('syncText');
         if (isError) { dot.className = 'dot offline'; text.textContent = '⚠️ 云端离线'; }
@@ -319,12 +318,8 @@
             if (resp.ok) {
                 lastSyncTime = new Date(); localStorage.setItem('ys_last_sync', lastSyncTime.toISOString());
                 updateSyncStatus('✅ 同步成功'); showToast('✅ 已同步到云端'); setTimeout(() => updateSyncStatus('☁️ 已连接'), 3000);
-            } else {
-                const err = await resp.text();
-                console.error('同步失败:', err);
-                throw new Error(resp.status);
-            }
-        } catch (e) { console.error(e); updateSyncStatus('❌ 同步失败', true); showToast('❌ 同步失败'); }
+            } else throw new Error(resp.status);
+        } catch (e) { updateSyncStatus('❌ 同步失败', true); showToast('❌ 同步失败'); }
         finally { syncInProgress = false; }
     }
     
@@ -344,13 +339,9 @@
                     lastSyncTime = new Date(); localStorage.setItem('ys_last_sync', lastSyncTime.toISOString());
                     updateSyncStatus('✅ 同步完成'); showToast(`✅ 同步 ${cloud.records?.length || 0} 条`); loadPredictHistory(); updateModelWinrate();
                     setTimeout(() => updateSyncStatus('☁️ 已连接'), 3000);
-                } else { updateSyncStatus('☁️ 云端无数据'); showToast('云端暂无数据，将上传'); await syncToCloud(); }
-            } else {
-                const err = await resp.text();
-                console.error('拉取失败:', err);
-                throw new Error(resp.status);
-            }
-        } catch (e) { console.error(e); updateSyncStatus('❌ 连接失败', true); showToast('❌ 无法连接云端'); }
+                } else { showToast('云端暂无数据，将上传'); await syncToCloud(); }
+            } else throw new Error(resp.status);
+        } catch (e) { updateSyncStatus('❌ 连接失败', true); showToast('❌ 无法连接云端'); }
         finally { syncInProgress = false; }
     }
     
@@ -387,13 +378,13 @@
     window.exportBackupJSON = exportBackupJSON;
     window.importDataFile = importDataFile;
 
-    // ==================== 原有功能 ====================
+    // 原有功能
     function shouldAddRomance(p, s) { return String(p).match(/13$|14$/) || s === 13 || s === 14; }
     function getPattern(n){ const [a,b,c]=n; if(a===b||b===c||a===c) return '对子'; const s=[...n].sort((x,y)=>x-y); return s[2]-s[1]===1&&s[1]-s[0]===1?'顺子':'杂六'; }
     function getSumInfo(s, n){ return { dx: s>13?'大':'小', ds: s%2===0?'双':'单', combo: (s>13?'大':'小')+(s%2===0?'双':'单'), pattern: getPattern(n) }; }
     function fmtTime(s){ const m=Math.floor(s/60), se=s%60; return `${m.toString().padStart(2,'0')}:${se.toString().padStart(2,'0')}`; }
     
-    // 算法（精简）
+    // 算法
     function ewma(seq, l=0.7){ const w=seq.map((_,i)=>Math.pow(l,i)), s=w.reduce((a,b)=>a+b,0), c={大单:0,大双:0,小单:0,小双:0}; seq.forEach((v,i)=>c[v]+=w[i]/s); return c; }
     function markovAdaptive(seq){ const n=seq.length; if(n<5) return {大单:.25,大双:.25,小单:.25,小双:.25}; let o=1,b=-1/0; for(let i=1;i<=Math.min(4,n-2);i++){ let ll=0; for(let j=i;j<n;j++){ const ctx=seq.slice(j-i,j).join('|'); let cnt=1; for(let k=0;k<i;k++) if(seq[j-k-1]===seq[j]) cnt++; ll+=Math.log((cnt+1)/(i+4)); } if(ll>b){ b=ll; o=i; } } const t={}; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'), cur=seq[i]; if(!t[ctx]) t[ctx]={大单:0,大双:0,小单:0,小双:0}; t[ctx][cur]++; } const ctx=seq.slice(n-o,n).join('|'); if(t[ctx]){ const d=t[ctx], tot=Object.values(d).reduce((a,b)=>a+b,0); return {大单:(d.大单+1)/(tot+4),大双:(d.大双+1)/(tot+4),小单:(d.小单+1)/(tot+4),小双:(d.小双+1)/(tot+4)}; } return {大单:.25,大双:.25,小单:.25,小双:.25}; }
     function bootstrapMC(seq, B=3000){ const n=seq.length; if(n<5) return {大单:.25,大双:.25,小单:.25,小双:.25}; const c={大单:0,大双:0,小单:0,小双:0}; for(let b=0;b<B;b++){ const s=Array.from({length:n},()=>seq[Math.floor(Math.random()*n)]), f={大单:0,大双:0,小单:0,小双:0}; s.forEach(v=>f[v]++); c[Object.keys(f).reduce((a,b)=>f[a]>f[b]?a:b)]++; } const p={}; combos.forEach(k=>p[k]=(c[k]+1)/(B+4)); return p; }
