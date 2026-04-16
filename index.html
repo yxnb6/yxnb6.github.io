@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
-    <title>鱼少PC28 · 完美终极版 | YC国际独家支持</title>
+    <title>鱼少PC28 · 最终完美版 | YC国际独家支持</title>
     <style>
         /* ===== 完整样式 ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
@@ -18,7 +18,21 @@
         .nav-bar { position: sticky; top: 0; z-index: 999; background: var(--ios-card); padding-top: env(safe-area-inset-top); border-bottom: 0.5px solid var(--ios-line); }
         .nav-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; height: 48px; }
         .logo { font-size: 16px; font-weight: 700; color: var(--ios-blue); display: flex; align-items: center; gap: 6px; }
-        .api-status { font-size: 13px; color: var(--ios-text-tertiary); }
+        .api-status { font-size: 13px; color: var(--ios-text-tertiary); display: flex; align-items: center; gap: 6px; }
+        /* 蓝色旋转圈圈 */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 122, 255, 0.2);
+            border-top-color: var(--ios-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .segmented-control { display: flex; padding: 0 16px 14px; gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .segmented-control span {
             flex-shrink: 0; min-width: 64px; text-align: center; padding: 8px 12px; font-size: 14px;
@@ -140,8 +154,8 @@
 <div class="wrap">
     <div class="nav-bar">
         <div class="nav-header">
-            <div class="logo">🐟 鱼少PC28 · 完美终极版</div>
-            <div class="api-status" id="apiTip">⌛ 加载中</div>
+            <div class="logo">🐟 鱼少PC28 · 最终完美版</div>
+            <div class="api-status" id="apiTip"><span class="loading-spinner"></span> 云端加载中</div>
         </div>
         <div class="segmented-control" id="tabControl">
             <span class="active" data-panel="history">开奖现场</span>
@@ -227,14 +241,14 @@
         <div class="ad-card exclusive" onclick="showAdModal('独家支持')"><div class="ad-title">🎁 独家支持</div><div class="ad-sub">尊享会员通道</div></div>
     </div>
     <div class="customer-card"><div class="customer-info"><span>📞 客服：</span><span class="customer-id" id="customerId">569348757</span></div><button class="copy-btn" onclick="copyCustomerId()">复制ID</button></div>
-    <div class="footer">完美终极版 · 极致单门优化 · 真实胜率显示<br>端对端平台安全保护中 | YC国际独家支持</div>
+    <div class="footer">最终完美版 · 极致单门优化 · 真实胜率显示<br>端对端平台安全保护中 | YC国际独家支持</div>
 </div>
 
 <!-- 免责弹窗 -->
 <div id="disclaimerModal" class="modal-overlay" style="display: flex;">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header"><span>📜 用户免责协议</span><span style="cursor:pointer; font-size:24px; opacity:0;">&times;</span></div>
-        <div class="modal-body"><div class="disclaimer-body"><p><strong>请您仔细阅读以下协议，同意后方可使用本网站。</strong></p><p>1. 本网站提供的PC28预测数据及分析结果仅供娱乐参考，不构成任何投资或投注建议。用户据此操作风险自担。</p><p>2. 彩票/游戏结果具有随机性，任何预测方法均无法保证100%准确。本网站不对用户的任何经济损失承担法律责任。</p><p>3. 用户不得利用本网站进行任何违法活动，包括但不限于赌博、欺诈、洗钱等。一经发现，永久封禁。</p><p>4. 用户不得对本网站进行反向工程、恶意攻击、数据抓取、破解或未经授权的访问。违规者将被封禁设备及IP。</p><p>5. 本网站采用端对端加密技术保护用户隐私，但用户需自行承担网络传输风险。</p><p>6. 管理员保留随时修改、暂停或终止服务的权利，且无需事先通知。</p><p>7. 点击“同意并继续”即表示您已满18周岁，并完全接受本协议所有条款。如不同意，请关闭本页面。</p><p><strong>如发现泄露、滥用或违规行为，管理员将永久封禁登录设备及IP，并保留追究法律责任的权利。</strong></p></div></div>
+        <div class="modal-body"><div class="disclaimer-body"><p><strong>请您仔细阅读以下协议，同意后方可使用本网站。</strong></p><p>1. 本网站提供的PC28预测数据及分析结果仅供娱乐参考，不构成任何投资或投注建议。用户据此操作风险自担。</p><p>2. 彩票/游戏结果具有随机性，任何预测方法均无法保证100%准确。本网站不对用户的任何经济损失承担法律责任。</p><p>3. 用户不得利用本网站进行任何违法活动，包括但不限于赌博、欺诈、洗钱等。一经发现，永久封禁。</p><p>4. 用户不得对本网站进行反向工程、恶意攻击、数据抓取、破解或未经授权的访问。违规者将被封禁设备及IP。</p><p>5. 本网站采用端对端加密技术保护用户隐私，但用户需自行承担网络传输风险。</p><p>6. 管理员保留随时修改、暂停或终止服务的权利，且无需事先通知。</p><p>7. 点击"同意并继续"即表示您已满18周岁，并完全接受本协议所有条款。如不同意，请关闭本页面。</p><p><strong>如发现泄露、滥用或违规行为，管理员将永久封禁登录设备及IP，并保留追究法律责任的权利。</strong></p></div></div>
         <div class="modal-footer"><button class="btn danger" onclick="window.location.href='about:blank'">❌ 拒绝并离开</button><button class="btn success" onclick="agreeDisclaimer()">✅ 同意并继续</button></div>
     </div>
 </div>
@@ -298,6 +312,13 @@
     let predictions = {};
     Object.keys(algoNames).forEach(k => predictions[k] = {double:[], single:'', conf:0, prob:0, secondProb:0, allProbs:{}});
 
+    // 自适应权重
+    let adaptiveWeights = {
+        pat: 0.08, trd: 0.12, rev: 0.08, mis: 0.07, cyc: 0.06,
+        mar: 0.11, bay: 0.07, lstm: 0.11, kal: 0.08, xgb: 0.08, deep: 0.14
+    };
+    let weightHistory = {};
+
     function shouldAddRomance(p, s) { return String(p).match(/13$|14$/) || s===13 || s===14; }
     function getPattern(n){ const [a,b,c]=n; if(a===b&&b===c) return '豹子'; if(a===b||b===c||a===c) return '对子'; const s=[...n].sort((x,y)=>x-y); return s[2]-s[1]===1&&s[1]-s[0]===1?'顺子':'杂六'; }
     function getSumInfo(s, n){ const dx=s>13?'大':'小', ds=s%2===0?'双':'单'; return { dx, ds, combo:dx+ds, pattern:getPattern(n), isBig:s>13 }; }
@@ -313,7 +334,7 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ==================== 极致完美预测算法 ====================
+    // ==================== 极致完美预测算法（最终优化版） ====================
     function getMarketRegime(seq) {
         const n = seq.length; if (n < 20) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
         const recent = seq.slice(0, 20); let changes = 0;
@@ -346,37 +367,105 @@
     function xgBoostHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); let pred=values.map(()=>0), residual=[...values], lr=0.18; let prevLoss=Infinity; for(let r=0;r<70;r++){ for(let i=0;i<values.length-6;i++){ let avg=0; for(let j=0;j<6;j++) avg+=residual[i+j]; avg/=6; const grad=avg/(1+Math.abs(avg)); pred[i]+=lr*grad; } for(let i=0;i<values.length;i++) residual[i]=values[i]-pred[i]; const loss=residual.reduce((s,v)=>s+v*v,0); if(loss>prevLoss) break; prevLoss=loss; lr*=0.93; } const fp=pred[0], probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-fp)*0.9)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
     function deepEnsemble(seq) { const algos=[{w:0.12,f:()=>ewma(seq)},{w:0.12,f:()=>markovAdaptive(seq)},{w:0.08,f:()=>bootstrapMC(seq)},{w:0.08,f:()=>bayesianShrink(seq)},{w:0.10,f:()=>lstmHeuristic(seq)},{w:0.10,f:()=>geneticAlgorithm(seq)},{w:0.09,f:()=>kalmanFilter(seq)},{w:0.09,f:()=>arimaHeuristic(seq)},{w:0.08,f:()=>randomForestHeuristic(seq)},{w:0.08,f:()=>xgBoostHeuristic(seq)}]; const recent=seq.slice(0,20); algos.forEach(a=>{ const p=a.f(), top=Object.keys(p).reduce((x,y)=>p[x]>p[y]?x:y); let correct=0; recent.forEach(v=>{ if(v===top) correct++; }); a.w*=(0.55+correct/recent.length*0.9); }); const totalW=algos.reduce((s,a)=>s+a.w,0), result={大单:0,大双:0,小单:0,小双:0}; algos.forEach(a=>{ const p=a.f(); Object.keys(result).forEach(k=>result[k]+=p[k]*a.w/totalW); }); return result; }
     function patternMatching(seq, len=16) { const n=seq.length; if(n<len+3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,len), probs={大单:0,大双:0,小单:0,小双:0}; let matches=0; for(let i=1;i<n-len;i++){ const pat=seq.slice(i,i+len); let sim=0; for(let j=0;j<len;j++) if(pat[j]===recent[j]) sim++; if(sim>=len-1){ probs[seq[i-1]]+=(sim/len)*(1+i/n); matches++; } } if(!matches) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]=(probs[k]+6)/(total+24)); return probs; }
-    function trendFollowing(seq, w=32) { const n=seq.length; if(n<w) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,w), weighted={大单:0,大双:0,小单:0,小双:0}; recent.forEach((c,i)=>weighted[c]+=Math.pow(0.74,i)); const total=Object.values(weighted).reduce((a,b)=>a+b,0), probs={}; combos.forEach(c=>probs[c]=weighted[c]/total); return probs; }
+    
+    // 增强版趋势跟踪（时间衰减优化）
+    function trendFollowing(seq, w=28) { 
+        const n=seq.length; 
+        if(n<w) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; 
+        const recent=seq.slice(0,w), weighted={大单:0,大双:0,小单:0,小双:0};
+        const alpha = 0.85, beta = 0.15;
+        recent.forEach((c,i) => {
+            const expWeight = Math.pow(alpha, i);
+            const linearWeight = 1 - (i / w) * beta;
+            const combinedWeight = expWeight * 0.7 + linearWeight * 0.3;
+            weighted[c] += combinedWeight;
+        });
+        const noise = 0.01;
+        const total = Object.values(weighted).reduce((a,b)=>a+b,0) + noise * 4;
+        const probs = {};
+        combos.forEach(c => { probs[c] = (weighted[c] + noise) / total; });
+        return probs;
+    }
+    
     function reversalPrediction(seq) { const n=seq.length; if(n<25) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,25); let maxStreak=1, curStreak=1, streakCombo=recent[0]; for(let i=1;i<recent.length;i++){ if(recent[i]===recent[i-1]){ curStreak++; if(curStreak>maxStreak){ maxStreak=curStreak; streakCombo=recent[i]; } } else curStreak=1; } const probs={大单:0.25,大双:0.25,小单:0.25,小双:0.25}; if(maxStreak>=3){ const opp={大单:['小双','大双'],大双:['小单','大单'],小单:['大双','小双'],小双:['大单','小单']}; probs[streakCombo]=0.02*Math.min(8,maxStreak); opp[streakCombo].forEach(c=>probs[c]=0.52+(maxStreak-3)*0.025); } const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
     function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.05+(missCount[c]/maxMiss)*0.5); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
     function cycleAnalysis(seq, maxCycle=40) { const n=seq.length; if(n<60) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; let bestCycle=2, bestScore=0; for(let c=2;c<=Math.min(maxCycle,Math.floor(n/3));c++){ let matches=0,total=0; for(let i=0;i<n-c;i++){ if(seq[i]===seq[i+c]) matches++; total++; } const score=matches/total; if(score>bestScore){ bestScore=score; bestCycle=c; } } const probs={大单:0,大双:0,小单:0,小双:0}; if(bestScore>0.22){ for(let i=0;i<n-bestCycle;i++){ if(i<18) probs[seq[i+bestCycle]]+=4.0*Math.pow(0.8,i); } } const total=Object.values(probs).reduce((a,b)=>a+b,0); if(!total) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; combos.forEach(c=>probs[c]=(probs[c]+7)/(total+28)); return probs; }
     
+    // 增强版和值预测（多时间尺度融合）
+    function sumTrendAnalysis(sums) { 
+        if(sums.length<30) return 14; 
+        const s3=sums.slice(0,3).reduce((a,b)=>a+b,0)/3;
+        const s8=sums.slice(0,8).reduce((a,b)=>a+b,0)/8;
+        const s20=sums.slice(0,20).reduce((a,b)=>a+b,0)/20;
+        const s40=sums.slice(0,40).reduce((a,b)=>a+b,0)/40;
+        const shortTrend=(s3-s8)*1.2, midTrend=(s8-s20)*0.8, longTrend=(s20-s40)*0.3;
+        let vol=0; for(let i=1;i<30;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=29;
+        const trendWeight=Math.min(1.5,1+vol*0.3);
+        const combinedTrend=(shortTrend*0.5+midTrend*0.35+longTrend*0.15)*trendWeight;
+        let prediction=s3+combinedTrend;
+        prediction=Math.max(2,Math.min(26,prediction));
+        return Math.round(prediction*10)/10;
+    }
+
+    // 终极专业单门预测（融合所有优化）
     function professionalSingle(seq, sums) { 
-        const n=seq.length; if(n<35) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
-        const pat=patternMatching(seq), trd=trendFollowing(seq), rev=reversalPrediction(seq), mis=missCompensation(seq), cyc=cycleAnalysis(seq);
-        const mar=markovAdaptive(seq), bay=bayesianShrink(seq), lstm=lstmHeuristic(seq), kal=kalmanFilter(seq), xgb=xgBoostHeuristic(seq), deep=deepEnsemble(seq);
-        const {regime} = getMarketRegime(seq);
-        let w={pat:0.08, trd:0.11, rev:0.07, mis:0.07, cyc:0.06, mar:0.12, bay:0.08, lstm:0.12, kal:0.08, xgb:0.08, deep:0.13};
-        if(regime==='choppy'){ w.rev+=0.07; w.mis+=0.06; w.trd-=0.07; w.pat-=0.06; }
-        else if(regime==='streaky'){ w.trd+=0.08; w.pat+=0.06; w.rev-=0.06; w.mis-=0.08; }
-        else if(regime==='bullish'||regime==='bearish'){ w.trd+=0.06; w.mar+=0.05; w.rev-=0.04; }
-        else if(regime==='odd_bias'||regime==='even_bias'){ w.lstm+=0.05; w.deep+=0.04; }
-        else if(regime==='duizi_due'){ w.mis+=0.09; w.rev+=0.05; w.pat-=0.05; }
-        const totalW=Object.values(w).reduce((a,b)=>a+b,0);
-        Object.keys(w).forEach(k=>w[k]/=totalW);
-        const result={大单:0,大双:0,小单:0,小双:0};
-        const strats={pat,trd,rev,mis,cyc,mar,bay,lstm,kal,xgb,deep};
-        Object.keys(w).forEach(k=>{ if(strats[k]) Object.keys(result).forEach(c=>result[c]+=strats[k][c]*w[k]); });
-        const sumPred=sumTrendAnalysis(sums);
-        if(sumPred>15) { result.大单*=1.1; result.大双*=1.1; }
-        else { result.小单*=1.1; result.小双*=1.1; }
-        if(sumPred%2===1) { result.大单*=1.05; result.小单*=1.05; }
-        else { result.大双*=1.05; result.小双*=1.05; }
-        const norm=Object.values(result).reduce((a,b)=>a+b,0);
-        Object.keys(result).forEach(k=>result[k]/=norm);
+        const n = seq.length;
+        if(n < 35) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
+        
+        const pat = patternMatching(seq);
+        const trd = trendFollowing(seq, 28);
+        const rev = reversalPrediction(seq);
+        const mis = missCompensation(seq);
+        const cyc = cycleAnalysis(seq);
+        const mar = markovAdaptive(seq);
+        const bay = bayesianShrink(seq);
+        const lstm = lstmHeuristic(seq);
+        const kal = kalmanFilter(seq);
+        const xgb = xgBoostHeuristic(seq);
+        const deep = deepEnsemble(seq);
+        
+        const {regime, volatility, streak} = getMarketRegime(seq);
+        
+        let w = {...adaptiveWeights};
+        
+        if(regime === 'choppy'){ w.rev *= 1.15; w.mis *= 1.12; w.trd *= 0.92; }
+        else if(regime === 'streaky'){ w.trd *= 1.18; w.pat *= 1.10; w.rev *= 0.88; }
+        else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.12; w.mar *= 1.08; }
+        else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.10; w.deep *= 1.08; }
+        else if(regime === 'duizi_due'){ w.mis *= 1.12; w.rev *= 1.07; }
+        
+        if(volatility > 0.7) { w.rev *= 1.05; w.mis *= 1.04; w.trd *= 0.95; }
+        if(streak >= 5) { w.trd *= 1.06; w.pat *= 1.05; w.rev *= 0.94; }
+        
+        const totalW = Object.values(w).reduce((a,b)=>a+b,0);
+        Object.keys(w).forEach(k => w[k] /= totalW);
+        
+        const result = {大单:0, 大双:0, 小单:0, 小双:0};
+        const strats = {pat, trd, rev, mis, cyc, mar, bay, lstm, kal, xgb, deep};
+        Object.keys(w).forEach(k => {
+            if(strats[k]) Object.keys(result).forEach(c => result[c] += strats[k][c] * w[k]);
+        });
+        
+        const sumPred = sumTrendAnalysis(sums);
+        const recentSums = sums.slice(0,6);
+        const avgRecent = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
+        const trendStrength = (sumPred - sums[0]) / 5;
+        let bias = sumPred * 0.6 + avgRecent * 0.4;
+        if (Math.abs(trendStrength) > 2) bias = sumPred * 0.8 + avgRecent * 0.2;
+        
+        if(bias > 15.5) { const factor = 1 + Math.min(0.25, (bias - 15.5) * 0.05); result.大单 *= factor; result.大双 *= factor; }
+        else if(bias < 12.5) { const factor = 1 + Math.min(0.25, (12.5 - bias) * 0.05); result.小单 *= factor; result.小双 *= factor; }
+        
+        const recentOddRatio = sums.slice(0,12).filter(s => s % 2 === 1).length / 12;
+        if (recentOddRatio > 0.65) { result.大单 *= 1.08; result.小单 *= 1.08; }
+        else if (recentOddRatio < 0.35) { result.大双 *= 1.08; result.小双 *= 1.08; }
+        
+        const norm = Object.values(result).reduce((a,b)=>a+b,0);
+        Object.keys(result).forEach(k => result[k] /= norm);
+        
         return result;
     }
-    function sumTrendAnalysis(sums) { if(sums.length<30) return 14; const s5=sums.slice(0,5).reduce((a,b)=>a+b,0)/5, s12=sums.slice(0,12).reduce((a,b)=>a+b,0)/12, s30=sums.slice(0,30).reduce((a,b)=>a+b,0)/30; const trend=(s5-s12)*0.7+(s12-s30)*0.2; let vol=0; for(let i=1;i<30;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=29; return Math.min(27,Math.max(0,Math.round(s5+trend*(1+vol/15)))); }
+
     function predictPatternProbs(patterns) { const n=patterns.length; if(n<12) return {对子:0.25,顺子:0.25,杂六:0.25,豹子:0.25}; const freq={对子:0,顺子:0,杂六:0,豹子:0}; patterns.slice(0,25).forEach((p,i)=>freq[p]+=Math.pow(0.83,i)); const total=Object.values(freq).reduce((a,b)=>a+b,0); const probs={}; ['对子','顺子','杂六','豹子'].forEach(p=>probs[p]=freq[p]/total); return probs; }
     
     function analyzeMarketState(seq) {
@@ -399,10 +488,37 @@
     }
     function getSuggestionText(state) { return state==='优'?'✅ 趋势优良 · 适合跟进':(state==='良'?'⚠️ 趋势良好 · 谨慎操作':'🔴 趋势较差 · 建议观望'); }
 
-    // UI更新
     function setPrediction(key, probs){ const s=Object.entries(probs).sort((a,b)=>b[1]-a[1]); predictions[key]={double:s.slice(0,2).map(c=>c[0]), single:s[0][0], prob:s[0][1], secondProb:s[1]?.[1]||0, allProbs:probs, conf:Math.min(0.99,s[0][1]*1.65+(s[0][1]-(s[1]?.[1]||0))*0.95)}; updateUI(key); }
     function updateUI(key){ const pn=$(key+'-panel'); if(!pn) return; const p=predictions[key]; const wr=algoWinRates[key]?`<span style="font-size:12px;color:var(--ios-green);margin-left:8px;">🏆 ${algoWinRates[key].toFixed(1)}%</span>`:''; let ph=''; if(p.allProbs){ const sp=Object.entries(p.allProbs).sort((a,b)=>b[1]-a[1]); ph=`<div class="prob-table"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">📊 概率分布</div>${sp.map(([c,v])=>{ const isS=c===p.single, isD=p.double.includes(c), cls=isS?'single':(isD?'double':'other'); return `<div class="prob-row"><span style="min-width:45px;">${c}</span><div class="prob-bar"><div class="prob-fill ${cls}" style="width:${v*100}%;"></div></div><span style="min-width:50px;text-align:right;">${(v*100).toFixed(1)}%</span>${isS?'<span style="color:var(--ios-purple);">⭐</span>':''}</div>`; }).join('')}</div>`; } pn.innerHTML=`<div class="predict-item"><div class="predict-title">🤖 ${algoNames[key]||key}${wr}</div><div class="double-single-row"><div><div>🎯 双门</div><div>${p.double.map(c=>`<span class="tag green">${c}</span>`).join(' + ')}</div></div><div><div>⭐ 单门</div><div><span class="tag purple" style="font-size:18px;padding:10px 20px;">${p.single}</span></div></div></div><div class="confidence-bar"><div class="confidence-fill" style="width:${p.conf*100}%;"></div></div><div style="font-size:13px;color:var(--ios-text-tertiary);margin-top:8px;">置信度: ${(p.conf*100).toFixed(1)}% | 领先: ${((p.prob-p.secondProb)*100).toFixed(1)}%</div>${ph}</div>`; }
-    function runAllPredictions(){ if(historyData.length<10){ Object.keys(algoNames).forEach(k=>{ predictions[k]={double:['大单','大双'],single:'大单',conf:0.5,prob:0.45,secondProb:0.2,allProbs:{大单:0.45,大双:0.25,小单:0.2,小双:0.1}}; updateUI(k); }); $('sumPredict').innerHTML='<span class="tag orange">14</span>'; updateTrendRating(); updatePatternPredict(); return; } const cs=historyData.map(d=>d.combo).reverse(), ss=historyData.map(d=>d.sum).reverse(); setPrediction('pro',professionalSingle(cs,ss)); setPrediction('weighted',ewma(cs)); setPrediction('markov',markovAdaptive(cs)); setPrediction('montecarlo',bootstrapMC(cs)); setPrediction('bayesian',bayesianShrink(cs)); setPrediction('lstm',lstmHeuristic(cs)); setPrediction('genetic',geneticAlgorithm(cs)); setPrediction('kalman',kalmanFilter(cs)); setPrediction('arima',arimaHeuristic(cs)); setPrediction('randomForest',randomForestHeuristic(cs)); setPrediction('xgboost',xgBoostHeuristic(cs)); setPrediction('deep',deepEnsemble(cs)); const ep={大单:0,大双:0,小单:0,小双:0}; let tw=0; sortedAlgoKeys.forEach(k=>{ const p=predictions[k]; if(!p) return; const wr=algoWinRates[k]||38, w=p.conf*(wr/48); tw+=w; Object.keys(ep).forEach(c=>ep[c]+=(p.allProbs[c]||0.25)*w); }); if(tw>0){ Object.keys(ep).forEach(c=>ep[c]/=tw); setPrediction('ensemble',ep); } $('sumPredict').innerHTML=`<span class="tag orange" style="font-size:18px;">${sumTrendAnalysis(ss)}</span> <span class="tag orange">${sumTrendAnalysis(ss)-1}</span> <span class="tag orange">${sumTrendAnalysis(ss)+1}</span>`; updateTrendRating(); updatePatternPredict(); updateAlgoWinRates(); updateModelWinrate(); }
+    
+    function runAllPredictions(){ 
+        if(historyData.length<10){ 
+            Object.keys(algoNames).forEach(k=>{ predictions[k]={double:['大单','大双'],single:'大单',conf:0.5,prob:0.45,secondProb:0.2,allProbs:{大单:0.45,大双:0.25,小单:0.2,小双:0.1}}; updateUI(k); }); 
+            $('sumPredict').innerHTML='<span class="tag orange">14</span>'; 
+            updateTrendRating(); updatePatternPredict(); 
+            return; 
+        } 
+        const cs=historyData.map(d=>d.combo).reverse(), ss=historyData.map(d=>d.sum).reverse(); 
+        setPrediction('pro',professionalSingle(cs,ss)); 
+        setPrediction('weighted',ewma(cs)); 
+        setPrediction('markov',markovAdaptive(cs)); 
+        setPrediction('montecarlo',bootstrapMC(cs)); 
+        setPrediction('bayesian',bayesianShrink(cs)); 
+        setPrediction('lstm',lstmHeuristic(cs)); 
+        setPrediction('genetic',geneticAlgorithm(cs)); 
+        setPrediction('kalman',kalmanFilter(cs)); 
+        setPrediction('arima',arimaHeuristic(cs)); 
+        setPrediction('randomForest',randomForestHeuristic(cs)); 
+        setPrediction('xgboost',xgBoostHeuristic(cs)); 
+        setPrediction('deep',deepEnsemble(cs)); 
+        const ep={大单:0,大双:0,小单:0,小双:0}; let tw=0; 
+        sortedAlgoKeys.forEach(k=>{ const p=predictions[k]; if(!p) return; const wr=algoWinRates[k]||38, w=p.conf*(wr/48); tw+=w; Object.keys(ep).forEach(c=>ep[c]+=(p.allProbs[c]||0.25)*w); }); 
+        if(tw>0){ Object.keys(ep).forEach(c=>ep[c]/=tw); setPrediction('ensemble',ep); } 
+        const sumPred = sumTrendAnalysis(ss);
+        $('sumPredict').innerHTML=`<span class="tag orange" style="font-size:18px;">${Math.round(sumPred)}</span> <span class="tag orange">${Math.round(sumPred)-1}</span> <span class="tag orange">${Math.round(sumPred)+1}</span>`; 
+        updateTrendRating(); updatePatternPredict(); updateAlgoWinRates(); updateModelWinrate(); 
+    }
+    
     function updatePatternPredict(){ const pats=historyData.map(d=>d.pattern).reverse(); const probs=predictPatternProbs(pats); let h=`<div class="pattern-prob-grid">`; ['对子','顺子','杂六','豹子'].forEach(p=>{ const v=(probs[p]*100).toFixed(1); let c='#8E8E93'; if(p==='对子') c='#FF9500'; else if(p==='顺子') c='#007AFF'; else if(p==='豹子') c='#FF3B30'; h+=`<div class="pattern-prob-item"><div class="pattern-prob-value" style="color:${c};">${v}%</div><div class="pattern-prob-label">${p}</div></div>`; }); h+=`</div>`; $('patternPredict').innerHTML=h; }
     function updateTrendRating(){ const c=$('trendDiagnostic'); if(historyData.length<15){ c.innerHTML='<div style="text-align:center;padding:10px;">⏳ 数据收集中...</div>'; return; } const cs=historyData.map(d=>d.combo).reverse(), st=analyzeMarketState(cs); const sug=getSuggestionText(st); c.innerHTML=`<div style="display:flex;align-items:center;gap:12px;"><div style="font-size:36px;">${st==='优'?'✅':(st==='良'?'⚠️':'🔴')}</div><div><div style="font-size:16px;font-weight:600;"><span class="trend-badge ${st}">${st}</span></div><div style="font-size:14px;color:var(--ios-text-secondary);margin-top:4px;">${sug}</div></div></div>`; }
     function updateAlgoWinRates(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'), rates={}; Object.keys(algoNames).forEach(k=>{ const ar=rs.filter(r=>r.algorithm===k), h=ar.filter(r=>r.hit).length; rates[k]=ar.length?(h/ar.length*100):0; }); algoWinRates=rates; sortedAlgoKeys=Object.keys(algoNames).sort((a,b)=>(algoWinRates[b]||0)-(algoWinRates[a]||0)); renderAlgorithmTabs(); }
@@ -410,7 +526,6 @@
     function initAlgorithmPanels(){ const c=$('algorithmPanelsContainer'); let h=''; sortedAlgoKeys.forEach((k,i)=>h+=`<div class="algorithm-panel ${i===0?'active':''}" id="${k}-panel"></div>`); h+=`<div class="algorithm-panel" id="ensemble-panel"></div>`; c.innerHTML=h; sortedAlgoKeys.forEach(k=>{ const p=$(k+'-panel'); if(p) p.innerHTML=`<div class="predict-item"><div class="predict-title">🤖 ${algoNames[k]}</div><div>加载中...</div></div>`; }); $('ensemble-panel').innerHTML=`<div class="predict-item"><div class="predict-title">🤖 动态集成</div><div>加载中...</div></div>`; }
     function updateModelWinrate(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); const st=Object.keys(algoNames).map(k=>{ const ar=rs.filter(r=>r.algorithm===k), h=ar.filter(r=>r.hit).length; return {name:algoNames[k], rate:ar.length?(h/ar.length*100).toFixed(1):'—', hits:h, total:ar.length}; }).sort((a,b)=>(parseFloat(b.rate)||0)-(parseFloat(a.rate)||0)); $('modelWinrate').innerHTML=st.map((s,i)=>{ const m=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':'')); return `<div class="algo-rank"><span style="min-width:90px;">${m} ${s.name}</span><div class="algo-rank-bar"><div class="algo-rank-fill" style="width:${s.rate==='—'?0:s.rate}%"></div></div><span>${s.rate}% (${s.hits}/${s.total})</span></div>`; }).join(''); }
 
-    // 数据加载（完美同步）
     function savePredictRecord(period, ap, nums, sum, time){
         const ac=getSumInfo(sum,nums).combo;
         Object.keys(predictions).forEach(a=>{ 
@@ -428,43 +543,93 @@
         });
         updateAlgoWinRates();
     }
+
+    // 更新API状态显示
+    function setApiLoading() {
+        $('apiTip').innerHTML = '<span class="loading-spinner"></span> 云端加载中';
+    }
+    function setApiSuccess() {
+        $('apiTip').innerHTML = '✅ 已同步';
+    }
+    function setApiError(msg) {
+        $('apiTip').innerHTML = `❌ ${msg}`;
+    }
+
     async function loadData(manual=false, isPolling=false){
-        if(!isPolling) $('apiTip').innerHTML=manual?'🔄 刷新中...':'🔄 同步中...';
+        if(!isPolling) setApiLoading();
         try{
-            const r=await fetch(API_URL+'&t='+Date.now()); if(!r.ok) throw new Error(`HTTP ${r.status}`); const j=await r.json();
+            const r=await fetch(API_URL+'&t='+Date.now()); 
+            if(!r.ok) throw new Error(`HTTP ${r.status}`); 
+            const j=await r.json();
             if(j?.data?.length){
                 const lt=j.data[0], cp=lt.nbr, [n1,n2,n3]=lt.number.split('+').map(Number), sv=parseInt(lt.num), info=getSumInfo(sv,[n1,n2,n3]), ts=`${lt.date} ${lt.time}`;
                 const isNewPeriod = (latestPeriod && latestPeriod !== cp);
                 if(isNewPeriod){
                     if(latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1,n2,n3], sv, ts);
-                    if(isOpening){ isOpening=false; openingStartTime=null; if(openingPolling){ clearInterval(openingPolling); openingPolling=null; } }
-                    $('timerLabel').innerText='下期开奖倒计时'; $('resultCard').classList.remove('opening-glow'); $('count').classList.remove('opening');
-                    $('openingAnimation').style.display='none'; $('resultBalls').style.display='flex'; $('openingHint').classList.remove('show');
+                    if(isOpening){ 
+                        isOpening=false; 
+                        openingStartTime=null; 
+                        if(openingPolling){ clearInterval(openingPolling); openingPolling=null; } 
+                    }
+                    $('timerLabel').innerText='下期开奖倒计时'; 
+                    $('resultCard').classList.remove('opening-glow'); 
+                    $('count').classList.remove('opening');
+                    $('openingAnimation').style.display='none'; 
+                    $('resultBalls').style.display='flex'; 
+                    $('openingHint').classList.remove('show');
                 }
                 latestPeriod = cp;
-                $('openingAnimation').style.display='none'; $('resultBalls').style.display='flex'; $('openingHint').classList.remove('show');
-                ['n1','n2','n3','sum'].forEach(id=>$(id).classList.add('roll')); setTimeout(()=>['n1','n2','n3','sum'].forEach(id=>$(id).classList.remove('roll')),500);
-                $('n1').innerText=n1; updateBallColor($('n1'), n1); $('n2').innerText=n2; updateBallColor($('n2'), n2); $('n3').innerText=n3; updateBallColor($('n3'), n3);
-                $('sum').innerText=sv; $('sum').className='ball sum '+(sv>13?'big':'small'); $('issue').innerText=cp; $('sumExpression').innerText=`${n1}+${n2}+${n3}=${sv}`;
-                $('combo').innerHTML=`<span class="pattern-badge ${info.pattern}">${info.pattern}</span>`; $('dx').innerHTML=`<span style="color:${info.dx==='大'?'var(--color-big)':'var(--color-small)'};font-weight:700;">${info.dx}</span>`; $('ds').innerHTML=`<span style="font-weight:700;">${info.ds}</span>`; $('comboDetail').innerHTML=`<span style="font-weight:700;">${info.combo}</span>`; $('openTime').innerText=ts;
+                if(!isOpening){
+                    $('openingAnimation').style.display='none'; 
+                    $('resultBalls').style.display='flex'; 
+                    $('openingHint').classList.remove('show');
+                    ['n1','n2','n3','sum'].forEach(id=>$(id).classList.add('roll')); 
+                    setTimeout(()=>['n1','n2','n3','sum'].forEach(id=>$(id).classList.remove('roll')),500);
+                    $('n1').innerText=n1; updateBallColor($('n1'), n1); 
+                    $('n2').innerText=n2; updateBallColor($('n2'), n2); 
+                    $('n3').innerText=n3; updateBallColor($('n3'), n3);
+                    $('sum').innerText=sv; $('sum').className='ball sum '+(sv>13?'big':'small'); 
+                    $('issue').innerText=cp; 
+                    $('sumExpression').innerText=`${n1}+${n2}+${n3}=${sv}`;
+                    $('combo').innerHTML=`<span class="pattern-badge ${info.pattern}">${info.pattern}</span>`; 
+                    $('dx').innerHTML=`<span style="color:${info.dx==='大'?'var(--color-big)':'var(--color-small)'};font-weight:700;">${info.dx}</span>`; 
+                    $('ds').innerHTML=`<span style="font-weight:700;">${info.ds}</span>`; 
+                    $('comboDetail').innerHTML=`<span style="font-weight:700;">${info.combo}</span>`; 
+                    $('openTime').innerText=ts;
+                }
                 if(!isOpening && j.countdown){
                     const cd=j.countdown;
                     if(cd==='00:00'||cd==='0:00'){
-                        if(!isOpening){ isOpening=true; openingStartTime=Date.now(); $('timerLabel').innerText='🔥 开奖中 🔥'; $('count').innerText='开奖中'; $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); $('openingAnimation').style.display='flex'; $('resultBalls').style.display='none'; startOpeningPolling(); }
+                        if(!isOpening){ 
+                            isOpening=true; 
+                            openingStartTime=Date.now(); 
+                            $('timerLabel').innerText='🔥 开奖中 🔥'; 
+                            $('count').innerText='开奖中'; 
+                            $('count').classList.add('opening'); 
+                            $('resultCard').classList.add('opening-glow'); 
+                            $('openingAnimation').style.display='flex'; 
+                            $('resultBalls').style.display='none'; 
+                            startOpeningPolling(); 
+                        }
                     } else {
                         const [m,s]=cd.split(':').map(Number); countdownSeconds=m*60+s;
                         $('count').innerText=fmtTime(countdownSeconds); $('count').classList.remove('opening');
                     }
                 }
-                $('apiTip').innerHTML='✅ 已同步';
+                setApiSuccess();
                 if(isNewPeriod || historyData.length===0){
                     historyData=j.data.map(i=>{ const [a,b,c]=i.number.split('+').map(Number), s=parseInt(i.num), inf=getSumInfo(s,[a,b,c]); return {period:i.nbr, numbers:[a,b,c], sum:s, combo:inf.combo, pattern:inf.pattern, time:`${i.date} ${i.time}`, isBig:s>13}; }).sort((a,b)=>parseInt(b.period)-parseInt(a.period));
                     renderHistoryTable(); calcStats(); runAllPredictions(); renderMiss(); drawChart(); updateTrendPanel();
                 }
-                updateModelWinrate(); loadPredictHistory(); if(manual) $('apiTip').innerHTML='✅ 刷新成功';
+                updateModelWinrate(); loadPredictHistory(); 
+                if(manual) setApiSuccess();
             }
-        }catch(e){ console.error(e); $('apiTip').innerHTML='❌ 失败: '+e.message; }
+        }catch(e){ 
+            console.error(e); 
+            setApiError('失败: '+e.message); 
+        }
     }
+
     function updateBallColor(ball, num) { ball.className = 'ball ' + (num > 13 ? 'big' : 'small'); }
     function updateTrendPanel(){ const c=$('trendAnalysis'); if(!c||historyData.length<5){ c.innerHTML='<div>⏳ 加载中...</div>'; return; } const r=historyData.slice(0,20), p=r.map(x=>x.pattern), cs=r.map(x=>x.combo), sums=r.map(x=>x.sum); let mpl=1, cp=1, dp=p[0]; for(let i=1;i<p.length;i++){ if(p[i]===p[i-1]){ cp++; if(cp>mpl){ mpl=cp; dp=p[i]; } } else cp=1; } let mcl=1, cc=1, dc=cs[0]; for(let i=1;i<cs.length;i++){ if(cs[i]===cs[i-1]){ cc++; if(cc>mcl){ mcl=cc; dc=cs[i]; } } else cc=1; } const bc=sums.filter(s=>s>13).length, sc=sums.length-bc, oc=sums.filter(s=>s%2===1).length, ec=sums.length-oc; const l5=p.slice(0,6).map(x=>`<span class="pattern-badge ${x}">${x}</span>`).join(' '), sd=cs.slice(0,12).reverse().map(c=>`<span class="trend-dot ${c}">${c}</span>`).join(''); let sug=''; if(mpl>=4) sug=`⚠️ ${dp}连开${mpl}期，追龙需谨慎！`; else if(mcl>=5) sug=`⚠️ ${dc}连开${mcl}期，建议观望。`; else if(bc>sc+4) sug='📈 大数偏多，关注小数回补'; else if(sc>bc+4) sug='📉 小数偏多，关注大数回补'; else sug='✅ 走势均衡，可正常投注'; c.innerHTML=`<div class="trend-status"><div style="font-weight:600;margin-bottom:8px;">📅 近期开奖序列</div><div style="margin-bottom:12px;">${l5}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${sd}</div></div><div class="trend-status"><div style="font-weight:600;margin-bottom:8px;">📊 数据统计 (近20期)</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div><div style="font-size:22px;font-weight:700;color:var(--color-big);">${bc}</div><div>大数</div></div><div><div style="font-size:22px;font-weight:700;color:var(--color-small);">${sc}</div><div>小数</div></div><div><div style="font-size:22px;font-weight:700;">${oc}</div><div>单数</div></div><div><div style="font-size:22px;font-weight:700;">${ec}</div><div>双数</div></div><div><div style="font-size:22px;font-weight:700;">${mpl>=2?dp+' '+mpl+'连':'无'}</div><div>组合连庄</div></div><div><div style="font-size:22px;font-weight:700;">${mcl>=2?dc+' '+mcl+'连':'无'}</div><div>单双大小连庄</div></div></div></div><div class="trend-status"><div style="font-weight:600;margin-bottom:8px;">🎯 投注建议</div><div>${sug}</div></div>`; }
     function renderHistoryTable(filter=null){ const tb=$('historyTable'); let d=filter?historyData.filter(x=>x.pattern===filter):historyData; tb.innerHTML=d.length?d.slice(0,30).map(r=>`<tr><td>${r.period}</td><td>${r.numbers.map(n=>`<span class="ball-sm ${n>13?'big':'small'}">${n}</span>`).join('')}</td><td><b style="color:${r.sum>13?'var(--color-big)':'var(--color-small)'};">${r.sum}</b></td><td><span class="pattern-badge ${r.pattern}">${r.pattern}</span></td><td>${r.combo}</td><td>${r.time}</td></tr>`).join(''):'<tr><td colspan="6">暂无数据</td></tr>'; }
@@ -475,10 +640,18 @@
     function loadPredictHistory(){ let rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); $('recordCount').innerText=`共${rs.length}条`; const set=new Set(rs.map(r=>r.algorithm)); let cur=window._curAlgoFilter||'all'; $('recordAlgoTabs').innerHTML=`<div class="filter-chip ${cur==='all'?'active':''}" data-algo="all">全部</div>`+Array.from(set).map(a=>`<div class="filter-chip ${cur===a?'active':''}" data-algo="${a}">${algoNames[a]||a}</div>`).join(''); document.querySelectorAll('.filter-chip').forEach(t=>t.addEventListener('click',function(){ window._curAlgoFilter=this.dataset.algo; loadPredictHistory(); })); let f=cur==='all'?rs:rs.filter(r=>r.algorithm===cur); const c=$('recordCardsContainer'); if(!f.length) c.innerHTML='<div style="text-align:center;padding:20px;">暂无记录</div>'; else c.innerHTML=f.slice(0,100).map(r=>`<div class="record-card"><div class="record-card-header"><span style="background:var(--ios-blue);color:#fff;padding:4px 12px;border-radius:20px;">${algoNames[r.algorithm]||r.algorithm}</span><span>${r.period}</span></div><div style="display:flex;justify-content:space-between;margin-top:8px;"><span>🎯 ${(r.doublePred||[]).join('/')}</span><span>⭐ ${r.singlePred||''}</span><span style="font-size:20px;">${r.hit?'🀄️':'🍉'}</span></div><div style="font-size:13px;color:var(--ios-text-tertiary);">开奖: ${r.actualCombo||r.combo}</div></div>`).join(''); updateModelWinrate(); }
     window.clearPredictHistory=()=>{ if(confirm('清空所有真实预测记录？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); updateAlgoWinRates(); renderAlgorithmTabs(); } };
     function startCountdown(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ if(isOpening) { if(openingStartTime && (Date.now()-openingStartTime)/1000 > 180) $('openingHint').classList.add('show'); return; } openingStartTime=null; $('openingHint').classList.remove('show'); if(countdownSeconds<=0){ isOpening=true; openingStartTime=Date.now(); $('timerLabel').innerText='🔥 开奖中 🔥'; $('count').innerText='开奖中'; $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); $('openingAnimation').style.display='flex'; $('resultBalls').style.display='none'; startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); $('count').classList.remove('opening'); } },1000); }
-    function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); },1500); }
+    
+    // 修改为1.3秒轮询
+    function startOpeningPolling(){ 
+        if(openingPolling) clearInterval(openingPolling); 
+        openingPolling=setInterval(()=>{ 
+            loadData(false,true); 
+        }, 1300); // 1.3秒
+    }
+    
     function startAutoRefresh(i=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); },i); }
 
-    // 测试功能（完整保留）
+    // 测试功能
     window.openTestModal = () => { $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
     window.closeTestModal = () => $('testModal').style.display='none';
     function generateSmartNumbers() { if(historyData.length<20) return { n1:Math.floor(Math.random()*10), n2:Math.floor(Math.random()*10), n3:Math.floor(Math.random()*10) }; const recent=historyData.slice(0,30); const freq=Array(10).fill(0); recent.forEach(d=>d.numbers.forEach(n=>freq[n]++)); const last=Array(10).fill(-1); recent.forEach((d,i)=>d.numbers.forEach(n=>{ if(last[n]===-1) last[n]=i; })); const total=freq.reduce((a,b)=>a+b,0); const probs=freq.map((f,i)=>{ const base=f/total; const miss=last[i]===-1?30:last[i]; return base*0.6+(miss/30)*0.4; }); const sum=probs.reduce((a,b)=>a+b,0); const norm=probs.map(p=>p/sum); const pick=()=>{ const r=Math.random(); let acc=0; for(let i=0;i<10;i++){ acc+=norm[i]; if(r<acc) return i; } return 9; }; return { n1:pick(), n2:pick(), n3:pick() }; }
@@ -494,7 +667,7 @@
     window.viewTestDetail = (i)=>{ try{ const h=JSON.parse(localStorage.getItem(TEST_STORAGE_KEY)||'[]'); const t=h[i]; if(!t) return; const m=t.genMode==='smart'?'走势':'随机'; let s=`时间:${new Date(t.timestamp).toLocaleString()}\n模式:${m}\n期数:${t.rounds}\n\n`; Object.keys(t.results).forEach(a=>{ const r=(t.results[a].hits/t.results[a].total*100).toFixed(1); s+=`${algoNames[a]}: ${r}% (${t.results[a].hits}/${t.results[a].total})\n`; }); alert(s); }catch(e){ alert('失败'); } };
     window.exportTestHistory = ()=>{ try{ const h=JSON.parse(localStorage.getItem(TEST_STORAGE_KEY)||'[]'); if(!h.length){ alert('无记录'); return; } let t='鱼少PC28 测试历史\n'; h.forEach((x,i)=>{ t+=`测试${i+1}|${new Date(x.timestamp).toLocaleString()}|${x.genMode}|${x.rounds}期\n`; Object.keys(x.results).forEach(a=>{ const r=(x.results[a].hits/x.results[a].total*100).toFixed(1); t+=`  ${algoNames[a]}: ${r}%\n`; }); t+='\n'; }); const b=new Blob([t],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='pc28_test_history.txt'; a.click(); }catch(e){ alert('失败'); } };
 
-    // 导出功能（完整保留）
+    // 导出功能
     function getAlgoStats(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'), st={}; Object.keys(algoNames).forEach(k=>{ const ar=rs.filter(r=>r.algorithm===k), h=ar.filter(r=>r.hit).length; st[k]={name:algoNames[k], total:ar.length, hits:h, rate:ar.length?(h/ar.length*100).toFixed(1):'—'}; }); return st; }
     function renderExportSelector(){ const st=getAlgoStats(), c=$('exportAlgoSelector'), sk=Object.keys(st).sort((a,b)=>(parseFloat(st[b].rate)||0)-(parseFloat(st[a].rate)||0)); let h=`<div class="export-algo-chip all" data-algo="all" onclick="toggleExportAlgo('all')">📊 全部</div>`; sk.forEach(k=>{ const s=st[k]; h+=`<div class="export-algo-chip ${selectedExportAlgos.has(k)?'active':''}" data-algo="${k}" onclick="toggleExportAlgo('${k}')">${s.name} ${s.rate}%</div>`; }); c.innerHTML=h; }
     window.toggleExportAlgo=function(k){ if(k==='all'){ if(selectedExportAlgos.has('all')) selectedExportAlgos.clear(); else { selectedExportAlgos.clear(); selectedExportAlgos.add('all'); Object.keys(algoNames).forEach(x=>selectedExportAlgos.add(x)); } } else { selectedExportAlgos.delete('all'); selectedExportAlgos.has(k)?selectedExportAlgos.delete(k):selectedExportAlgos.add(k); if(selectedExportAlgos.size===Object.keys(algoNames).length) selectedExportAlgos.add('all'); } renderExportSelector(); updateExportStats(); };
@@ -511,7 +684,7 @@
 
     window.onload=()=>{
         updateAlgoWinRates(); initAlgorithmPanels(); renderAlgorithmTabs();
-        loadData(); startCountdown(); startAutoRefresh(); loadPredictHistory(); loadTestHistory();
+        setApiLoading(); loadData(); startCountdown(); startAutoRefresh(); loadPredictHistory(); loadTestHistory();
         document.querySelectorAll('#tabControl span').forEach(t=>t.addEventListener('click',function(){
             document.querySelectorAll('#tabControl span').forEach(s=>s.classList.remove('active')); this.classList.add('active');
             document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); $(this.dataset.panel+'-panel').classList.add('active');
