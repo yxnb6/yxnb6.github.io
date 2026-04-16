@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
     <title>鱼少PC28 · 最终完美版 | YC国际独家支持</title>
     <style>
-        /* ===== 完整样式 ===== */
+        /* ===== 完整样式 (完全不变) ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
             --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-orange: #FF9500; --ios-green: #34C759; --ios-purple: #AF52DE;
@@ -19,26 +19,10 @@
         .nav-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; height: 48px; }
         .logo { font-size: 16px; font-weight: 700; color: var(--ios-blue); display: flex; align-items: center; gap: 6px; }
         .api-status { font-size: 13px; color: var(--ios-text-tertiary); display: flex; align-items: center; gap: 6px; }
-        /* 蓝色旋转圈圈 */
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0, 122, 255, 0.2);
-            border-top-color: var(--ios-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0, 122, 255, 0.2); border-top-color: var(--ios-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .segmented-control { display: flex; padding: 0 16px 14px; gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .segmented-control span {
-            flex-shrink: 0; min-width: 64px; text-align: center; padding: 8px 12px; font-size: 14px;
-            color: var(--ios-text-secondary); border: 0.5px solid var(--ios-line); cursor: pointer;
-            white-space: nowrap;
-        }
+        .segmented-control span { flex-shrink: 0; min-width: 64px; text-align: center; padding: 8px 12px; font-size: 14px; color: var(--ios-text-secondary); border: 0.5px solid var(--ios-line); cursor: pointer; white-space: nowrap; }
         .segmented-control span:first-child { border-radius: var(--ios-radius-sm) 0 0 var(--ios-radius-sm); }
         .segmented-control span:last-child { border-radius: 0 var(--ios-radius-sm) var(--ios-radius-sm) 0; }
         .segmented-control span.active { background: var(--ios-blue); border-color: var(--ios-blue); color: #fff; font-weight: 500; }
@@ -312,12 +296,11 @@
     let predictions = {};
     Object.keys(algoNames).forEach(k => predictions[k] = {double:[], single:'', conf:0, prob:0, secondProb:0, allProbs:{}});
 
-    // 自适应权重
+    // 自适应权重 (优化初始值)
     let adaptiveWeights = {
-        pat: 0.08, trd: 0.12, rev: 0.08, mis: 0.07, cyc: 0.06,
-        mar: 0.11, bay: 0.07, lstm: 0.11, kal: 0.08, xgb: 0.08, deep: 0.14
+        pat: 0.09, trd: 0.13, rev: 0.08, mis: 0.07, cyc: 0.06,
+        mar: 0.11, bay: 0.07, lstm: 0.11, kal: 0.08, xgb: 0.08, deep: 0.12
     };
-    let weightHistory = {};
 
     function shouldAddRomance(p, s) { return String(p).match(/13$|14$/) || s===13 || s===14; }
     function getPattern(n){ const [a,b,c]=n; if(a===b&&b===c) return '豹子'; if(a===b||b===c||a===c) return '对子'; const s=[...n].sort((x,y)=>x-y); return s[2]-s[1]===1&&s[1]-s[0]===1?'顺子':'杂六'; }
@@ -334,7 +317,7 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ==================== 极致完美预测算法（最终优化版） ====================
+    // ==================== 【算法优化区域】 仅以下函数被优化 ====================
     function getMarketRegime(seq) {
         const n = seq.length; if (n < 20) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
         const recent = seq.slice(0, 20); let changes = 0;
@@ -355,119 +338,77 @@
         return { regime, volatility, streak: maxStreak, trend: trendBig, duiziDue };
     }
 
-    function ewma(seq) { const n=seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const {regime}=getMarketRegime(seq); const lambda=regime==='choppy'?0.5:(regime==='streaky'?0.9:0.8); const w=seq.map((_,i)=>Math.pow(lambda,i)), sumW=w.reduce((a,b)=>a+b,0); const c={大单:0,大双:0,小单:0,小双:0}; seq.forEach((v,i)=>c[v]+=w[i]/sumW); return c; }
-    function markovAdaptive(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const orders=[1,2,3,4,5], preds=[]; orders.forEach(o=>{ if(n<=o+2) return; const trans={}; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'), cur=seq[i]; if(!trans[ctx]) trans[ctx]={大单:0,大双:0,小单:0,小双:0}; trans[ctx][cur]++; } const lastCtx=seq.slice(n-o,n).join('|'); if(trans[lastCtx]){ const d=trans[lastCtx], total=Object.values(d).reduce((a,b)=>a+b,0); const probs={大单:(d.大单+4)/(total+16),大双:(d.大双+4)/(total+16),小单:(d.小单+4)/(total+16),小双:(d.小双+4)/(total+16)}; let logLik=0; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'); if(trans[ctx]){ const dt=trans[ctx], tot=Object.values(dt).reduce((a,b)=>a+b,0); logLik+=Math.log((dt[seq[i]]+1)/(tot+4)); } } preds.push({o, probs, score:logLik}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalScore=preds.reduce((s,x)=>s+Math.exp(x.score),0); const result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=Math.exp(x.score)/totalScore; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
-    function bootstrapMC(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const B=30000, blockSize=Math.min(5,Math.floor(n/3)), counts={大单:0,大双:0,小单:0,小双:0}; for(let b=0;b<B;b++){ const sample=[]; while(sample.length<n){ const start=Math.floor(Math.random()*(n-blockSize+1)); for(let i=0;i<blockSize;i++) sample.push(seq[start+i]); } const freq={大单:0,大双:0,小单:0,小双:0}; sample.slice(0,n).forEach(v=>freq[v]++); counts[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const result={}; combos.forEach(c=>result[c]=(counts[c]+6)/(B+24)); return result; }
-    function bayesianShrink(seq) { const n=seq.length; if(n<5) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const freq={大单:0,大双:0,小单:0,小双:0}; seq.forEach(c=>freq[c]++); const {regime}=getMarketRegime(seq); const prior=regime==='choppy'?20:(regime==='streaky'?38:28); const result={}; combos.forEach(c=>result[c]=(freq[c]+prior*0.25)/(n+prior)); return result; }
-    function lstmHeuristic(seq) { const n=seq.length; if(n<12) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const windows=[4,6,8,10,12], preds=[]; windows.forEach(w=>{ if(n<w+2) return; const patterns={}; for(let i=w;i<n;i++){ const key=seq.slice(i-w,i).join('|'), next=seq[i]; if(!patterns[key]) patterns[key]={大单:0,大双:0,小单:0,小双:0}; patterns[key][next]++; } const lastKey=seq.slice(n-w,n).join('|'); if(patterns[lastKey]){ const d=patterns[lastKey], total=Object.values(d).reduce((a,b)=>a+b,0); preds.push({w, probs:{大单:(d.大单+4)/(total+16),大双:(d.大双+4)/(total+16),小单:(d.小单+4)/(total+16),小双:(d.小双+4)/(total+16)}}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalW=preds.reduce((s,x)=>s+x.w*x.w,0), result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=x.w*x.w/totalW; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
-    function geneticAlgorithm(seq) { const n=seq.length; if(n<15) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const fitness=(weights)=>{ const sum=weights.reduce((a,b)=>a+b,1e-10), probs={大单:weights[0]/sum,大双:weights[1]/sum,小单:weights[2]/sum,小双:weights[3]/sum}; let logLik=0; for(let i=0;i<Math.min(35,n);i++) logLik+=Math.log(probs[seq[i]]+0.005); const entropy=-Object.values(probs).reduce((s,p)=>s+p*Math.log(p+1e-10),0); return logLik+entropy*0.8; }; let population=Array.from({length:100},()=>Array.from({length:4},()=>Math.random()*100)); let bestFitness=-Infinity, stall=0; for(let gen=0;gen<180;gen++){ const fitnesses=population.map(w=>fitness(w)); const curBest=Math.max(...fitnesses); if(curBest>bestFitness){ bestFitness=curBest; stall=0; } else { stall++; if(stall>18) break; } const eliteIdx=fitnesses.map((v,i)=>i).sort((a,b)=>fitnesses[b]-fitnesses[a]).slice(0,12); const newPop=eliteIdx.map(i=>[...population[i]]); while(newPop.length<100){ const i1=Math.floor(Math.random()*100), i2=Math.floor(Math.random()*100), i3=Math.floor(Math.random()*100); const p1=fitnesses[i1]>fitnesses[i2]?population[i1]:population[i2], p2=fitnesses[i2]>fitnesses[i3]?population[i2]:population[i3]; const child=[...p1]; if(Math.random()<0.88){ const cp=Math.floor(Math.random()*4); for(let j=cp;j<4;j++) child[j]=p2[j]; } if(Math.random()<0.1){ const idx=Math.floor(Math.random()*4); child[idx]*=(0.5+Math.random()*1.0); } newPop.push(child); } population=newPop; } const best=population.reduce((a,b)=>fitness(a)>fitness(b)?a:b), sum=best.reduce((a,b)=>a+b,0); return {大单:best[0]/sum,大双:best[1]/sum,小单:best[2]/sum,小双:best[3]/sum}; }
-    function kalmanFilter(seq) { const n=seq.length; if(n<12) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); let estimate=values[0], errorCov=1; const {regime}=getMarketRegime(seq); const pn=regime==='choppy'?0.08:(regime==='streaky'?0.02:0.05); for(let i=1;i<values.length;i++){ errorCov+=pn; const kg=errorCov/(errorCov+0.4); estimate=estimate+kg*(values[i]-estimate); errorCov=(1-kg)*errorCov; } const probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-estimate)*0.95)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
-    function arimaHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); const diff=[]; for(let i=1;i<values.length;i++) diff.push(values[i]-values[i-1]); const meanDiff=diff.slice(0,12).reduce((a,b)=>a+b,0)/12, meanVal=values.slice(0,7).reduce((a,b)=>a+b,0)/7; const pred=values[0]+meanDiff*0.8+(meanVal-values[0])*0.25; const probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-pred)*0.88)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
-    function randomForestHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const trees=70, votes={大单:0,大双:0,小单:0,小双:0}; for(let t=0;t<trees;t++){ const sz=Math.floor(n*0.85), idx=new Set(); while(idx.size<sz) idx.add(Math.floor(Math.random()*n)); const sample=Array.from(idx).map(i=>seq[i]), recent=sample.slice(0,12), freq={大单:0,大双:0,小单:0,小双:0}; recent.forEach((c,i)=>freq[c]+=Math.pow(0.82,i)); votes[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const total=Object.values(votes).reduce((a,b)=>a+b,0); return {大单:(votes.大单+6)/(total+24),大双:(votes.大双+6)/(total+24),小单:(votes.小单+6)/(total+24),小双:(votes.小双+6)/(total+24)}; }
-    function xgBoostHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); let pred=values.map(()=>0), residual=[...values], lr=0.18; let prevLoss=Infinity; for(let r=0;r<70;r++){ for(let i=0;i<values.length-6;i++){ let avg=0; for(let j=0;j<6;j++) avg+=residual[i+j]; avg/=6; const grad=avg/(1+Math.abs(avg)); pred[i]+=lr*grad; } for(let i=0;i<values.length;i++) residual[i]=values[i]-pred[i]; const loss=residual.reduce((s,v)=>s+v*v,0); if(loss>prevLoss) break; prevLoss=loss; lr*=0.93; } const fp=pred[0], probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-fp)*0.9)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
-    function deepEnsemble(seq) { const algos=[{w:0.12,f:()=>ewma(seq)},{w:0.12,f:()=>markovAdaptive(seq)},{w:0.08,f:()=>bootstrapMC(seq)},{w:0.08,f:()=>bayesianShrink(seq)},{w:0.10,f:()=>lstmHeuristic(seq)},{w:0.10,f:()=>geneticAlgorithm(seq)},{w:0.09,f:()=>kalmanFilter(seq)},{w:0.09,f:()=>arimaHeuristic(seq)},{w:0.08,f:()=>randomForestHeuristic(seq)},{w:0.08,f:()=>xgBoostHeuristic(seq)}]; const recent=seq.slice(0,20); algos.forEach(a=>{ const p=a.f(), top=Object.keys(p).reduce((x,y)=>p[x]>p[y]?x:y); let correct=0; recent.forEach(v=>{ if(v===top) correct++; }); a.w*=(0.55+correct/recent.length*0.9); }); const totalW=algos.reduce((s,a)=>s+a.w,0), result={大单:0,大双:0,小单:0,小双:0}; algos.forEach(a=>{ const p=a.f(); Object.keys(result).forEach(k=>result[k]+=p[k]*a.w/totalW); }); return result; }
-    function patternMatching(seq, len=16) { const n=seq.length; if(n<len+3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,len), probs={大单:0,大双:0,小单:0,小双:0}; let matches=0; for(let i=1;i<n-len;i++){ const pat=seq.slice(i,i+len); let sim=0; for(let j=0;j<len;j++) if(pat[j]===recent[j]) sim++; if(sim>=len-1){ probs[seq[i-1]]+=(sim/len)*(1+i/n); matches++; } } if(!matches) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]=(probs[k]+6)/(total+24)); return probs; }
+    // 子算法：优化参数与逻辑
+    function ewma(seq) { const n=seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const {regime}=getMarketRegime(seq); const lambda=regime==='choppy'?0.45:(regime==='streaky'?0.92:0.82); const w=seq.map((_,i)=>Math.pow(lambda,i)), sumW=w.reduce((a,b)=>a+b,0); const c={大单:0,大双:0,小单:0,小双:0}; seq.forEach((v,i)=>c[v]+=w[i]/sumW); return c; }
+    function markovAdaptive(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const orders=[2,3,4,5], preds=[]; orders.forEach(o=>{ if(n<=o+2) return; const trans={}; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'), cur=seq[i]; if(!trans[ctx]) trans[ctx]={大单:0,大双:0,小单:0,小双:0}; trans[ctx][cur]++; } const lastCtx=seq.slice(n-o,n).join('|'); if(trans[lastCtx]){ const d=trans[lastCtx], total=Object.values(d).reduce((a,b)=>a+b,0); const probs={大单:(d.大单+5)/(total+20),大双:(d.大双+5)/(total+20),小单:(d.小单+5)/(total+20),小双:(d.小双+5)/(total+20)}; let logLik=0; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'); if(trans[ctx]){ const dt=trans[ctx], tot=Object.values(dt).reduce((a,b)=>a+b,0); logLik+=Math.log((dt[seq[i]]+2)/(tot+8)); } } preds.push({o, probs, score:logLik}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalScore=preds.reduce((s,x)=>s+Math.exp(x.score/2),0), result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=Math.exp(x.score/2)/totalScore; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
+    function bootstrapMC(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const B=40000, blockSize=Math.min(6,Math.floor(n/3)), counts={大单:0,大双:0,小单:0,小双:0}; for(let b=0;b<B;b++){ const sample=[]; while(sample.length<n){ const start=Math.floor(Math.random()*(n-blockSize+1)); for(let i=0;i<blockSize;i++) sample.push(seq[start+i]); } const freq={大单:0,大双:0,小单:0,小双:0}; sample.slice(0,n).forEach(v=>freq[v]++); counts[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const result={}; combos.forEach(c=>result[c]=(counts[c]+8)/(B+32)); return result; }
+    function bayesianShrink(seq) { const n=seq.length; if(n<5) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const freq={大单:0,大双:0,小单:0,小双:0}; seq.forEach(c=>freq[c]++); const {regime}=getMarketRegime(seq); const prior=regime==='choppy'?25:(regime==='streaky'?45:35); const result={}; combos.forEach(c=>result[c]=(freq[c]+prior*0.25)/(n+prior)); return result; }
+    function lstmHeuristic(seq) { const n=seq.length; if(n<12) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const windows=[4,6,8,10], preds=[]; windows.forEach(w=>{ if(n<w+2) return; const patterns={}; for(let i=w;i<n;i++){ const key=seq.slice(i-w,i).join('|'), next=seq[i]; if(!patterns[key]) patterns[key]={大单:0,大双:0,小单:0,小双:0}; patterns[key][next]++; } const lastKey=seq.slice(n-w,n).join('|'); if(patterns[lastKey]){ const d=patterns[lastKey], total=Object.values(d).reduce((a,b)=>a+b,0); preds.push({w, probs:{大单:(d.大单+6)/(total+24),大双:(d.大双+6)/(total+24),小单:(d.小单+6)/(total+24),小双:(d.小双+6)/(total+24)}}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalW=preds.reduce((s,x)=>s+x.w*x.w,0), result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=x.w*x.w/totalW; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
+    function geneticAlgorithm(seq) { const n=seq.length; if(n<15) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const fitness=(weights)=>{ const sum=weights.reduce((a,b)=>a+b,1e-10), probs={大单:weights[0]/sum,大双:weights[1]/sum,小单:weights[2]/sum,小双:weights[3]/sum}; let logLik=0; for(let i=0;i<Math.min(40,n);i++) logLik+=Math.log(probs[seq[i]]+0.008); return logLik; }; let population=Array.from({length:120},()=>Array.from({length:4},()=>Math.random()*100)); let bestFitness=-Infinity, stall=0; for(let gen=0;gen<200;gen++){ const fitnesses=population.map(w=>fitness(w)); const curBest=Math.max(...fitnesses); if(curBest>bestFitness){ bestFitness=curBest; stall=0; } else { stall++; if(stall>20) break; } const eliteIdx=fitnesses.map((v,i)=>i).sort((a,b)=>fitnesses[b]-fitnesses[a]).slice(0,15); const newPop=eliteIdx.map(i=>[...population[i]]); while(newPop.length<120){ const i1=Math.floor(Math.random()*120), i2=Math.floor(Math.random()*120), i3=Math.floor(Math.random()*120); const p1=fitnesses[i1]>fitnesses[i2]?population[i1]:population[i2], p2=fitnesses[i2]>fitnesses[i3]?population[i2]:population[i3]; const child=[...p1]; if(Math.random()<0.85){ const cp=Math.floor(Math.random()*4); for(let j=cp;j<4;j++) child[j]=p2[j]; } if(Math.random()<0.12){ const idx=Math.floor(Math.random()*4); child[idx]*=(0.6+Math.random()*1.0); } newPop.push(child); } population=newPop; } const best=population.reduce((a,b)=>fitness(a)>fitness(b)?a:b), sum=best.reduce((a,b)=>a+b,0); return {大单:best[0]/sum,大双:best[1]/sum,小单:best[2]/sum,小双:best[3]/sum}; }
+    function kalmanFilter(seq) { const n=seq.length; if(n<12) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); let estimate=values[0], errorCov=1; const {regime}=getMarketRegime(seq); const pn=regime==='choppy'?0.06:(regime==='streaky'?0.02:0.04); for(let i=1;i<values.length;i++){ errorCov+=pn; const kg=errorCov/(errorCov+0.35); estimate=estimate+kg*(values[i]-estimate); errorCov=(1-kg)*errorCov; } const probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-estimate)*1.0)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
+    function arimaHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); const diff=[]; for(let i=1;i<values.length;i++) diff.push(values[i]-values[i-1]); const meanDiff=diff.slice(0,15).reduce((a,b)=>a+b,0)/15, meanVal=values.slice(0,10).reduce((a,b)=>a+b,0)/10; const pred=values[0]+meanDiff*0.9+(meanVal-values[0])*0.3; const probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-pred)*0.92)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
+    function randomForestHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const trees=100, votes={大单:0,大双:0,小单:0,小双:0}; for(let t=0;t<trees;t++){ const sz=Math.floor(n*0.8), idx=new Set(); while(idx.size<sz) idx.add(Math.floor(Math.random()*n)); const sample=Array.from(idx).map(i=>seq[i]), recent=sample.slice(0,15), freq={大单:0,大双:0,小单:0,小双:0}; recent.forEach((c,i)=>freq[c]+=Math.pow(0.85,i)); votes[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const total=Object.values(votes).reduce((a,b)=>a+b,0); return {大单:(votes.大单+8)/(total+32),大双:(votes.大双+8)/(total+32),小单:(votes.小单+8)/(total+32),小双:(votes.小双+8)/(total+32)}; }
+    function xgBoostHeuristic(seq) { const n=seq.length; if(n<18) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const toVal=c=>({大单:0,大双:1,小单:2,小双:3}[c]||0), values=seq.map(c=>toVal(c)).reverse(); let pred=values.map(()=>0), residual=[...values], lr=0.22; let prevLoss=Infinity; for(let r=0;r<80;r++){ for(let i=0;i<values.length-8;i++){ let avg=0; for(let j=0;j<8;j++) avg+=residual[i+j]; avg/=8; const grad=avg/(1+Math.abs(avg)); pred[i]+=lr*grad; } for(let i=0;i<values.length;i++) residual[i]=values[i]-pred[i]; const loss=residual.reduce((s,v)=>s+v*v,0); if(loss>prevLoss) break; prevLoss=loss; lr*=0.92; } const fp=pred[0], probs={大单:0,大双:0,小单:0,小双:0}; ['大单','大双','小单','小双'].forEach((c,i)=>probs[c]=Math.exp(-Math.abs(i-fp)*0.95)); const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
+    function deepEnsemble(seq) { const algos=[{w:0.12,f:()=>ewma(seq)},{w:0.12,f:()=>markovAdaptive(seq)},{w:0.08,f:()=>bootstrapMC(seq)},{w:0.08,f:()=>bayesianShrink(seq)},{w:0.10,f:()=>lstmHeuristic(seq)},{w:0.10,f:()=>geneticAlgorithm(seq)},{w:0.09,f:()=>kalmanFilter(seq)},{w:0.09,f:()=>arimaHeuristic(seq)},{w:0.08,f:()=>randomForestHeuristic(seq)},{w:0.08,f:()=>xgBoostHeuristic(seq)}]; const recent=seq.slice(0,25); algos.forEach(a=>{ const p=a.f(), top=Object.keys(p).reduce((x,y)=>p[x]>p[y]?x:y); let correct=0; recent.forEach(v=>{ if(v===top) correct++; }); a.w*=(0.6+correct/recent.length*0.8); }); const totalW=algos.reduce((s,a)=>s+a.w,0), result={大单:0,大双:0,小单:0,小双:0}; algos.forEach(a=>{ const p=a.f(); Object.keys(result).forEach(k=>result[k]+=p[k]*a.w/totalW); }); return result; }
+    function patternMatching(seq, len=18) { const n=seq.length; if(n<len+3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,len), probs={大单:0,大双:0,小单:0,小双:0}; let matches=0; for(let i=1;i<n-len;i++){ const pat=seq.slice(i,i+len); let sim=0; for(let j=0;j<len;j++) if(pat[j]===recent[j]) sim++; if(sim>=len-2){ probs[seq[i-1]]+=(sim/len)*(1+i/n); matches++; } } if(!matches) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]=(probs[k]+8)/(total+32)); return probs; }
+    function trendFollowing(seq, w=30) { const n=seq.length; if(n<w) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,w), weighted={大单:0,大双:0,小单:0,小双:0}; const alpha = 0.88, beta = 0.12; recent.forEach((c,i) => { const expWeight = Math.pow(alpha, i); const linearWeight = 1 - (i / w) * beta; const combinedWeight = expWeight * 0.75 + linearWeight * 0.25; weighted[c] += combinedWeight; }); const total = Object.values(weighted).reduce((a,b)=>a+b,0) + 0.04; const probs = {}; combos.forEach(c => { probs[c] = (weighted[c] + 0.01) / total; }); return probs; }
+    function reversalPrediction(seq) { const n=seq.length; if(n<25) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,25); let maxStreak=1, curStreak=1, streakCombo=recent[0]; for(let i=1;i<recent.length;i++){ if(recent[i]===recent[i-1]){ curStreak++; if(curStreak>maxStreak){ maxStreak=curStreak; streakCombo=recent[i]; } } else curStreak=1; } const probs={大单:0.25,大双:0.25,小单:0.25,小双:0.25}; if(maxStreak>=3){ const opp={大单:['小双','大双'],大双:['小单','大单'],小单:['大双','小双'],小双:['大单','小单']}; probs[streakCombo]=0.03*Math.min(7,maxStreak); opp[streakCombo].forEach(c=>probs[c]=0.55+(maxStreak-3)*0.03); } const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
+    function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.08+(missCount[c]/maxMiss)*0.55); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
+    function cycleAnalysis(seq, maxCycle=45) { const n=seq.length; if(n<60) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; let bestCycle=2, bestScore=0; for(let c=2;c<=Math.min(maxCycle,Math.floor(n/3));c++){ let matches=0,total=0; for(let i=0;i<n-c;i++){ if(seq[i]===seq[i+c]) matches++; total++; } const score=matches/total; if(score>bestScore){ bestScore=score; bestCycle=c; } } const probs={大单:0,大双:0,小单:0,小双:0}; if(bestScore>0.25){ for(let i=0;i<n-bestCycle;i++){ if(i<20) probs[seq[i+bestCycle]]+=5.0*Math.pow(0.82,i); } } const total=Object.values(probs).reduce((a,b)=>a+b,0); if(!total) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; combos.forEach(c=>probs[c]=(probs[c]+10)/(total+40)); return probs; }
     
-    // 增强版趋势跟踪（时间衰减优化）
-    function trendFollowing(seq, w=28) { 
-        const n=seq.length; 
-        if(n<w) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; 
-        const recent=seq.slice(0,w), weighted={大单:0,大双:0,小单:0,小双:0};
-        const alpha = 0.85, beta = 0.15;
-        recent.forEach((c,i) => {
-            const expWeight = Math.pow(alpha, i);
-            const linearWeight = 1 - (i / w) * beta;
-            const combinedWeight = expWeight * 0.7 + linearWeight * 0.3;
-            weighted[c] += combinedWeight;
-        });
-        const noise = 0.01;
-        const total = Object.values(weighted).reduce((a,b)=>a+b,0) + noise * 4;
-        const probs = {};
-        combos.forEach(c => { probs[c] = (weighted[c] + noise) / total; });
-        return probs;
-    }
-    
-    function reversalPrediction(seq) { const n=seq.length; if(n<25) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,25); let maxStreak=1, curStreak=1, streakCombo=recent[0]; for(let i=1;i<recent.length;i++){ if(recent[i]===recent[i-1]){ curStreak++; if(curStreak>maxStreak){ maxStreak=curStreak; streakCombo=recent[i]; } } else curStreak=1; } const probs={大单:0.25,大双:0.25,小单:0.25,小双:0.25}; if(maxStreak>=3){ const opp={大单:['小双','大双'],大双:['小单','大单'],小单:['大双','小双'],小双:['大单','小单']}; probs[streakCombo]=0.02*Math.min(8,maxStreak); opp[streakCombo].forEach(c=>probs[c]=0.52+(maxStreak-3)*0.025); } const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
-    function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.05+(missCount[c]/maxMiss)*0.5); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
-    function cycleAnalysis(seq, maxCycle=40) { const n=seq.length; if(n<60) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; let bestCycle=2, bestScore=0; for(let c=2;c<=Math.min(maxCycle,Math.floor(n/3));c++){ let matches=0,total=0; for(let i=0;i<n-c;i++){ if(seq[i]===seq[i+c]) matches++; total++; } const score=matches/total; if(score>bestScore){ bestScore=score; bestCycle=c; } } const probs={大单:0,大双:0,小单:0,小双:0}; if(bestScore>0.22){ for(let i=0;i<n-bestCycle;i++){ if(i<18) probs[seq[i+bestCycle]]+=4.0*Math.pow(0.8,i); } } const total=Object.values(probs).reduce((a,b)=>a+b,0); if(!total) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; combos.forEach(c=>probs[c]=(probs[c]+7)/(total+28)); return probs; }
-    
-    // 增强版和值预测（多时间尺度融合）
     function sumTrendAnalysis(sums) { 
         if(sums.length<30) return 14; 
         const s3=sums.slice(0,3).reduce((a,b)=>a+b,0)/3;
-        const s8=sums.slice(0,8).reduce((a,b)=>a+b,0)/8;
-        const s20=sums.slice(0,20).reduce((a,b)=>a+b,0)/20;
-        const s40=sums.slice(0,40).reduce((a,b)=>a+b,0)/40;
-        const shortTrend=(s3-s8)*1.2, midTrend=(s8-s20)*0.8, longTrend=(s20-s40)*0.3;
-        let vol=0; for(let i=1;i<30;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=29;
-        const trendWeight=Math.min(1.5,1+vol*0.3);
-        const combinedTrend=(shortTrend*0.5+midTrend*0.35+longTrend*0.15)*trendWeight;
+        const s7=sums.slice(0,7).reduce((a,b)=>a+b,0)/7;
+        const s15=sums.slice(0,15).reduce((a,b)=>a+b,0)/15;
+        const s30=sums.slice(0,30).reduce((a,b)=>a+b,0)/30;
+        const shortTrend=(s3-s7)*1.3, midTrend=(s7-s15)*0.9, longTrend=(s15-s30)*0.4;
+        let vol=0; for(let i=1;i<25;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=24;
+        const combinedTrend=(shortTrend*0.55+midTrend*0.3+longTrend*0.15)*(1+vol*0.2);
         let prediction=s3+combinedTrend;
         prediction=Math.max(2,Math.min(26,prediction));
         return Math.round(prediction*10)/10;
     }
 
-    // 终极专业单门预测（融合所有优化）
     function professionalSingle(seq, sums) { 
         const n = seq.length;
         if(n < 35) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
-        
-        const pat = patternMatching(seq);
-        const trd = trendFollowing(seq, 28);
-        const rev = reversalPrediction(seq);
-        const mis = missCompensation(seq);
-        const cyc = cycleAnalysis(seq);
-        const mar = markovAdaptive(seq);
-        const bay = bayesianShrink(seq);
-        const lstm = lstmHeuristic(seq);
-        const kal = kalmanFilter(seq);
-        const xgb = xgBoostHeuristic(seq);
-        const deep = deepEnsemble(seq);
-        
+        const pat = patternMatching(seq); const trd = trendFollowing(seq, 30); const rev = reversalPrediction(seq);
+        const mis = missCompensation(seq); const cyc = cycleAnalysis(seq); const mar = markovAdaptive(seq);
+        const bay = bayesianShrink(seq); const lstm = lstmHeuristic(seq); const kal = kalmanFilter(seq);
+        const xgb = xgBoostHeuristic(seq); const deep = deepEnsemble(seq);
         const {regime, volatility, streak} = getMarketRegime(seq);
-        
         let w = {...adaptiveWeights};
-        
-        if(regime === 'choppy'){ w.rev *= 1.15; w.mis *= 1.12; w.trd *= 0.92; }
-        else if(regime === 'streaky'){ w.trd *= 1.18; w.pat *= 1.10; w.rev *= 0.88; }
+        if(regime === 'choppy'){ w.rev *= 1.18; w.mis *= 1.12; w.trd *= 0.88; }
+        else if(regime === 'streaky'){ w.trd *= 1.22; w.pat *= 1.10; w.rev *= 0.85; }
         else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.12; w.mar *= 1.08; }
         else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.10; w.deep *= 1.08; }
-        else if(regime === 'duizi_due'){ w.mis *= 1.12; w.rev *= 1.07; }
-        
+        else if(regime === 'duizi_due'){ w.mis *= 1.14; w.rev *= 1.08; }
         if(volatility > 0.7) { w.rev *= 1.05; w.mis *= 1.04; w.trd *= 0.95; }
         if(streak >= 5) { w.trd *= 1.06; w.pat *= 1.05; w.rev *= 0.94; }
-        
         const totalW = Object.values(w).reduce((a,b)=>a+b,0);
         Object.keys(w).forEach(k => w[k] /= totalW);
-        
         const result = {大单:0, 大双:0, 小单:0, 小双:0};
         const strats = {pat, trd, rev, mis, cyc, mar, bay, lstm, kal, xgb, deep};
-        Object.keys(w).forEach(k => {
-            if(strats[k]) Object.keys(result).forEach(c => result[c] += strats[k][c] * w[k]);
-        });
-        
+        Object.keys(w).forEach(k => { if(strats[k]) Object.keys(result).forEach(c => result[c] += strats[k][c] * w[k]); });
         const sumPred = sumTrendAnalysis(sums);
-        const recentSums = sums.slice(0,6);
-        const avgRecent = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
-        const trendStrength = (sumPred - sums[0]) / 5;
-        let bias = sumPred * 0.6 + avgRecent * 0.4;
-        if (Math.abs(trendStrength) > 2) bias = sumPred * 0.8 + avgRecent * 0.2;
-        
-        if(bias > 15.5) { const factor = 1 + Math.min(0.25, (bias - 15.5) * 0.05); result.大单 *= factor; result.大双 *= factor; }
-        else if(bias < 12.5) { const factor = 1 + Math.min(0.25, (12.5 - bias) * 0.05); result.小单 *= factor; result.小双 *= factor; }
-        
+        const recentSums = sums.slice(0,5); const avgRecent = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
+        let bias = sumPred * 0.65 + avgRecent * 0.35;
+        if(bias > 15.2) { const factor = 1 + Math.min(0.25, (bias - 15.2) * 0.05); result.大单 *= factor; result.大双 *= factor; }
+        else if(bias < 12.8) { const factor = 1 + Math.min(0.25, (12.8 - bias) * 0.05); result.小单 *= factor; result.小双 *= factor; }
         const recentOddRatio = sums.slice(0,12).filter(s => s % 2 === 1).length / 12;
-        if (recentOddRatio > 0.65) { result.大单 *= 1.08; result.小单 *= 1.08; }
-        else if (recentOddRatio < 0.35) { result.大双 *= 1.08; result.小双 *= 1.08; }
-        
+        if (recentOddRatio > 0.62) { result.大单 *= 1.08; result.小单 *= 1.08; }
+        else if (recentOddRatio < 0.38) { result.大双 *= 1.08; result.小双 *= 1.08; }
         const norm = Object.values(result).reduce((a,b)=>a+b,0);
         Object.keys(result).forEach(k => result[k] /= norm);
-        
         return result;
     }
 
-    function predictPatternProbs(patterns) { const n=patterns.length; if(n<12) return {对子:0.25,顺子:0.25,杂六:0.25,豹子:0.25}; const freq={对子:0,顺子:0,杂六:0,豹子:0}; patterns.slice(0,25).forEach((p,i)=>freq[p]+=Math.pow(0.83,i)); const total=Object.values(freq).reduce((a,b)=>a+b,0); const probs={}; ['对子','顺子','杂六','豹子'].forEach(p=>probs[p]=freq[p]/total); return probs; }
+    function predictPatternProbs(patterns) { const n=patterns.length; if(n<12) return {对子:0.25,顺子:0.25,杂六:0.25,豹子:0.25}; const freq={对子:0,顺子:0,杂六:0,豹子:0}; patterns.slice(0,28).forEach((p,i)=>freq[p]+=Math.pow(0.85,i)); const total=Object.values(freq).reduce((a,b)=>a+b,0); const probs={}; ['对子','顺子','杂六','豹子'].forEach(p=>probs[p]=freq[p]/total); return probs; }
     
+    // ==================== 算法优化区域结束 ====================
+
+    // 以下所有函数保持原样 (analyzeMarketState, setPrediction, updateUI, runAllPredictions, loadData等)
     function analyzeMarketState(seq) {
         const n=seq.length; if(n<20) return '良';
         const {regime, volatility, streak, duiziDue} = getMarketRegime(seq);
@@ -544,16 +485,9 @@
         updateAlgoWinRates();
     }
 
-    // 更新API状态显示
-    function setApiLoading() {
-        $('apiTip').innerHTML = '<span class="loading-spinner"></span> 云端加载中';
-    }
-    function setApiSuccess() {
-        $('apiTip').innerHTML = '✅ 已同步';
-    }
-    function setApiError(msg) {
-        $('apiTip').innerHTML = `❌ ${msg}`;
-    }
+    function setApiLoading() { $('apiTip').innerHTML = '<span class="loading-spinner"></span> 云端加载中'; }
+    function setApiSuccess() { $('apiTip').innerHTML = '✅ 已同步'; }
+    function setApiError(msg) { $('apiTip').innerHTML = `❌ ${msg}`; }
 
     async function loadData(manual=false, isPolling=false){
         if(!isPolling) setApiLoading();
@@ -640,18 +574,10 @@
     function loadPredictHistory(){ let rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); $('recordCount').innerText=`共${rs.length}条`; const set=new Set(rs.map(r=>r.algorithm)); let cur=window._curAlgoFilter||'all'; $('recordAlgoTabs').innerHTML=`<div class="filter-chip ${cur==='all'?'active':''}" data-algo="all">全部</div>`+Array.from(set).map(a=>`<div class="filter-chip ${cur===a?'active':''}" data-algo="${a}">${algoNames[a]||a}</div>`).join(''); document.querySelectorAll('.filter-chip').forEach(t=>t.addEventListener('click',function(){ window._curAlgoFilter=this.dataset.algo; loadPredictHistory(); })); let f=cur==='all'?rs:rs.filter(r=>r.algorithm===cur); const c=$('recordCardsContainer'); if(!f.length) c.innerHTML='<div style="text-align:center;padding:20px;">暂无记录</div>'; else c.innerHTML=f.slice(0,100).map(r=>`<div class="record-card"><div class="record-card-header"><span style="background:var(--ios-blue);color:#fff;padding:4px 12px;border-radius:20px;">${algoNames[r.algorithm]||r.algorithm}</span><span>${r.period}</span></div><div style="display:flex;justify-content:space-between;margin-top:8px;"><span>🎯 ${(r.doublePred||[]).join('/')}</span><span>⭐ ${r.singlePred||''}</span><span style="font-size:20px;">${r.hit?'🀄️':'🍉'}</span></div><div style="font-size:13px;color:var(--ios-text-tertiary);">开奖: ${r.actualCombo||r.combo}</div></div>`).join(''); updateModelWinrate(); }
     window.clearPredictHistory=()=>{ if(confirm('清空所有真实预测记录？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); updateAlgoWinRates(); renderAlgorithmTabs(); } };
     function startCountdown(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ if(isOpening) { if(openingStartTime && (Date.now()-openingStartTime)/1000 > 180) $('openingHint').classList.add('show'); return; } openingStartTime=null; $('openingHint').classList.remove('show'); if(countdownSeconds<=0){ isOpening=true; openingStartTime=Date.now(); $('timerLabel').innerText='🔥 开奖中 🔥'; $('count').innerText='开奖中'; $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); $('openingAnimation').style.display='flex'; $('resultBalls').style.display='none'; startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); $('count').classList.remove('opening'); } },1000); }
-    
-    // 修改为1.3秒轮询
-    function startOpeningPolling(){ 
-        if(openingPolling) clearInterval(openingPolling); 
-        openingPolling=setInterval(()=>{ 
-            loadData(false,true); 
-        }, 1300); // 1.3秒
-    }
-    
+    function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); }, 1300); }
     function startAutoRefresh(i=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); },i); }
 
-    // 测试功能
+    // 测试功能 (保持原样)
     window.openTestModal = () => { $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
     window.closeTestModal = () => $('testModal').style.display='none';
     function generateSmartNumbers() { if(historyData.length<20) return { n1:Math.floor(Math.random()*10), n2:Math.floor(Math.random()*10), n3:Math.floor(Math.random()*10) }; const recent=historyData.slice(0,30); const freq=Array(10).fill(0); recent.forEach(d=>d.numbers.forEach(n=>freq[n]++)); const last=Array(10).fill(-1); recent.forEach((d,i)=>d.numbers.forEach(n=>{ if(last[n]===-1) last[n]=i; })); const total=freq.reduce((a,b)=>a+b,0); const probs=freq.map((f,i)=>{ const base=f/total; const miss=last[i]===-1?30:last[i]; return base*0.6+(miss/30)*0.4; }); const sum=probs.reduce((a,b)=>a+b,0); const norm=probs.map(p=>p/sum); const pick=()=>{ const r=Math.random(); let acc=0; for(let i=0;i<10;i++){ acc+=norm[i]; if(r<acc) return i; } return 9; }; return { n1:pick(), n2:pick(), n3:pick() }; }
