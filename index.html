@@ -276,7 +276,13 @@
 
 <script>
 (function(){
-    const API_URL = 'https://pc28.ai/api/kj.json?nbr=50';
+    // ===== 多API源支持，轮询尝试 =====
+    const API_URLS = [
+        'https://www.pc28.help/api/kj.json?nbr=50',   // 新主接口
+        'https://pc28.ai/api/kj.json?nbr=50'          // 备用原接口
+    ];
+    let currentApiIndex = 0;
+    
     const STORAGE_KEY = 'ys_pc28_perfect_final_v3';
     const TEST_STORAGE_KEY = 'ys_pc28_test_perfect_v3';
     let historyData = [], latestPeriod = '';
@@ -317,7 +323,7 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ==================== 【算法优化区域】 仅以下函数被优化 ====================
+    // ==================== 【算法优化区域】 ====================
     function getMarketRegime(seq) {
         const n = seq.length; if (n < 20) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
         const recent = seq.slice(0, 20); let changes = 0;
@@ -338,7 +344,6 @@
         return { regime, volatility, streak: maxStreak, trend: trendBig, duiziDue };
     }
 
-    // 子算法：优化参数与逻辑
     function ewma(seq) { const n=seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const {regime}=getMarketRegime(seq); const lambda=regime==='choppy'?0.45:(regime==='streaky'?0.92:0.82); const w=seq.map((_,i)=>Math.pow(lambda,i)), sumW=w.reduce((a,b)=>a+b,0); const c={大单:0,大双:0,小单:0,小双:0}; seq.forEach((v,i)=>c[v]+=w[i]/sumW); return c; }
     function markovAdaptive(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const orders=[2,3,4,5], preds=[]; orders.forEach(o=>{ if(n<=o+2) return; const trans={}; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'), cur=seq[i]; if(!trans[ctx]) trans[ctx]={大单:0,大双:0,小单:0,小双:0}; trans[ctx][cur]++; } const lastCtx=seq.slice(n-o,n).join('|'); if(trans[lastCtx]){ const d=trans[lastCtx], total=Object.values(d).reduce((a,b)=>a+b,0); const probs={大单:(d.大单+5)/(total+20),大双:(d.大双+5)/(total+20),小单:(d.小单+5)/(total+20),小双:(d.小双+5)/(total+20)}; let logLik=0; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'); if(trans[ctx]){ const dt=trans[ctx], tot=Object.values(dt).reduce((a,b)=>a+b,0); logLik+=Math.log((dt[seq[i]]+2)/(tot+8)); } } preds.push({o, probs, score:logLik}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalScore=preds.reduce((s,x)=>s+Math.exp(x.score/2),0), result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=Math.exp(x.score/2)/totalScore; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
     function bootstrapMC(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const B=40000, blockSize=Math.min(6,Math.floor(n/3)), counts={大单:0,大双:0,小单:0,小双:0}; for(let b=0;b<B;b++){ const sample=[]; while(sample.length<n){ const start=Math.floor(Math.random()*(n-blockSize+1)); for(let i=0;i<blockSize;i++) sample.push(seq[start+i]); } const freq={大单:0,大双:0,小单:0,小双:0}; sample.slice(0,n).forEach(v=>freq[v]++); counts[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const result={}; combos.forEach(c=>result[c]=(counts[c]+8)/(B+32)); return result; }
@@ -408,7 +413,6 @@
     
     // ==================== 算法优化区域结束 ====================
 
-    // 以下所有函数保持原样 (analyzeMarketState, setPrediction, updateUI, runAllPredictions, loadData等)
     function analyzeMarketState(seq) {
         const n=seq.length; if(n<20) return '良';
         const {regime, volatility, streak, duiziDue} = getMarketRegime(seq);
@@ -489,78 +493,126 @@
     function setApiSuccess() { $('apiTip').innerHTML = '✅ 已同步'; }
     function setApiError(msg) { $('apiTip').innerHTML = `❌ ${msg}`; }
 
-    async function loadData(manual=false, isPolling=false){
-        if(!isPolling) setApiLoading();
-        try{
-            const r=await fetch(API_URL+'&t='+Date.now()); 
-            if(!r.ok) throw new Error(`HTTP ${r.status}`); 
-            const j=await r.json();
-            if(j?.data?.length){
-                const lt=j.data[0], cp=lt.nbr, [n1,n2,n3]=lt.number.split('+').map(Number), sv=parseInt(lt.num), info=getSumInfo(sv,[n1,n2,n3]), ts=`${lt.date} ${lt.time}`;
-                const isNewPeriod = (latestPeriod && latestPeriod !== cp);
-                if(isNewPeriod){
-                    if(latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1,n2,n3], sv, ts);
-                    if(isOpening){ 
-                        isOpening=false; 
-                        openingStartTime=null; 
-                        if(openingPolling){ clearInterval(openingPolling); openingPolling=null; } 
+    // ===== 核心修改：多API轮询加载数据 =====
+    async function tryFetchApi(index) {
+        const url = API_URLS[index] + '&t=' + Date.now();
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.warn(`API ${index + 1} 失败: ${url}`, error);
+            return null;
+        }
+    }
+
+    async function loadData(manual = false, isPolling = false) {
+        if (!isPolling) setApiLoading();
+        
+        let data = null;
+        let successIndex = -1;
+        
+        // 先尝试当前索引的API
+        data = await tryFetchApi(currentApiIndex);
+        if (data) successIndex = currentApiIndex;
+        else {
+            // 尝试下一个API
+            const nextIndex = (currentApiIndex + 1) % API_URLS.length;
+            data = await tryFetchApi(nextIndex);
+            if (data) {
+                successIndex = nextIndex;
+                currentApiIndex = nextIndex; // 切换为主用
+            } else if (API_URLS.length > 2) {
+                // 尝试所有其他API
+                for (let i = 0; i < API_URLS.length; i++) {
+                    if (i === currentApiIndex || i === nextIndex) continue;
+                    data = await tryFetchApi(i);
+                    if (data) {
+                        successIndex = i;
+                        currentApiIndex = i;
+                        break;
                     }
-                    $('timerLabel').innerText='下期开奖倒计时'; 
+                }
+            }
+        }
+
+        if (!data) {
+            setApiError('所有API均失败，请检查网络');
+            return;
+        }
+
+        try {
+            const j = data;
+            if (j?.data?.length) {
+                const lt = j.data[0], cp = lt.nbr, [n1, n2, n3] = lt.number.split('+').map(Number), sv = parseInt(lt.num), info = getSumInfo(sv, [n1, n2, n3]), ts = `${lt.date} ${lt.time}`;
+                const isNewPeriod = (latestPeriod && latestPeriod !== cp);
+                if (isNewPeriod) {
+                    if (latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1, n2, n3], sv, ts);
+                    if (isOpening) { 
+                        isOpening = false; 
+                        openingStartTime = null; 
+                        if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } 
+                    }
+                    $('timerLabel').innerText = '下期开奖倒计时'; 
                     $('resultCard').classList.remove('opening-glow'); 
                     $('count').classList.remove('opening');
-                    $('openingAnimation').style.display='none'; 
-                    $('resultBalls').style.display='flex'; 
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
                     $('openingHint').classList.remove('show');
                 }
                 latestPeriod = cp;
-                if(!isOpening){
-                    $('openingAnimation').style.display='none'; 
-                    $('resultBalls').style.display='flex'; 
+                if (!isOpening) {
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
                     $('openingHint').classList.remove('show');
-                    ['n1','n2','n3','sum'].forEach(id=>$(id).classList.add('roll')); 
-                    setTimeout(()=>['n1','n2','n3','sum'].forEach(id=>$(id).classList.remove('roll')),500);
-                    $('n1').innerText=n1; updateBallColor($('n1'), n1); 
-                    $('n2').innerText=n2; updateBallColor($('n2'), n2); 
-                    $('n3').innerText=n3; updateBallColor($('n3'), n3);
-                    $('sum').innerText=sv; $('sum').className='ball sum '+(sv>13?'big':'small'); 
-                    $('issue').innerText=cp; 
-                    $('sumExpression').innerText=`${n1}+${n2}+${n3}=${sv}`;
-                    $('combo').innerHTML=`<span class="pattern-badge ${info.pattern}">${info.pattern}</span>`; 
-                    $('dx').innerHTML=`<span style="color:${info.dx==='大'?'var(--color-big)':'var(--color-small)'};font-weight:700;">${info.dx}</span>`; 
-                    $('ds').innerHTML=`<span style="font-weight:700;">${info.ds}</span>`; 
-                    $('comboDetail').innerHTML=`<span style="font-weight:700;">${info.combo}</span>`; 
-                    $('openTime').innerText=ts;
+                    ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.add('roll')); 
+                    setTimeout(() => ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.remove('roll')), 500);
+                    $('n1').innerText = n1; updateBallColor($('n1'), n1); 
+                    $('n2').innerText = n2; updateBallColor($('n2'), n2); 
+                    $('n3').innerText = n3; updateBallColor($('n3'), n3);
+                    $('sum').innerText = sv; $('sum').className = 'ball sum ' + (sv > 13 ? 'big' : 'small'); 
+                    $('issue').innerText = cp; 
+                    $('sumExpression').innerText = `${n1}+${n2}+${n3}=${sv}`;
+                    $('combo').innerHTML = `<span class="pattern-badge ${info.pattern}">${info.pattern}</span>`; 
+                    $('dx').innerHTML = `<span style="color:${info.dx === '大' ? 'var(--color-big)' : 'var(--color-small)'};font-weight:700;">${info.dx}</span>`; 
+                    $('ds').innerHTML = `<span style="font-weight:700;">${info.ds}</span>`; 
+                    $('comboDetail').innerHTML = `<span style="font-weight:700;">${info.combo}</span>`; 
+                    $('openTime').innerText = ts;
                 }
-                if(!isOpening && j.countdown){
-                    const cd=j.countdown;
-                    if(cd==='00:00'||cd==='0:00'){
-                        if(!isOpening){ 
-                            isOpening=true; 
-                            openingStartTime=Date.now(); 
-                            $('timerLabel').innerText='🔥 开奖中 🔥'; 
-                            $('count').innerText='开奖中'; 
+                if (!isOpening && j.countdown) {
+                    const cd = j.countdown;
+                    if (cd === '00:00' || cd === '0:00') {
+                        if (!isOpening) { 
+                            isOpening = true; 
+                            openingStartTime = Date.now(); 
+                            $('timerLabel').innerText = '🔥 开奖中 🔥'; 
+                            $('count').innerText = '开奖中'; 
                             $('count').classList.add('opening'); 
                             $('resultCard').classList.add('opening-glow'); 
-                            $('openingAnimation').style.display='flex'; 
-                            $('resultBalls').style.display='none'; 
+                            $('openingAnimation').style.display = 'flex'; 
+                            $('resultBalls').style.display = 'none'; 
                             startOpeningPolling(); 
                         }
                     } else {
-                        const [m,s]=cd.split(':').map(Number); countdownSeconds=m*60+s;
-                        $('count').innerText=fmtTime(countdownSeconds); $('count').classList.remove('opening');
+                        const [m, s] = cd.split(':').map(Number); countdownSeconds = m * 60 + s;
+                        $('count').innerText = fmtTime(countdownSeconds); $('count').classList.remove('opening');
                     }
                 }
                 setApiSuccess();
-                if(isNewPeriod || historyData.length===0){
-                    historyData=j.data.map(i=>{ const [a,b,c]=i.number.split('+').map(Number), s=parseInt(i.num), inf=getSumInfo(s,[a,b,c]); return {period:i.nbr, numbers:[a,b,c], sum:s, combo:inf.combo, pattern:inf.pattern, time:`${i.date} ${i.time}`, isBig:s>13}; }).sort((a,b)=>parseInt(b.period)-parseInt(a.period));
+                if (isNewPeriod || historyData.length === 0) {
+                    historyData = j.data.map(i => { 
+                        const [a, b, c] = i.number.split('+').map(Number), s = parseInt(i.num), inf = getSumInfo(s, [a, b, c]); 
+                        return { period: i.nbr, numbers: [a, b, c], sum: s, combo: inf.combo, pattern: inf.pattern, time: `${i.date} ${i.time}`, isBig: s > 13 }; 
+                    }).sort((a, b) => parseInt(b.period) - parseInt(a.period));
                     renderHistoryTable(); calcStats(); runAllPredictions(); renderMiss(); drawChart(); updateTrendPanel();
                 }
                 updateModelWinrate(); loadPredictHistory(); 
-                if(manual) setApiSuccess();
+                if (manual) setApiSuccess();
             }
-        }catch(e){ 
+        } catch (e) {
             console.error(e); 
-            setApiError('失败: '+e.message); 
+            setApiError('解析失败: ' + e.message); 
         }
     }
 
