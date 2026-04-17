@@ -581,13 +581,24 @@
                 const isNewPeriod = (latestPeriod && latestPeriod !== cp);
                 if (isNewPeriod) {
                     if (latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1, n2, n3], sv, ts);
-                    if (isOpening) { isOpening = false; openingStartTime = null; if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } }
-                    $('timerLabel').innerText = '下期开奖倒计时'; $('resultCard').classList.remove('opening-glow'); $('count').classList.remove('opening');
-                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
+                    // 强制退出开奖状态，确保界面同步
+                    if (isOpening) { 
+                        isOpening = false; 
+                        openingStartTime = null; 
+                        if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } 
+                    }
+                    $('timerLabel').innerText = '下期开奖倒计时'; 
+                    $('resultCard').classList.remove('opening-glow'); 
+                    $('count').classList.remove('opening');
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
+                    $('openingHint').classList.remove('show');
                 }
                 latestPeriod = cp;
                 if (!isOpening) {
-                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
+                    $('openingHint').classList.remove('show');
                     ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.add('roll')); 
                     setTimeout(() => ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.remove('roll')), 500);
                     $('n1').innerText = n1; updateBallColor($('n1'), n1); 
@@ -622,6 +633,11 @@
                         return { period: i.nbr, numbers: [a, b, c], sum: s, combo: inf.combo, pattern: inf.pattern, time: `${i.date} ${i.time}`, isBig: s > 13 }; 
                     }).sort((a, b) => parseInt(b.period) - parseInt(a.period));
                     renderHistoryTable(); calcStats(); runAllPredictions(); renderMiss(); drawChart(); updateTrendPanel();
+                    
+                    // 开奖后延迟再次刷新，确保数据完全同步 (修复时间对不上的问题)
+                    if (isNewPeriod) {
+                        setTimeout(() => { if (!isOpening) loadData(false); }, 800);
+                    }
                 }
                 updateModelWinrate(); loadPredictHistory(); 
                 if (manual) setApiSuccess();
@@ -640,7 +656,7 @@
     window.clearPredictHistory=()=>{ if(confirm('清空所有真实预测记录？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); updateAlgoWinRates(); renderAlgorithmTabs(); } };
     function startCountdown(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ if(isOpening) { if(openingStartTime && (Date.now()-openingStartTime)/1000 > 180) $('openingHint').classList.add('show'); return; } openingStartTime=null; $('openingHint').classList.remove('show'); if(countdownSeconds<=0){ isOpening=true; openingStartTime=Date.now(); $('timerLabel').innerText='🔥 开奖中 🔥'; $('count').innerText='开奖中'; $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); $('openingAnimation').style.display='flex'; $('resultBalls').style.display='none'; startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); $('count').classList.remove('opening'); } },1000); }
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); }, 1300); }
-    function startAutoRefresh(i=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); },i); }
+    function startAutoRefresh(i=10000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); },i); }
 
     // 测试功能 (保持不变)
     window.openTestModal = () => { $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
