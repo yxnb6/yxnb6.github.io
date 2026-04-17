@@ -276,10 +276,10 @@
 
 <script>
 (function(){
-    // ===== 多API源支持，轮询尝试 =====
+    // ===== 多API源支持 =====
     const API_URLS = [
-        'https://www.pc28.help/api/kj.json?nbr=50',   // 新主接口
-        'https://pc28.ai/api/kj.json?nbr=50'          // 备用原接口
+        'https://www.pc28.help/api/kj.json?nbr=50',
+        'https://pc28.ai/api/kj.json?nbr=50'
     ];
     let currentApiIndex = 0;
     
@@ -323,24 +323,25 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ==================== 【算法优化区域】 ====================
+    // ==================== 【算法优化区域 V2】 ====================
     function getMarketRegime(seq) {
-        const n = seq.length; if (n < 20) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
-        const recent = seq.slice(0, 20); let changes = 0;
+        const n = seq.length; if (n < 15) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
+        const recent = seq.slice(0, 15); // 缩短窗口增加敏感度
+        let changes = 0;
         for (let i = 1; i < recent.length; i++) if (recent[i] !== recent[i-1]) changes++;
         const volatility = changes / (recent.length - 1);
         let maxStreak = 1, cur = 1;
         for (let i = 1; i < recent.length; i++) { if (recent[i] === recent[i-1]) { cur++; if (cur > maxStreak) maxStreak = cur; } else cur = 1; }
         const bigCount = recent.filter(c => c.includes('大')).length, oddCount = recent.filter(c => c.includes('单')).length;
-        const trendBig = (bigCount - 10) / 10, trendOdd = (oddCount - 10) / 10;
+        const trendBig = (bigCount - 7.5) / 7.5, trendOdd = (oddCount - 7.5) / 7.5;
         const patterns = historyData.slice(0, 30).map(d => d.pattern);
         const duiziMiss = patterns.indexOf('对子'); const duiziDue = duiziMiss === -1 ? 0 : duiziMiss;
         let regime = 'neutral';
-        if (volatility > 0.65 && maxStreak <= 2) regime = 'choppy';
-        else if (maxStreak >= 4) regime = 'streaky';
-        else if (Math.abs(trendBig) > 0.25) regime = trendBig > 0 ? 'bullish' : 'bearish';
-        else if (Math.abs(trendOdd) > 0.25) regime = trendOdd > 0 ? 'odd_bias' : 'even_bias';
-        else if (duiziDue > 12) regime = 'duizi_due';
+        if (volatility > 0.7 && maxStreak <= 2) regime = 'choppy';
+        else if (maxStreak >= 3) regime = 'streaky';
+        else if (Math.abs(trendBig) > 0.3) regime = trendBig > 0 ? 'bullish' : 'bearish';
+        else if (Math.abs(trendOdd) > 0.3) regime = trendOdd > 0 ? 'odd_bias' : 'even_bias';
+        else if (duiziDue > 10) regime = 'duizi_due';
         return { regime, volatility, streak: maxStreak, trend: trendBig, duiziDue };
     }
 
@@ -361,49 +362,91 @@
     function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.08+(missCount[c]/maxMiss)*0.55); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
     function cycleAnalysis(seq, maxCycle=45) { const n=seq.length; if(n<60) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; let bestCycle=2, bestScore=0; for(let c=2;c<=Math.min(maxCycle,Math.floor(n/3));c++){ let matches=0,total=0; for(let i=0;i<n-c;i++){ if(seq[i]===seq[i+c]) matches++; total++; } const score=matches/total; if(score>bestScore){ bestScore=score; bestCycle=c; } } const probs={大单:0,大双:0,小单:0,小双:0}; if(bestScore>0.25){ for(let i=0;i<n-bestCycle;i++){ if(i<20) probs[seq[i+bestCycle]]+=5.0*Math.pow(0.82,i); } } const total=Object.values(probs).reduce((a,b)=>a+b,0); if(!total) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; combos.forEach(c=>probs[c]=(probs[c]+10)/(total+40)); return probs; }
     
+    // 优化后的和值预测：引入均值回归与动量修正
     function sumTrendAnalysis(sums) { 
-        if(sums.length<30) return 14; 
+        if(sums.length<20) return 14; 
         const s3=sums.slice(0,3).reduce((a,b)=>a+b,0)/3;
         const s7=sums.slice(0,7).reduce((a,b)=>a+b,0)/7;
         const s15=sums.slice(0,15).reduce((a,b)=>a+b,0)/15;
         const s30=sums.slice(0,30).reduce((a,b)=>a+b,0)/30;
-        const shortTrend=(s3-s7)*1.3, midTrend=(s7-s15)*0.9, longTrend=(s15-s30)*0.4;
-        let vol=0; for(let i=1;i<25;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=24;
-        const combinedTrend=(shortTrend*0.55+midTrend*0.3+longTrend*0.15)*(1+vol*0.2);
-        let prediction=s3+combinedTrend;
+        const shortTrend=(s3-s7)*1.4; // 增强短期敏感度
+        const midTrend=(s7-s15)*0.9;
+        const longTrend=(s15-s30)*0.3;
+        // 波动率调整
+        let vol=0; for(let i=1;i<20;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=19;
+        const combinedTrend=(shortTrend*0.6+midTrend*0.3+longTrend*0.1)*(1+vol*0.25);
+        // 均值回归项：长期均值14
+        const meanReversion = (14 - s3) * 0.12;
+        let prediction=s3+combinedTrend+meanReversion;
         prediction=Math.max(2,Math.min(26,prediction));
         return Math.round(prediction*10)/10;
     }
 
+    // 短期动量因子：最近2期组合方向
+    function shortMomentumAdjust(probs, seq) {
+        if (seq.length < 3) return probs;
+        const last = seq[0], prev = seq[1];
+        const momentumMap = {
+            '大单': ['大单','大双','小单'],
+            '大双': ['大双','大单','小双'],
+            '小单': ['小单','小双','大单'],
+            '小双': ['小双','小单','大双']
+        };
+        const boost = momentumMap[prev]?.includes(last) ? 1.12 : 0.92;
+        const adjusted = {...probs};
+        if (boost > 1.0) {
+            adjusted[last] = probs[last] * boost;
+        } else {
+            // 反转概率提升
+            const reverse = momentumMap[last]?.find(c => c !== last && c !== prev) || '小双';
+            adjusted[reverse] = probs[reverse] * 1.08;
+        }
+        const total = Object.values(adjusted).reduce((a,b)=>a+b,0);
+        Object.keys(adjusted).forEach(k => adjusted[k] /= total);
+        return adjusted;
+    }
+
     function professionalSingle(seq, sums) { 
         const n = seq.length;
-        if(n < 35) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
+        if(n < 25) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
         const pat = patternMatching(seq); const trd = trendFollowing(seq, 30); const rev = reversalPrediction(seq);
         const mis = missCompensation(seq); const cyc = cycleAnalysis(seq); const mar = markovAdaptive(seq);
         const bay = bayesianShrink(seq); const lstm = lstmHeuristic(seq); const kal = kalmanFilter(seq);
         const xgb = xgBoostHeuristic(seq); const deep = deepEnsemble(seq);
         const {regime, volatility, streak} = getMarketRegime(seq);
+        // 根据历史胜率动态微调权重 (从localStorage读取)
         let w = {...adaptiveWeights};
-        if(regime === 'choppy'){ w.rev *= 1.18; w.mis *= 1.12; w.trd *= 0.88; }
-        else if(regime === 'streaky'){ w.trd *= 1.22; w.pat *= 1.10; w.rev *= 0.85; }
-        else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.12; w.mar *= 1.08; }
-        else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.10; w.deep *= 1.08; }
-        else if(regime === 'duizi_due'){ w.mis *= 1.14; w.rev *= 1.08; }
-        if(volatility > 0.7) { w.rev *= 1.05; w.mis *= 1.04; w.trd *= 0.95; }
-        if(streak >= 5) { w.trd *= 1.06; w.pat *= 1.05; w.rev *= 0.94; }
+        const rs = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+        const proRecords = rs.filter(r=>r.algorithm==='pro' && r.hit).length;
+        const proTotal = rs.filter(r=>r.algorithm==='pro').length;
+        if (proTotal > 10) {
+            const hitRate = proRecords / proTotal;
+            if (hitRate > 0.55) { w.trd *= 1.05; w.pat *= 1.03; }
+            else if (hitRate < 0.4) { w.rev *= 1.08; w.mis *= 1.05; }
+        }
+        if(regime === 'choppy'){ w.rev *= 1.2; w.mis *= 1.15; w.trd *= 0.85; }
+        else if(regime === 'streaky'){ w.trd *= 1.25; w.pat *= 1.12; w.rev *= 0.8; }
+        else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.15; w.mar *= 1.1; }
+        else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.12; w.deep *= 1.1; }
+        else if(regime === 'duizi_due'){ w.mis *= 1.18; w.rev *= 1.1; }
+        if(volatility > 0.7) { w.rev *= 1.06; w.mis *= 1.05; w.trd *= 0.92; }
+        if(streak >= 4) { w.trd *= 1.08; w.pat *= 1.06; w.rev *= 0.9; }
         const totalW = Object.values(w).reduce((a,b)=>a+b,0);
         Object.keys(w).forEach(k => w[k] /= totalW);
-        const result = {大单:0, 大双:0, 小单:0, 小双:0};
+        let result = {大单:0, 大双:0, 小单:0, 小双:0};
         const strats = {pat, trd, rev, mis, cyc, mar, bay, lstm, kal, xgb, deep};
         Object.keys(w).forEach(k => { if(strats[k]) Object.keys(result).forEach(c => result[c] += strats[k][c] * w[k]); });
+        // 和值偏向调整
         const sumPred = sumTrendAnalysis(sums);
         const recentSums = sums.slice(0,5); const avgRecent = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
-        let bias = sumPred * 0.65 + avgRecent * 0.35;
-        if(bias > 15.2) { const factor = 1 + Math.min(0.25, (bias - 15.2) * 0.05); result.大单 *= factor; result.大双 *= factor; }
-        else if(bias < 12.8) { const factor = 1 + Math.min(0.25, (12.8 - bias) * 0.05); result.小单 *= factor; result.小双 *= factor; }
-        const recentOddRatio = sums.slice(0,12).filter(s => s % 2 === 1).length / 12;
-        if (recentOddRatio > 0.62) { result.大单 *= 1.08; result.小单 *= 1.08; }
-        else if (recentOddRatio < 0.38) { result.大双 *= 1.08; result.小双 *= 1.08; }
+        let bias = sumPred * 0.7 + avgRecent * 0.3;
+        if(bias > 15.2) { const factor = 1 + Math.min(0.3, (bias - 15.2) * 0.06); result.大单 *= factor; result.大双 *= factor; }
+        else if(bias < 12.8) { const factor = 1 + Math.min(0.3, (12.8 - bias) * 0.06); result.小单 *= factor; result.小双 *= factor; }
+        const recentOddRatio = sums.slice(0,10).filter(s => s % 2 === 1).length / 10;
+        if (recentOddRatio > 0.65) { result.大单 *= 1.1; result.小单 *= 1.1; }
+        else if (recentOddRatio < 0.35) { result.大双 *= 1.1; result.小双 *= 1.1; }
+        // 短期动量修正
+        result = shortMomentumAdjust(result, seq);
         const norm = Object.values(result).reduce((a,b)=>a+b,0);
         Object.keys(result).forEach(k => result[k] /= norm);
         return result;
@@ -493,7 +536,6 @@
     function setApiSuccess() { $('apiTip').innerHTML = '✅ 已同步'; }
     function setApiError(msg) { $('apiTip').innerHTML = `❌ ${msg}`; }
 
-    // ===== 核心修改：多API轮询加载数据 =====
     async function tryFetchApi(index) {
         const url = API_URLS[index] + '&t=' + Date.now();
         try {
@@ -509,22 +551,17 @@
 
     async function loadData(manual = false, isPolling = false) {
         if (!isPolling) setApiLoading();
-        
         let data = null;
         let successIndex = -1;
-        
-        // 先尝试当前索引的API
         data = await tryFetchApi(currentApiIndex);
         if (data) successIndex = currentApiIndex;
         else {
-            // 尝试下一个API
             const nextIndex = (currentApiIndex + 1) % API_URLS.length;
             data = await tryFetchApi(nextIndex);
             if (data) {
                 successIndex = nextIndex;
-                currentApiIndex = nextIndex; // 切换为主用
+                currentApiIndex = nextIndex;
             } else if (API_URLS.length > 2) {
-                // 尝试所有其他API
                 for (let i = 0; i < API_URLS.length; i++) {
                     if (i === currentApiIndex || i === nextIndex) continue;
                     data = await tryFetchApi(i);
@@ -536,12 +573,7 @@
                 }
             }
         }
-
-        if (!data) {
-            setApiError('所有API均失败，请检查网络');
-            return;
-        }
-
+        if (!data) { setApiError('所有API均失败，请检查网络'); return; }
         try {
             const j = data;
             if (j?.data?.length) {
@@ -549,23 +581,13 @@
                 const isNewPeriod = (latestPeriod && latestPeriod !== cp);
                 if (isNewPeriod) {
                     if (latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1, n2, n3], sv, ts);
-                    if (isOpening) { 
-                        isOpening = false; 
-                        openingStartTime = null; 
-                        if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } 
-                    }
-                    $('timerLabel').innerText = '下期开奖倒计时'; 
-                    $('resultCard').classList.remove('opening-glow'); 
-                    $('count').classList.remove('opening');
-                    $('openingAnimation').style.display = 'none'; 
-                    $('resultBalls').style.display = 'flex'; 
-                    $('openingHint').classList.remove('show');
+                    if (isOpening) { isOpening = false; openingStartTime = null; if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } }
+                    $('timerLabel').innerText = '下期开奖倒计时'; $('resultCard').classList.remove('opening-glow'); $('count').classList.remove('opening');
+                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
                 }
                 latestPeriod = cp;
                 if (!isOpening) {
-                    $('openingAnimation').style.display = 'none'; 
-                    $('resultBalls').style.display = 'flex'; 
-                    $('openingHint').classList.remove('show');
+                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
                     ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.add('roll')); 
                     setTimeout(() => ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.remove('roll')), 500);
                     $('n1').innerText = n1; updateBallColor($('n1'), n1); 
@@ -584,15 +606,9 @@
                     const cd = j.countdown;
                     if (cd === '00:00' || cd === '0:00') {
                         if (!isOpening) { 
-                            isOpening = true; 
-                            openingStartTime = Date.now(); 
-                            $('timerLabel').innerText = '🔥 开奖中 🔥'; 
-                            $('count').innerText = '开奖中'; 
-                            $('count').classList.add('opening'); 
-                            $('resultCard').classList.add('opening-glow'); 
-                            $('openingAnimation').style.display = 'flex'; 
-                            $('resultBalls').style.display = 'none'; 
-                            startOpeningPolling(); 
+                            isOpening = true; openingStartTime = Date.now(); $('timerLabel').innerText = '🔥 开奖中 🔥'; $('count').innerText = '开奖中'; 
+                            $('count').classList.add('opening'); $('resultCard').classList.add('opening-glow'); 
+                            $('openingAnimation').style.display = 'flex'; $('resultBalls').style.display = 'none'; startOpeningPolling(); 
                         }
                     } else {
                         const [m, s] = cd.split(':').map(Number); countdownSeconds = m * 60 + s;
@@ -610,10 +626,7 @@
                 updateModelWinrate(); loadPredictHistory(); 
                 if (manual) setApiSuccess();
             }
-        } catch (e) {
-            console.error(e); 
-            setApiError('解析失败: ' + e.message); 
-        }
+        } catch (e) { console.error(e); setApiError('解析失败: ' + e.message); }
     }
 
     function updateBallColor(ball, num) { ball.className = 'ball ' + (num > 13 ? 'big' : 'small'); }
@@ -629,7 +642,7 @@
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); }, 1300); }
     function startAutoRefresh(i=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); },i); }
 
-    // 测试功能 (保持原样)
+    // 测试功能 (保持不变)
     window.openTestModal = () => { $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
     window.closeTestModal = () => $('testModal').style.display='none';
     function generateSmartNumbers() { if(historyData.length<20) return { n1:Math.floor(Math.random()*10), n2:Math.floor(Math.random()*10), n3:Math.floor(Math.random()*10) }; const recent=historyData.slice(0,30); const freq=Array(10).fill(0); recent.forEach(d=>d.numbers.forEach(n=>freq[n]++)); const last=Array(10).fill(-1); recent.forEach((d,i)=>d.numbers.forEach(n=>{ if(last[n]===-1) last[n]=i; })); const total=freq.reduce((a,b)=>a+b,0); const probs=freq.map((f,i)=>{ const base=f/total; const miss=last[i]===-1?30:last[i]; return base*0.6+(miss/30)*0.4; }); const sum=probs.reduce((a,b)=>a+b,0); const norm=probs.map(p=>p/sum); const pick=()=>{ const r=Math.random(); let acc=0; for(let i=0;i<10;i++){ acc+=norm[i]; if(r<acc) return i; } return 9; }; return { n1:pick(), n2:pick(), n3:pick() }; }
