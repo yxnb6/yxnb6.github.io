@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
     <title>🐟 鱼少PC28 ·Pro | HUAN预测</title>
     <style>
+        /* 样式完全保留原样，省略以节省篇幅，实际使用时需包含完整原样式 */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
             --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-orange: #FF9500; --ios-green: #34C759; --ios-purple: #AF52DE;
@@ -273,7 +274,7 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ========== 终极预测算法 · 元学习增强版 (V3) ==========
+    // ========== 终极预测算法 (保持不变) ==========
     function getUltimateRegime(seq, sums) {
         const n = seq.length;
         if (n < 15) return { regime: 'neutral', confidence: 0.5, volatility: 0.5, trendStrength: 0, reversalSignal: 0, sumTrend: 0, duiziDue: 5 };
@@ -585,22 +586,12 @@
         return probs;
     }
 
-    // 元学习权重：基于近期预测准确率调整
     function getMetaWeights(regimeInfo) {
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
         const recentRecs = records.slice(0, 40);
         const weights = {
             pat:0.08, trd:0.12, rev:0.08, mis:0.07, mar:0.10, bay:0.08, lstm:0.09, kal:0.07, xgb:0.09, deep:0.12, mc:0.08, gen:0.08, arima:0.06, rf:0.08
         };
-        if (recentRecs.length > 15) {
-            const algoHits = {};
-            Object.keys(weights).forEach(k => algoHits[k] = {hits:0, total:0});
-            recentRecs.forEach(r => {
-                const algoMap = { pat:'patternMatching', trd:'trendFollowing', rev:'reversalPrediction', mis:'missCompensation', mar:'highOrderMarkov', bay:'hierarchicalBayes', lstm:'attentionLSTM', kal:'adaptiveKalman', xgb:'xgBoost', deep:'deepEnsemble', mc:'monteCarloSim', gen:'geneticOptimizer', arima:'arimaPredictor', rf:'randomForest' };
-                // 这里简单模拟：由于无法对应具体子算法，我们使用算法名近似，但主要依靠regime调整
-            });
-        }
-        // 根据regime调整基础权重
         const { regime, volatility, trendStrength, reversalSignal, maxStreak, duiziDue } = regimeInfo;
         if (regime === 'choppy') { weights.rev*=1.6; weights.mis*=1.4; weights.bay*=1.3; weights.trd*=0.5; }
         else if (regime === 'streaky') { weights.trd*=1.8; weights.pat*=1.4; weights.mar*=1.3; weights.rev*=0.4; }
@@ -735,7 +726,7 @@
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); }, 1500); }
     function startAutoRefresh(i=8000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); }, i); }
 
-    // ===== 导出功能 =====
+    // ===== 导出功能 (新格式) =====
     function getAlgoStats(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'), st={}; Object.keys(algoNames).forEach(k=>{ const ar=rs.filter(r=>r.algorithm===k), h=ar.filter(r=>r.hit).length; st[k]={name:algoNames[k], total:ar.length, hits:h, rate:ar.length?(h/ar.length*100).toFixed(1):'—'}; }); return st; }
     function renderExportSelector(){ const st=getAlgoStats(), c=$('exportAlgoSelector'), sk=Object.keys(st).sort((a,b)=>(parseFloat(st[b].rate)||0)-(parseFloat(st[a].rate)||0)); let h=`<div class="export-algo-chip all ${selectedExportAlgos.has('all')?'active':''}" data-algo="all" onclick="toggleExportAlgo('all')">📊 全部算法</div>`; sk.forEach(k=>{ const s=st[k]; h+=`<div class="export-algo-chip ${selectedExportAlgos.has(k)?'active':''}" data-algo="${k}" onclick="toggleExportAlgo('${k}')" style="${k==='ultimate'?'background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;':''}">${s.name} ${s.rate}%</div>`; }); c.innerHTML=h; }
     window.toggleExportAlgo = function(k){ if(k==='all'){ if(selectedExportAlgos.has('all')) selectedExportAlgos.clear(); else { selectedExportAlgos.clear(); selectedExportAlgos.add('all'); Object.keys(algoNames).forEach(x=>selectedExportAlgos.add(x)); } } else { selectedExportAlgos.delete('all'); selectedExportAlgos.has(k)?selectedExportAlgos.delete(k):selectedExportAlgos.add(k); if(selectedExportAlgos.size===Object.keys(algoNames).length) selectedExportAlgos.add('all'); } renderExportSelector(); updateExportStats(); };
@@ -743,14 +734,32 @@
     window.deselectAllAlgos = ()=>{ selectedExportAlgos.clear(); renderExportSelector(); updateExportStats(); };
     window.selectTopAlgos = ()=>{ const st=getAlgoStats(); const top=Object.keys(st).filter(k=>st[k].rate!=='—'&&parseFloat(st[k].rate)>=50).sort((a,b)=>parseFloat(st[b].rate)-parseFloat(st[a].rate)).slice(0,5); selectedExportAlgos.clear(); top.forEach(k=>selectedExportAlgos.add(k)); renderExportSelector(); updateExportStats(); };
     function updateExportStats(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); let sk=selectedExportAlgos.has('all')?Object.keys(algoNames):Array.from(selectedExportAlgos); const fr=rs.filter(r=>sk.includes(r.algorithm)), total=fr.length, hits=fr.filter(r=>r.hit).length; $('exportStats').innerHTML=`<div style="display:flex;justify-content:space-around;"><div>算法:${sk.length}</div><div>记录:${total}</div><div>命中:${hits}</div><div>命中率:${total?(hits/total*100).toFixed(1):0}%</div></div>`; }
-    function generateExport(incAll=false){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); let sk=incAll?Object.keys(algoNames):(selectedExportAlgos.has('all')?Object.keys(algoNames):Array.from(selectedExportAlgos)); if(!sk.length) return '❌ 请选择算法'; const fr=rs.filter(r=>sk.includes(r.algorithm)); if(!fr.length) return '❌ 所选算法无记录'; let t='='.repeat(60)+'\n🐟 鱼少PC28 · 你所谓的真心是真是假\n'+'='.repeat(60)+`\n导出:${new Date().toLocaleString()}\n算法:${sk.map(k=>algoNames[k]).join(',')}\n记录:${fr.length} 命中率:${(fr.filter(r=>r.hit).length/fr.length*100).toFixed(1)}%\n`+'='.repeat(60)+'\n\n算法\t期号\t号码\t和值\t双门\t单门\t开奖\t结果\n'; fr.forEach(r=>{ const romance=shouldAddRomance(r.period,r.sum)?'💕':''; t+=`${algoNames[r.algorithm]}\t${r.period}${romance}\t${r.numbers}\t${r.sum}\t${(r.doublePred||[]).join('/')}\t${r.singlePred||''}\t${r.actualCombo||r.combo}\t${r.hit?'🀄️':'🍉'}\n`; }); return t; }
+
+    // *** 导出核心函数 - 新格式 ***
+    function generateExport(incAll=false){
+        const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        let sk = incAll ? Object.keys(algoNames) : (selectedExportAlgos.has('all') ? Object.keys(algoNames) : Array.from(selectedExportAlgos));
+        if (!sk.length) return '❌ 请选择算法';
+        const fr = rs.filter(r => sk.includes(r.algorithm));
+        if (!fr.length) return '❌ 所选算法无记录';
+
+        // 新格式头部
+        let t = '鱼少38.8同款杀组转换率算法/浪漫自觉/花小钱办大事/\n=====\n';
+        fr.forEach(r => {
+            const doubleStr = (r.doublePred || []).join('/');
+            const pattern = r.actualPattern || getPattern(r.numbers.split('+').map(Number));
+            t += `${r.period} ${r.numbers} 预测${doubleStr} 结果${r.sum}（${pattern}） ${r.hit ? '🀄️' : '🍉'}\n`;
+        });
+        return t;
+    }
+
     window.openExportModal = ()=>{ selectedExportAlgos.clear(); selectedExportAlgos.add('all'); Object.keys(algoNames).forEach(k=>selectedExportAlgos.add(k)); renderExportSelector(); updateExportStats(); $('exportTextArea').value=''; $('exportModal').style.display='flex'; };
     window.closeExportModal = ()=>$('exportModal').style.display='none';
     window.previewExport = ()=>$('exportTextArea').value=generateExport(false);
     window.copySelectedExport = ()=>{ const t=generateExport(false); navigator.clipboard?.writeText(t).then(()=>alert('已复制')).catch(()=>{ const ta=$('exportTextArea'); ta.value=t; ta.select(); document.execCommand('copy'); alert('已复制'); }); };
     window.downloadSelectedExport = ()=>{ const t=generateExport(false); const b=new Blob([t],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`pc28_${new Date().toISOString().slice(0,10)}.txt`; a.click(); };
 
-    // 测试功能
+    // 测试功能 (略，与原版一致)
     window.openTestModal = ()=>{ $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
     window.closeTestModal = ()=>$('testModal').style.display='none';
     function generateSmartNumbers(){ if(historyData.length<20) return { n1:Math.floor(Math.random()*10), n2:Math.floor(Math.random()*10), n3:Math.floor(Math.random()*10) }; const recent=historyData.slice(0,30); const freq=Array(10).fill(0); recent.forEach(d=>d.numbers.forEach(n=>freq[n]++)); const last=Array(10).fill(-1); recent.forEach((d,i)=>d.numbers.forEach(n=>{ if(last[n]===-1) last[n]=i; })); const total=freq.reduce((a,b)=>a+b,0); const probs=freq.map((f,i)=>{ const base=f/total; const miss=last[i]===-1?30:last[i]; return base*0.6+(miss/30)*0.4; }); const sum=probs.reduce((a,b)=>a+b,0); const norm=probs.map(p=>p/sum); const pick=()=>{ const r=Math.random(); let acc=0; for(let i=0;i<10;i++){ acc+=norm[i]; if(r<acc) return i; } return 9; }; return { n1:pick(), n2:pick(), n3:pick() }; }
