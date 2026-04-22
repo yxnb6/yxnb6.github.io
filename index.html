@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
     <title>🐟 鱼少PC28 ·Pro 遗漏趋势融合 | HUAN预测</title>
     <style>
-        /* ===== 样式完整保留，未作任何更改 ===== */
+        /* ===== 完整样式 未作任何删减 ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
             --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-orange: #FF9500; --ios-green: #34C759; --ios-purple: #AF52DE;
@@ -133,13 +133,14 @@
         .disclaimer-body { max-height: 300px; overflow-y: auto; text-align: left; padding: 8px; background: var(--ios-bg); border-radius: 12px; margin-bottom: 16px; }
         .disclaimer-body p { margin-bottom: 10px; } .disclaimer-body strong { color: var(--ios-red); }
         .ultimate-badge { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; margin-left: 6px; }
+        .refresh-tip { background: rgba(0,122,255,0.08); border-radius: 30px; padding: 10px 16px; margin-top: 16px; text-align: center; font-size: 13px; color: var(--ios-blue); border: 0.5px dashed var(--ios-blue); }
     </style>
 </head>
 <body>
 <div class="wrap">
     <div class="nav-bar">
         <div class="nav-header">
-            <div class="logo">🐟 鱼少PC28 · 遗漏趋势融合 <span class="ultimate-badge">FIXED</span></div>
+            <div class="logo">🐟 鱼少PC28 · 遗漏趋势融合 <span class="ultimate-badge">PRO+</span></div>
             <div class="api-status" id="apiTip"><span class="loading-spinner"></span> 云端加载中</div>
         </div>
         <div class="segmented-control" id="tabControl">
@@ -152,7 +153,7 @@
         </div>
     </div>
     <div class="security-warning">
-        ⚡ 遗漏+趋势双接口融合 · 实时冷热号与走势方向 · 智能预测
+        ⚡ 遗漏+趋势双接口融合 · 实时冷热号与走势方向 · 智能防跳预测
     </div>
     <div class="status-bar"><span>🔐 端对端加密 · 遗漏趋势融合系统</span><span id="openTime">--</span></div>
 
@@ -164,6 +165,9 @@
             <div id="openingAnimation" class="opening-animation" style="display:none;"><div class="opening-ball"></div><div class="opening-ball"></div><div class="opening-ball"></div></div>
             <div class="result-balls" id="resultBalls"><div class="ball" id="n1">-</div><div class="ball" id="n2">-</div><div class="ball" id="n3">-</div><div style="font-size:22px;">=</div><div class="ball sum" id="sum">-</div></div>
             <div id="openingHint" class="opening-hint">⚠️ 如果结果已出但页面仍在开奖中，请点击刷新</div>
+            <div class="refresh-tip" id="refreshTipMessage">
+                🔄 每期开奖后建议刷新页面，获取最新AI预测与遗漏数据
+            </div>
             <div style="text-align:center; font-size:18px; font-weight:500; margin-bottom:20px;" id="sumExpression"></div>
             <div class="result-meta">
                 <div class="meta-item"><div class="meta-label">组合类型</div><div class="meta-value" id="combo">-</div></div>
@@ -230,7 +234,7 @@
     <div class="footer">🐟 鱼少PC28 · 遗漏趋势融合版 · 真实数据双接口驱动<br>🔐 端对端平台安全保护中 | YC国际独家支持</div>
 </div>
 
-<!-- 弹窗部分 (完整保留) -->
+<!-- 弹窗部分 -->
 <div id="disclaimerModal" class="modal-overlay" style="display: flex;"><div class="modal-card" style="max-width:500px;"><div class="modal-header"><span>📜 用户免责协议</span><span style="cursor:pointer;font-size:24px;opacity:0;">&times;</span></div><div class="modal-body"><div class="disclaimer-body"><p><strong>请您仔细阅读以下协议，同意后方可使用本网站。</strong></p><p>1. 本网站提供的PC28预测数据及分析结果仅供娱乐参考，不构成任何投资或投注建议。用户据此操作风险自担。</p><p>2. 彩票/游戏结果具有随机性，任何预测方法均无法保证100%准确。本网站不对用户的任何经济损失承担法律责任。</p><p>3. 用户不得利用本网站进行任何违法活动，包括但不限于赌博、欺诈、洗钱等。一经发现，永久封禁。</p><p>4. 用户不得对本网站进行反向工程、恶意攻击、数据抓取、破解或未经授权的访问。违规者将被封禁设备及IP。</p><p>5. 本网站采用端对端加密技术保护用户隐私，但用户需自行承担网络传输风险。</p><p>6. 管理员保留随时修改、暂停或终止服务的权利，且无需事先通知。</p><p>7. 点击"同意并继续"即表示您已满18周岁，并完全接受本协议所有条款。如不同意，请关闭本页面。</p><p><strong>如发现泄露、滥用或违规行为，管理员将永久封禁登录设备及IP，并保留追究法律责任的权利。</strong></p></div></div><div class="modal-footer"><button class="btn danger" onclick="window.location.href='about:blank'">❌ 拒绝并离开</button><button class="btn success" onclick="agreeDisclaimer()">✅ 同意并继续</button></div></div></div>
 
 <div id="exportModal" class="modal-overlay" style="display:none;"><div class="modal-card"><div class="modal-header"><span>📄 导出预测数据</span><span style="cursor:pointer;font-size:24px;" onclick="closeExportModal()">&times;</span></div><div class="modal-body"><div style="margin-bottom:12px;"><div style="font-weight:600;margin-bottom:8px;">选择算法：</div><div style="display:flex;gap:6px;margin-bottom:10px;"><button class="btn" style="flex:1;" onclick="selectAllAlgos()">全选</button><button class="btn" style="flex:1;" onclick="deselectAllAlgos()">取消</button><button class="btn primary" style="flex:1;" onclick="selectTopAlgos()">高胜率</button></div><div class="export-algo-selector" id="exportAlgoSelector"></div></div><div id="exportStats" class="export-stats"></div><textarea id="exportTextArea" class="export-textarea" readonly placeholder="点击预览查看数据"></textarea></div><div class="modal-footer"><button class="btn" onclick="previewExport()">👁️ 预览</button><button class="btn success" onclick="copySelectedExport()">📋 复制</button><button class="btn primary" onclick="downloadSelectedExport()">⬇️ 下载</button></div></div></div>
@@ -256,7 +260,7 @@
     const $ = id => document.getElementById(id);
     const combos = ['大单','大双','小单','小双'];
     const patterns = ['对子','顺子','杂六','豹子'];
-    // 算法名称 (包含新增的遗漏趋势融合算法)
+    // 算法名称
     const algoNames = {
         ultimate:'🔥 终极融合',pro:'专业单门',ensemble:'动态集成',weighted:'权威加权',
         markov:'高阶马尔可夫',lstm:'深度LSTM',genetic:'遗传进化',kalman:'卡尔曼滤波',
@@ -288,7 +292,7 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ========== 原有预测算法 (完整保留，未作任何删减) ==========
+    // ========== 核心算法 (完整保留所有原算法) ==========
     function getUltimateRegime(seq, sums) {
         const n = seq.length;
         if (n < 15) return { regime: 'neutral', confidence: 0.5, volatility: 0.5, trendStrength: 0, reversalSignal: 0, sumTrend: 0, duiziDue: 5 };
@@ -750,7 +754,7 @@
         return probs;
     }
 
-    // ========== 新增：遗漏+趋势数据获取 ==========
+    // ========== 强化版遗漏趋势融合预测 (防乱跳 + 基于局势严密计算) ==========
     async function fetchMissingData() {
         try {
             const controller = new AbortController();
@@ -820,37 +824,83 @@
         }
     }
 
-    // 遗漏趋势融合预测 (修复置信度与属性过滤)
     function missingTrendPredict(seq, sums) {
         let missingObj = cachedMissingData?.missing;
         if (!missingObj) missingObj = computeLocalMissing();
+        
+        const regimeInfo = getUltimateRegime(seq, sums);
+        const { regime, volatility, trendStrength, maxStreak, duiziDue } = regimeInfo;
+        
         const probs = {大单:0, 大双:0, 小单:0, 小双:0};
         const maxMiss = Math.max(...Object.values(missingObj), 1);
+        
         for (let c of combos) {
-            probs[c] = 0.15 + (missingObj[c] / maxMiss) * 0.7;
+            let missWeight = missingObj[c] / maxMiss;
+            if (regime === 'choppy' || regime === 'extreme') missWeight = Math.pow(missWeight, 0.8);
+            else if (regime === 'streaky' || regime === 'bullish' || regime === 'bearish') missWeight = Math.pow(missWeight, 1.2);
+            probs[c] = 0.12 + missWeight * 0.65;
         }
-        // 趋势数据调整
+        
         if (cachedTrendData?.trend) {
             const t = cachedTrendData.trend;
-            if (t.includes('大')) { probs.大单 *= 1.5; probs.大双 *= 1.5; }
-            if (t.includes('小')) { probs.小单 *= 1.5; probs.小双 *= 1.5; }
-            if (t.includes('单')) { probs.大单 *= 1.4; probs.小单 *= 1.4; }
-            if (t.includes('双')) { probs.大双 *= 1.4; probs.小双 *= 1.4; }
+            if (t.includes('大')) { probs.大单 *= 1.45; probs.大双 *= 1.45; }
+            if (t.includes('小')) { probs.小单 *= 1.45; probs.小双 *= 1.45; }
+            if (t.includes('单')) { probs.大单 *= 1.35; probs.小单 *= 1.35; }
+            if (t.includes('双')) { probs.大双 *= 1.35; probs.小双 *= 1.35; }
         }
-        const recentSums = sums.slice(0, 10);
+        
+        const recentSums = sums.slice(0, 12);
         const bigCount = recentSums.filter(s => s > 13).length;
         const bigRatio = bigCount / recentSums.length;
-        if (bigRatio > 0.65) { probs.小单 *= 1.4; probs.小双 *= 1.4; probs.大单 *= 0.7; probs.大双 *= 0.7; }
-        else if (bigRatio < 0.35) { probs.大单 *= 1.4; probs.大双 *= 1.4; probs.小单 *= 0.7; probs.小双 *= 0.7; }
         const oddCount = recentSums.filter(s => s % 2 === 1).length;
         const oddRatio = oddCount / recentSums.length;
-        if (oddRatio > 0.6) { probs.大双 *= 1.3; probs.小双 *= 1.3; }
-        else if (oddRatio < 0.4) { probs.大单 *= 1.3; probs.小单 *= 1.3; }
+        
+        let reversalFactor = 1.0;
+        if (volatility > 0.75) reversalFactor = 0.7;
+        else if (volatility < 0.35) reversalFactor = 1.3;
+        
+        if (bigRatio > 0.6) {
+            const adjust = 1.3 * reversalFactor;
+            probs.小单 *= adjust; probs.小双 *= adjust;
+            probs.大单 *= (1/ adjust); probs.大双 *= (1/ adjust);
+        } else if (bigRatio < 0.4) {
+            const adjust = 1.3 * reversalFactor;
+            probs.大单 *= adjust; probs.大双 *= adjust;
+            probs.小单 *= (1/ adjust); probs.小双 *= (1/ adjust);
+        }
+        
+        if (oddRatio > 0.55) {
+            probs.大双 *= 1.2; probs.小双 *= 1.2;
+            probs.大单 *= 0.85; probs.小单 *= 0.85;
+        } else if (oddRatio < 0.45) {
+            probs.大单 *= 1.2; probs.小单 *= 1.2;
+            probs.大双 *= 0.85; probs.小双 *= 0.85;
+        }
+        
+        if (regime === 'duizi_due') {
+            probs.大单 *= 1.2; probs.大双 *= 1.2; probs.小单 *= 1.2; probs.小双 *= 1.2;
+        }
+        
+        if (seq.length >= 3) {
+            const lastThree = seq.slice(0,3);
+            if (lastThree.every(v => v === lastThree[0])) {
+                probs[lastThree[0]] *= 0.65;
+                combos.filter(c => c !== lastThree[0]).forEach(c => probs[c] *= 1.15);
+            }
+        }
+        
         const total = Object.values(probs).reduce((a,b)=>a+b, 0.01);
         for (let c of combos) probs[c] /= total;
-        // 确保置信度为有效数值
-        probs._confidence = 0.89;
+        
+        let confidence = 0.85;
+        if (cachedMissingData?.source !== 'local') confidence += 0.05;
+        if (cachedTrendData?.trend) confidence += 0.03;
+        if (regimeInfo.confidence > 0.7) confidence += 0.05;
+        confidence = Math.min(0.98, confidence);
+        
+        probs._confidence = confidence;
         probs._source = cachedMissingData?.source || 'local';
+        probs._regimeInfo = regimeInfo;
         return probs;
     }
 
@@ -858,7 +908,6 @@
     function analyzeMarketState(seq) { const n=seq.length; if(n<20) return '良'; const sums = historyData.map(d => d.sum); const info = getUltimateRegime(seq, sums); const { regime, confidence, maxStreak, duiziDue } = info; let score = 50; if (regime === 'streaky') score += 15; else if (regime === 'bullish' || regime === 'bearish') score += 10; else if (regime === 'choppy') score -= 15; else if (regime === 'extreme') score -= 10; if (maxStreak >= 3) score += 5; if (duiziDue > 10) score += 10; if (confidence > 0.7) score += 5; return score >= 70 ? '优' : (score >= 45 ? '良' : '差'); }
     function getSuggestionText(state) { return state==='优'?'🔥 趋势极佳 · 高胜率区间':(state==='良'?'📊 趋势良好 · 可正常操作':'⚠️ 趋势混沌 · 建议观望'); }
     
-    // 修复：过滤所有以下划线开头的内部属性
     function setPrediction(key, probs){ 
         const s = Object.entries(probs).filter(([k]) => !k.startsWith('_')).sort((a,b)=>b[1]-a[1]); 
         const confValue = probs._confidence;
@@ -1032,7 +1081,7 @@
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling=setInterval(()=>{ loadData(false,true); }, 1500); }
     function startAutoRefresh(i=8000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh=setInterval(()=>{ if(!isOpening) loadData(false,false); }, i); }
 
-    // ===== 导出功能 (完整保留) =====
+    // ===== 导出功能 =====
     function getAlgoStats(){ const rs=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'), st={}; Object.keys(algoNames).forEach(k=>{ const ar=rs.filter(r=>r.algorithm===k), h=ar.filter(r=>r.hit).length; st[k]={name:algoNames[k], total:ar.length, hits:h, rate:ar.length?(h/ar.length*100).toFixed(1):'—'}; }); return st; }
     function renderExportSelector(){ const st=getAlgoStats(), c=$('exportAlgoSelector'), sk=Object.keys(st).sort((a,b)=>(parseFloat(st[b].rate)||0)-(parseFloat(st[a].rate)||0)); let h=`<div class="export-algo-chip all ${selectedExportAlgos.has('all')?'active':''}" data-algo="all" onclick="toggleExportAlgo('all')">📊 全部算法</div>`; sk.forEach(k=>{ const s=st[k]; h+=`<div class="export-algo-chip ${selectedExportAlgos.has(k)?'active':''}" data-algo="${k}" onclick="toggleExportAlgo('${k}')" style="${k==='ultimate'?'background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;':''}">${s.name} ${s.rate}%</div>`; }); c.innerHTML=h; }
     window.toggleExportAlgo = function(k){ if(k==='all'){ if(selectedExportAlgos.has('all')) selectedExportAlgos.clear(); else { selectedExportAlgos.clear(); selectedExportAlgos.add('all'); Object.keys(algoNames).forEach(x=>selectedExportAlgos.add(x)); } } else { selectedExportAlgos.delete('all'); selectedExportAlgos.has(k)?selectedExportAlgos.delete(k):selectedExportAlgos.add(k); if(selectedExportAlgos.size===Object.keys(algoNames).length) selectedExportAlgos.add('all'); } renderExportSelector(); updateExportStats(); };
@@ -1047,7 +1096,7 @@
     window.copySelectedExport = ()=>{ const t=generateExport(false); navigator.clipboard?.writeText(t).then(()=>alert('已复制')).catch(()=>{ const ta=$('exportTextArea'); ta.value=t; ta.select(); document.execCommand('copy'); alert('已复制'); }); };
     window.downloadSelectedExport = ()=>{ const t=generateExport(false); const b=new Blob([t],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`pc28_${new Date().toISOString().slice(0,10)}.txt`; a.click(); };
 
-    // 测试功能 (完整保留)
+    // 测试功能
     window.openTestModal = ()=>{ $('testModal').style.display='flex'; $('testRoundsInput').value='50'; $('testGenMode').value='random'; $('testProgressBar').style.width='0%'; $('testProgressText').innerText=''; $('testResultsContainer').innerHTML=''; };
     window.closeTestModal = ()=>$('testModal').style.display='none';
     function generateSmartNumbers(){ if(historyData.length<20) return { n1:Math.floor(Math.random()*10), n2:Math.floor(Math.random()*10), n3:Math.floor(Math.random()*10) }; const recent=historyData.slice(0,30); const freq=Array(10).fill(0); recent.forEach(d=>d.numbers.forEach(n=>freq[n]++)); const last=Array(10).fill(-1); recent.forEach((d,i)=>d.numbers.forEach(n=>{ if(last[n]===-1) last[n]=i; })); const total=freq.reduce((a,b)=>a+b,0); const probs=freq.map((f,i)=>{ const base=f/total; const miss=last[i]===-1?30:last[i]; return base*0.6+(miss/30)*0.4; }); const sum=probs.reduce((a,b)=>a+b,0); const norm=probs.map(p=>p/sum); const pick=()=>{ const r=Math.random(); let acc=0; for(let i=0;i<10;i++){ acc+=norm[i]; if(r<acc) return i; } return 9; }; return { n1:pick(), n2:pick(), n3:pick() }; }
