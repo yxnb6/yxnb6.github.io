@@ -1,0 +1,14 @@
+{
+    "version": "1.0",
+    "updated": "2026-04-22T00:00:00.000Z",
+    "keys": {
+        "TEST-1234-5678-ABCD": {
+            "type": "week",
+            "duration": 604800,
+            "createdAt": "2026-04-22T00:00:00.000Z",
+            "status": "unused",
+            "deviceId": null,
+            "activatedAt": null
+        }
+    }
+}
