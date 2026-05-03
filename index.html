@@ -300,7 +300,7 @@
             </div>
         </div>
 
-        <div class="footer">🐟 鱼少PC28 · Pro Max · 双接口+自适应回补预警+12算法<br>🔐 端对端平台安全保护中 | YC国际独家支持</div>
+        <div class="footer">🐟 鱼少PC28 · Pro Max · 双接口+自适应回补预警+13算法<br>🔐 端对端平台安全保护中 | YC国际独家支持</div>
     </div>
 
     <div id="disclaimerModal" class="modal-overlay" style="display:flex;">
@@ -392,7 +392,8 @@
                 spanAnalysis: '📏 跨度走势',
                 oddEven: '⚖️ 奇偶平衡',
                 bigSmall: '📈 大小轮动',
-                patternCycle: '🔄 形态周期'
+                patternCycle: '🔄 形态周期',
+                smartExclude: '🧠 智能排除·重跳融合'  // 新增算法
             };
             let algoWinRates = {}, sortedAlgoKeys = Object.keys(algoNames);
             let predictions = {};
@@ -631,7 +632,78 @@
                 return probs;
             }
 
-            // 其余预测算法保持不变
+            // ============ 新增：智能排除·重跳融合算法 ============
+            function smartExcludePredict(seq, sums) {
+                const n = seq.length;
+                if (n < 5) return { 大单: 0.25, 大双: 0.25, 小单: 0.25, 小双: 0.25, _confidence: 0.5 };
+                // 1. 转移概率（重跳）
+                const lookback = Math.min(40, n - 1);
+                const trans = {};
+                for (let c of combos) { trans[c] = {}; for (let t of combos) trans[c][t] = 0; }
+                let totalTrans = 0;
+                for (let i = 0; i < lookback; i++) {
+                    const prev = seq[i + 1], curr = seq[i];
+                    if (prev && curr) { trans[prev][curr]++; totalTrans++; }
+                }
+                const lastCombo = seq[0];
+                const pTrans = {};
+                if (totalTrans > 0 && trans[lastCombo]) {
+                    let s = Object.values(trans[lastCombo]).reduce((a, b) => a + b, 0);
+                    for (let c of combos) pTrans[c] = (trans[lastCombo][c] + 1) / (s + 4);
+                } else {
+                    for (let c of combos) pTrans[c] = 0.25;
+                }
+                // 2. 频率概率
+                const freq = {};
+                combos.forEach(c => freq[c] = 0);
+                seq.forEach(c => freq[c]++);
+                const totalFreq = seq.length;
+                const pFreq = {};
+                combos.forEach(c => pFreq[c] = (freq[c] + 1) / (totalFreq + 4));
+                // 3. 理论组合概率
+                const theoryProbs = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                let theoryTotal = 0;
+                for (let s = 3; s <= 27; s++) {
+                    const prob = SUM_THEORY_PROBS[s] || 0;
+                    const combo = sumToCombo(s);
+                    theoryProbs[combo] += prob;
+                    theoryTotal += prob;
+                }
+                combos.forEach(c => theoryProbs[c] /= theoryTotal);
+                // 4. 混合权重
+                const wTrans = 0.4, wFreq = 0.3, wTheory = 0.3;
+                const mixed = {};
+                combos.forEach(c => mixed[c] = wTrans * pTrans[c] + wFreq * pFreq[c] + wTheory * theoryProbs[c]);
+                // 5. 计算本序列中的遗漏期数用于冷态排除
+                const localMiss = {};
+                for (let c of combos) {
+                    let cnt = 0;
+                    for (let i = 0; i < seq.length; i++) { if (seq[i] === c) break; cnt++; }
+                    localMiss[c] = cnt;
+                }
+                const expectedIntervals = { 大单: 1 / theoryProbs.大单, 大双: 1 / theoryProbs.大双, 小单: 1 / theoryProbs.小单, 小双: 1 / theoryProbs.小双 };
+                for (let c of combos) {
+                    const miss = localMiss[c] || 0;
+                    const threshold = expectedIntervals[c] * 2.2;
+                    if (miss > threshold && miss > 10) {
+                        mixed[c] *= 0.2;
+                    } else if (miss > expectedIntervals[c] * 1.5 && miss > 6) {
+                        mixed[c] *= 0.5;
+                    }
+                }
+                // 6. 归一化
+                const sumMixed = Object.values(mixed).reduce((a, b) => a + b, 0);
+                const result = {};
+                combos.forEach(c => result[c] = mixed[c] / sumMixed);
+                // 7. 置信度
+                const entropy = -Object.values(pTrans).reduce((s, p) => s + (p > 0 ? p * Math.log(p) : 0), 0);
+                const maxEntropy = Math.log(4);
+                const certainty = 1 - entropy / maxEntropy;
+                result._confidence = Math.min(0.92, 0.65 + certainty * 0.25 + (lookback > 20 ? 0.05 : 0));
+                return result;
+            }
+
+            // 其余算法不变 ...
             function markovPredict(seq, sums) {
                 const n = seq.length;
                 if (n < 10) return { 大单: 0.25, 大双: 0.25, 小单: 0.25, 小双: 0.25, _confidence: 0.5 };
@@ -867,6 +939,7 @@
                 setPrediction('oddEven', oddEvenPredict(cs, ss));
                 setPrediction('bigSmall', bigSmallPredict(cs, ss));
                 setPrediction('patternCycle', patternCyclePredict(cs, ss));
+                setPrediction('smartExclude', smartExcludePredict(cs, ss)); // 新算法调用
                 // 集成（大幅提升遗漏补齐算法权重）
                 const ep = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
                 let tw = 0;
@@ -880,7 +953,6 @@
                     neutral: {}
                 };
                 const factor = regimeFactors[regimeInfo.regime] || {};
-                // 强制提升遗漏补齐算法在所有情形下的权重
                 const boostedFactor = { ...factor, missingTrend: (factor.missingTrend || 1.0) * 2.5 };
                 sortedAlgoKeys.forEach(k => {
                     const p = predictions[k]; if (!p) return;
@@ -1257,7 +1329,8 @@
                             spanAnalysis: spanPredict(cs, ss),
                             oddEven: oddEvenPredict(cs, ss),
                             bigSmall: bigSmallPredict(cs, ss),
-                            patternCycle: patternCyclePredict(cs, ss)
+                            patternCycle: patternCyclePredict(cs, ss),
+                            smartExclude: smartExcludePredict(cs, ss)
                         };
                         Object.keys(preds).forEach(k => { const p = preds[k]; const s = Object.entries(p).filter(([key]) => !key.startsWith('_')).sort((a, b) => b[1] - a[1]); if (s[0]?.[0] === actualCombo) results.algoResults[k].hits++; });
                         if (Object.values(preds).some(p => { const s = Object.entries(p).filter(([key]) => !key.startsWith('_')).sort((a, b) => b[1] - a[1]); return s[0]?.[0] === actualCombo; })) results.hits++;
