@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PC28预测 · 遗漏补齐算法 v9.1</title>
+    <title>PC28预测 · 遗漏补齐算法 v9.4</title>
     <style>
-        /* 样式与之前完全一致，此处省略以节省空间，直接使用你之前版本中的完整CSS */
-        /* 为了代码完整性，我在此处重新放置了完整CSS */
         * {
             margin: 0;
             padding: 0;
@@ -330,7 +328,7 @@
             white-space: nowrap;
         }
         .ok {
-            background: #2e7d32;
+            background: #e53935;    /* 中 → 红色 */
             color: #fff;
             padding: 4px 10px;
             border-radius: 4px;
@@ -340,7 +338,7 @@
             min-width: 36px;
         }
         .err {
-            background: #e53935;
+            background: #1976d2;    /* 错 → 蓝色 */
             color: #fff;
             padding: 4px 10px;
             border-radius: 4px;
@@ -961,8 +959,10 @@
                     ? ` <span style="font-size:10px;color:#2e7d32;">🏆${algoWinRates[currentAlgoKey].toFixed(1)}%</span>` 
                     : '';
                 $('algoDetailTitle').innerHTML = `🤖 ${algoNames[currentAlgoKey] || currentAlgoKey}${wr}`;
+                // 动态着色双门按钮
+                const doubleBtns = p.double.map(c => `<span class="${c.includes('大')?'btn-red':'btn-blue'}">${c}</span>`).join(' ');
                 let html = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px;">
-                    <div><span style="font-size:11px;color:#999;">双门</span> ${p.double.map(c => `<span class="btn-red">${c}</span>`).join(' ')}</div>
+                    <div><span style="font-size:11px;color:#999;">双门</span> ${doubleBtns}</div>
                     <div><span style="font-size:11px;color:#999;">⭐单门</span> <span style="background:#1d1d1f;color:#fff;padding:5px 14px;border-radius:4px;font-size:15px;font-weight:600;">${p.single}</span></div>
                 </div>`;
                 html += `<div class="confidence-bar"><div class="confidence-fill" style="width:${(p.conf * 100).toFixed(0)}%;"></div></div>`;
@@ -1054,7 +1054,6 @@
                 // 对剩余的每一行历史数据，基于其“之前”的历史生成独立预测
                 for (let i = 0; i < Math.min(d.length, 24); i++) {
                     const r = d[i];
-                    // 该期之前的历史（即数组更早的部分，不包括本期）
                     const prevHistory = historyData.filter(item => parseInt(item.period) < parseInt(r.period));
                     const pred = getPredictionForSlice(prevHistory);
                     const hit = pred.double.includes(r.combo);
@@ -1065,13 +1064,15 @@
             }
 
             function buildPendingRow(period, doublePred) {
+                const cls0 = doublePred[0].includes('大') ? 'btn-red' : 'btn-blue';
+                const cls1 = doublePred[1].includes('大') ? 'btn-red' : 'btn-blue';
                 return `<div class="tr" style="background:#fffde7;">
                     <div class="td">${period}</div>
                     <div class="td"><div class="ball-group">
                         <span class="redball">-</span><span class="redball">-</span><span class="redball">-</span>
                         <span class="blueball">-</span>
                     </div></div>
-                    <div class="td"><span class="btn-red">${doublePred[0]}</span><span class="btn-blue">${doublePred[1]}</span></div>
+                    <div class="td"><span class="${cls0}">${doublePred[0]}</span><span class="${cls1}">${doublePred[1]}</span></div>
                     <div class="td"><span class="none-result">-</span></div>
                 </div>`;
             }
@@ -1080,13 +1081,15 @@
                 const n1 = numbers[0], n2 = numbers[1], n3 = numbers[2];
                 const blueFormatted = formatBlue(sum);
                 const resHtml = hit ? '<span class="ok">中</span>' : '<span class="err">错</span>';
+                const cls0 = doublePred[0].includes('大') ? 'btn-red' : 'btn-blue';
+                const cls1 = doublePred[1].includes('大') ? 'btn-red' : 'btn-blue';
                 return `<div class="tr">
                     <div class="td">${period}</div>
                     <div class="td"><div class="ball-group">
                         <span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span>
                         <span class="blueball">${blueFormatted}</span>
                     </div></div>
-                    <div class="td"><span class="btn-red">${doublePred[0]}</span><span class="btn-blue">${doublePred[1]}</span></div>
+                    <div class="td"><span class="${cls0}">${doublePred[0]}</span><span class="${cls1}">${doublePred[1]}</span></div>
                     <div class="td">${resHtml}</div>
                 </div>`;
             }
@@ -1274,10 +1277,12 @@
                 }
                 tb.innerHTML = rs.slice(0, 60).map(r => {
                     const al = algoNames[r.algorithm] || r.algorithm;
+                    const cls0 = (r.doublePred || [])[0]?.includes('大') ? 'btn-red' : 'btn-blue';
+                    const cls1 = (r.doublePred || [])[1]?.includes('大') ? 'btn-red' : 'btn-blue';
                     return `<div class="tr">
                         <div class="td" style="font-size:11px;">${r.period}</div>
                         <div class="td" style="font-size:11px;">${al}</div>
-                        <div class="td"><span class="btn-red">${(r.doublePred || [])[0] || '--'}</span><span class="btn-blue">${(r.doublePred || [])[1] || '--'}</span></div>
+                        <div class="td"><span class="${cls0}">${(r.doublePred || [])[0] || '--'}</span><span class="${cls1}">${(r.doublePred || [])[1] || '--'}</span></div>
                         <div class="td">${r.hit ? '<span class="ok">中</span>' : '<span class="err">错</span>'}</div>
                     </div>`;
                 }).join('');
