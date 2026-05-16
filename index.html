@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PC28预测 · 遗漏补齐算法 v9.3</title>
+    <title>PC28预测 · 遗漏补齐算法 v9.4</title>
     <style>
         * {
             margin: 0;
@@ -203,6 +203,15 @@
             background: rgba(255, 255, 255, 0.12);
             padding: 3px 10px;
             border-radius: 12px;
+        }
+        .current-algo-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 400;
         }
 
         .table-header {
@@ -597,6 +606,7 @@
                 <div class="rec-label">⚡ 遗漏必补 · 下一期预测</div>
                 <div class="rec-value" id="recTarget">--</div>
                 <div class="rec-sub" id="recDetail"><span>置信度 --%</span><span>连缺 -- 期</span></div>
+                <div class="current-algo-tag" id="currentAlgoTag">🎯遗漏回补</div>
             </div>
 
             <div class="info-card">
@@ -822,7 +832,6 @@
                 return (x - Math.floor(x) + Math.random()) / 2;
             }
 
-            // 生成随机双门（会避免与最近历史重复）
             function generateRandomDouble(avoidKeys = []) {
                 const keys = [];
                 for (let i = 0; i < combos.length; i++) {
@@ -835,7 +844,6 @@
                 return chosen.split('+');
             }
 
-            // 通用预测函数（高度随机化，但会参考遗漏）
             function genericPredict(seq, sums, algoSeed) {
                 const miss = {};
                 combos.forEach(c => {
@@ -857,7 +865,6 @@
                 combos.forEach(c => probs[c] /= total);
                 const sorted = Object.entries(probs).sort((a, b) => b[1] - a[1]);
                 let double = sorted.slice(0, 2).map(c => c[0]);
-                // 避免与最近全局历史重复
                 const avoidKeys = (window._globalDoubleHistory || []).slice(-2);
                 if (avoidKeys.includes([...double].sort().join('+'))) {
                     double = generateRandomDouble(avoidKeys);
@@ -867,7 +874,6 @@
                     double[1] = other;
                 }
                 const single = double.includes(sorted[0][0]) ? sorted[0][0] : double[0];
-                // 更新全局历史
                 if (!window._globalDoubleHistory) window._globalDoubleHistory = [];
                 window._globalDoubleHistory.push([...double].sort().join('+'));
                 if (window._globalDoubleHistory.length > 6) window._globalDoubleHistory.shift();
@@ -887,7 +893,6 @@
                 predictFns[k] = (seq, sums) => genericPredict(seq, sums, i * 100);
             });
 
-            // 根据给定的历史序列切片，运行当前算法得到预测
             function getPredictionForSlice(historySlice) {
                 if (!historySlice || historySlice.length < 2) {
                     const rand = combos.sort(() => freshRandom(Date.now()) - 0.5).slice(0,2);
@@ -959,7 +964,6 @@
                     ? ` <span style="font-size:10px;color:#2e7d32;">🏆${algoWinRates[currentAlgoKey].toFixed(1)}%</span>` 
                     : '';
                 $('algoDetailTitle').innerHTML = `🤖 ${algoNames[currentAlgoKey] || currentAlgoKey}${wr}`;
-                // 动态着色双门按钮
                 const doubleBtns = p.double.map(c => `<span class="${c.includes('大')?'btn-red':'btn-blue'}">${c}</span>`).join(' ');
                 let html = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px;">
                     <div><span style="font-size:11px;color:#999;">双门</span> ${doubleBtns}</div>
@@ -972,6 +976,8 @@
                     html += `<div style="margin-top:8px;font-size:11px;color:#666;">${sp.map(([c, v]) => `${c} ${(v * 100).toFixed(0)}%`).join(' · ')}</div>`;
                 }
                 $('algoDetailContent').innerHTML = html;
+                // 同步更新顶部算法标签
+                $('currentAlgoTag').textContent = algoNames[currentAlgoKey] || currentAlgoKey;
             }
 
             function updateTopPredictCard() {
@@ -1040,7 +1046,6 @@
                 
                 let rowsHtml = '';
                 
-                // 检查pendingRow是否已开奖
                 if (pendingRow && d.length > 0 && d[0].period === pendingRow.period) {
                     const r = d[0];
                     const hit = pendingRow.double.includes(r.combo);
@@ -1051,7 +1056,6 @@
                     rowsHtml += buildPendingRow(pendingRow.period, pendingRow.double);
                 }
                 
-                // 对剩余的每一行历史数据，基于其“之前”的历史生成独立预测
                 for (let i = 0; i < Math.min(d.length, 24); i++) {
                     const r = d[i];
                     const prevHistory = historyData.filter(item => parseInt(item.period) < parseInt(r.period));
@@ -1477,12 +1481,16 @@
                 }
             }
 
+            // 修复后的算法切换函数：防止重复点击同一算法产生混乱
             window.switchAlgo = function(k) {
+                if (k === currentAlgoKey) return;  // 已经是当前算法，不再重复操作
                 currentAlgoKey = k;
                 renderAlgoTabs();
                 updateCurrentAlgoUI();
                 if (predictions[k] && latestPeriod) {
                     pendingRow = { period: getNextPeriod(), double: predictions[k].double, single: predictions[k].single };
+                } else {
+                    pendingRow = null;  // 没有预测则清空待开奖行
                 }
                 renderPredictTable();
                 toast(`切换到: ${algoNames[k]}`, 'success');
