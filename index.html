@@ -2,22 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PC28预测 · 遗漏补齐算法 v9.4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
+    <title>PC28预测 · from 静态杀组 v12.3</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
         :root {
             --bg: #f2f2f2;
-            --card: #fff;
+            --card: #ffffff;
             --line: #efefef;
-            --text: #333;
-            --text2: #666;
-            --text3: #999;
+            --text: #333333;
+            --text2: #666666;
+            --text3: #999999;
             --red: #e53935;
             --blue: #1976d2;
             --green: #2e7d32;
@@ -26,7 +20,16 @@
             --gold: #ff8f00;
             --radius: 4px;
             --font: -apple-system, 'Microsoft Yahei', 'PingFang SC', Helvetica, Roboto, sans-serif;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             background: var(--bg);
             font-family: var(--font);
@@ -35,76 +38,164 @@
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            -webkit-user-select: none;
+            user-select: none;
+            padding-bottom: var(--safe-bottom);
         }
+
         .app-container {
             background: var(--bg);
             min-height: 100vh;
             max-width: 600px;
             margin: 0 auto;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
         }
 
         .tabs {
             display: flex;
-            background: #fff;
-            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
             z-index: 100;
+            backdrop-filter: blur(10px);
+            align-items: center;
         }
+
         .tab {
             flex: 1;
             text-align: center;
-            padding: 13px 0;
+            padding: 15px 0;
             color: #666;
             font-size: 15px;
-            font-weight: 400;
+            font-weight: 500;
             transition: all 0.2s ease;
             cursor: pointer;
-            user-select: none;
             border-bottom: 2px solid transparent;
         }
+
         .tab.active {
             background: #2979ff;
             color: #fff;
-            font-weight: 500;
+            font-weight: 600;
             border-bottom-color: #2979ff;
+        }
+
+        .settings-btn {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            transition: all 0.2s;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .settings-btn:active {
+            background: #f0f0f0;
+            transform: rotate(60deg);
+        }
+
+        .settings-btn.has-update {
+            animation: gearPulse 0.6s ease-in-out;
+        }
+
+        @keyframes gearPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            30% {
+                transform: scale(1.25) rotate(30deg);
+            }
+            60% {
+                transform: scale(0.9) rotate(-15deg);
+            }
+        }
+
+        .mode-switch-row {
+            display: flex;
+            gap: 6px;
+            padding: 10px 12px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            align-items: center;
+        }
+
+        .mode-switch-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px 8px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: 2px solid transparent;
+            background: #f5f5f5;
+            color: #666;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .mode-switch-btn.active {
+            background: #1d1d1f;
+            color: #fff;
+            border-color: #1d1d1f;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .mode-switch-btn .mode-icon {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 2px;
         }
 
         .algo-tabs {
             display: flex;
             overflow-x: auto;
-            gap: 4px;
-            padding: 8px 10px;
+            gap: 8px;
+            padding: 12px 12px;
             background: #fff;
             border-bottom: 1px solid var(--line);
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
+
         .algo-tabs::-webkit-scrollbar {
             display: none;
         }
+
         .algo-tab {
             flex-shrink: 0;
-            padding: 6px 12px;
-            border-radius: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 12px;
-            color: #666;
+            color: #555;
             background: #f5f5f5;
             cursor: pointer;
-            user-select: none;
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: all 0.25s;
             border: 1px solid transparent;
-            font-weight: 400;
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
         }
+
         .algo-tab.active {
             background: #1d1d1f;
             color: #fff;
             border-color: #1d1d1f;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
+
         .algo-tab.win-high {
             border-color: #2e7d32;
             background: #e8f5e9;
@@ -114,32 +205,41 @@
         .info-card {
             background: #fff;
             margin: 8px 10px;
-            padding: 14px 16px;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            padding: 16px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            position: relative;
         }
+
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
         }
+
         .issue-no {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 24px;
+            font-weight: 800;
             color: #222;
+            letter-spacing: -0.3px;
         }
+
         .timer {
-            font-size: 26px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #e53935;
             font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
         }
+
         .timer.opening {
             color: #f57c00;
-            animation: pulse 0.6s infinite;
+            animation: pulse 0.8s infinite;
         }
+
         @keyframes pulse {
             0%,
             100% {
@@ -147,293 +247,443 @@
                 transform: scale(1);
             }
             50% {
-                opacity: 0.55;
-                transform: scale(1.05);
+                opacity: 0.45;
+                transform: scale(1.06);
             }
         }
+
         .api-dot {
             display: inline-block;
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: #2e7d32;
-            margin-right: 4px;
+            margin-right: 5px;
             animation: dotPulse 2s infinite;
         }
+
         @keyframes dotPulse {
             0%,
             100% {
                 box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.5);
             }
             50% {
-                box-shadow: 0 0 0 8px rgba(46, 125, 50, 0);
+                box-shadow: 0 0 0 12px rgba(46, 125, 50, 0);
             }
         }
 
         .rec-card {
-            background: linear-gradient(135deg, #1d1d1f, #2d2d30);
+            background: linear-gradient(145deg, #1a1a1e 0%, #2d2d32 100%);
             color: #fff;
-            border-radius: 12px;
-            margin: 8px 10px;
-            padding: 16px 18px;
+            border-radius: 20px;
+            margin: 12px 10px;
+            padding: 22px 20px;
             text-align: center;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
         }
+
         .rec-card .rec-label {
-            font-size: 12px;
-            opacity: 0.8;
+            font-size: 13px;
+            opacity: 0.9;
             letter-spacing: 2px;
+            font-weight: 400;
         }
+
         .rec-card .rec-value {
-            font-size: 36px;
-            font-weight: 800;
+            font-size: 46px;
+            font-weight: 900;
             background: linear-gradient(135deg, #ffd60a, #ff8f00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 4px 0;
+            margin: 8px 0;
+            filter: drop-shadow(0 2px 6px rgba(255, 200, 0, 0.4));
         }
+
+        .rec-card .rec-value.number-range {
+            font-size: 38px;
+            letter-spacing: 1px;
+        }
+
         .rec-card .rec-sub {
             font-size: 12px;
-            opacity: 0.85;
+            opacity: 0.9;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 14px;
             flex-wrap: wrap;
         }
+
         .rec-card .rec-sub span {
-            background: rgba(255, 255, 255, 0.12);
-            padding: 3px 10px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 5px 14px;
+            border-radius: 20px;
         }
+
         .current-algo-tag {
             display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 2px 10px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 16px;
+            border-radius: 20px;
             font-size: 11px;
-            margin-top: 4px;
-            font-weight: 400;
+            margin-top: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* 杀组标签 - 去除固定背景，由 btn-red/btn-blue 动态着色 */
+        .kill-tag {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 4px 3px;
+            border: 1px solid rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+        }
+
+        .kill-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .kill-section .kill-label {
+            font-size: 11px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
         .table-header {
             background: #fff;
-            border-bottom: 1px solid var(--line);
-            margin: 6px 10px 0;
-            border-radius: 8px 8px 0 0;
+            margin: 8px 10px 0;
+            border-radius: 12px 12px 0 0;
         }
+
         .thead {
             display: flex;
-            padding: 11px 0;
+            padding: 12px 0;
             background: #fff;
-            border-radius: 8px 8px 0 0;
+            border-radius: 12px 12px 0 0;
         }
+
         .th {
-            flex: 1;
             text-align: center;
             font-size: 14px;
             color: #333;
-            font-weight: 500;
-            letter-spacing: 0.3px;
+            font-weight: 600;
         }
 
-        .tbody {
-            background: #fff;
-            width: 100%;
-            margin: 0 10px;
-            max-width: calc(100% - 20px);
+        .th-col-period {
+            flex: 0.7;
         }
+
+        .th-col-nums {
+            flex: 1.1;
+        }
+
+        .th-col-pred {
+            flex: 1;
+        }
+
+        .th-col-kill {
+            flex: 0.9;
+        }
+
+        .th-col-predres {
+            flex: 0.7;
+        }
+
+        .th-col-killres {
+            flex: 0.7;
+        }
+
         .table-card {
             background: #fff;
-            margin: 0 10px 8px;
-            border-radius: 0 0 8px 8px;
+            margin: 0 10px 10px;
+            border-radius: 0 0 12px 12px;
             overflow: hidden;
             border: 1px solid #eee;
             border-top: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
         }
+
         .tr {
             display: flex;
-            padding: 11px 0;
-            border-bottom: 1px solid #f5f5f5;
+            padding: 13px 0;
+            border-bottom: 1px solid #f9f9f9;
             align-items: center;
-            transition: background 0.1s;
+            transition: background 0.15s;
         }
+
         .tr:active {
             background: #fafafa;
         }
+
         .tr:last-child {
             border-bottom: none;
         }
+
         .td {
-            flex: 1;
             text-align: center;
             font-size: 13px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 2px;
+            gap: 3px;
         }
-        .td:first-child {
-            font-weight: 500;
+
+        .td-col-period {
+            flex: 0.7;
+            font-weight: 600;
             color: #222;
             font-size: 12px;
         }
+
+        .td-col-nums {
+            flex: 1.1;
+        }
+
+        .td-col-pred {
+            flex: 1;
+        }
+
+        .td-col-kill {
+            flex: 0.9;
+            font-size: 11px;
+        }
+
+        .td-col-predres {
+            flex: 0.7;
+        }
+
+        .td-col-killres {
+            flex: 0.7;
+        }
+
         .ball-group {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 3px;
-            flex-wrap: nowrap;
         }
+
         .redball {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             background: #e53935;
             color: #fff;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(229, 57, 53, 0.25);
         }
+
         .blueball {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             background: #1976d2;
             color: #fff;
             border-radius: 50%;
             font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(25, 118, 210, 0.25);
         }
+
+        .btn-red,
+        .btn-blue {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0 2px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            transition: transform 0.1s;
+        }
+
         .btn-red {
             background: #e53935;
             color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            display: inline-block;
-            margin: 0 2px;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(229, 57, 53, 0.2);
         }
+
         .btn-blue {
             background: #1976d2;
             color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+        }
+
+        .btn-range {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
             display: inline-block;
             margin: 0 2px;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             white-space: nowrap;
+            background: #1d1d1f;
+            color: #ffd60a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
         }
+
         .ok {
-            background: #e53935;    /* 中 → 红色 */
+            background: #e53935;
             color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 5px 12px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             display: inline-block;
-            min-width: 36px;
+            min-width: 38px;
         }
+
         .err {
-            background: #1976d2;    /* 错 → 蓝色 */
+            background: #1976d2;
             color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 5px 12px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             display: inline-block;
-            min-width: 36px;
+            min-width: 38px;
         }
+
         .none-result {
             color: #999;
-            font-size: 11px;
+            font-size: 12px;
             background: #f5f5f5;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 5px 10px;
+            border-radius: 6px;
             display: inline-block;
+        }
+
+        /* 杀组结果颜色与预测结果一致 */
+        .kill-ok {
+            background: #e53935;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 38px;
+        }
+
+        .kill-err {
+            background: #1976d2;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 38px;
+        }
+
+        .kill-tag-sm {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin: 1px 2px;
+            white-space: nowrap;
+            /* 背景由 btn-red/btn-blue 决定，这里只保留通用样式 */
         }
 
         .stat-card {
             background: #fff;
-            margin: 8px 10px;
-            padding: 14px 16px;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            margin: 10px 10px;
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
         }
+
         .stat-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
             color: #222;
         }
+
         .stat-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f9f9f9;
             font-size: 13px;
         }
+
         .stat-row:last-child {
             border-bottom: none;
         }
+
         .alert-item {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin: 6px 0;
+            padding: 14px;
+            border-radius: 12px;
+            margin: 10px 0;
             font-size: 13px;
-            border-left: 3px solid #e0e0e0;
+            border-left: 5px solid #e0e0e0;
             background: #fafafa;
+            transition: all 0.2s;
         }
+
         .alert-item.lv1 {
             border-left-color: #f57c00;
             background: #fff8f0;
         }
+
         .alert-item.lv2 {
             border-left-color: #e53935;
             background: #fff0f0;
         }
+
         .alert-item.lv3 {
             border-left-color: #7b1fa2;
             background: #fdf0ff;
         }
+
         .confidence-bar {
             width: 100%;
-            height: 5px;
+            height: 6px;
             background: #e0e0e0;
-            border-radius: 3px;
+            border-radius: 8px;
             overflow: hidden;
-            margin: 6px 0;
+            margin: 10px 0;
         }
+
         .confidence-fill {
             height: 100%;
             background: linear-gradient(90deg, #2e7d32, #f57c00, #e53935);
-            border-radius: 3px;
-            transition: width 0.4s;
+            border-radius: 8px;
+            transition: width 0.5s;
         }
 
         .panel {
             display: none;
         }
+
         .panel.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.35s ease;
         }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(6px);
+                transform: translateY(8px);
             }
             to {
                 opacity: 1;
@@ -442,35 +692,39 @@
         }
 
         .btn-sm {
-            padding: 5px 12px;
-            border-radius: 14px;
-            font-size: 11px;
+            padding: 7px 18px;
+            border-radius: 22px;
+            font-size: 12px;
             border: 1px solid #ddd;
             background: #fff;
             cursor: pointer;
-            color: #555;
-            white-space: nowrap;
+            color: #444;
+            font-weight: 500;
             transition: all 0.2s;
         }
+
         .btn-sm:active {
-            opacity: 0.7;
-            transform: scale(0.95);
+            opacity: 0.8;
+            transform: scale(0.96);
         }
+
         .btn-sm.primary {
             background: #1d1d1f;
             color: #fff;
             border-color: transparent;
         }
+
         .btn-sm.success {
             background: #2e7d32;
             color: #fff;
             border-color: transparent;
         }
+
         .btn-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
-            padding: 8px 10px;
+            gap: 10px;
+            padding: 12px 12px;
         }
 
         #toastContainer {
@@ -481,20 +735,23 @@
             z-index: 99999;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
             pointer-events: none;
         }
+
         .toast {
             pointer-events: auto;
-            background: rgba(30, 30, 30, 0.9);
+            background: rgba(30, 30, 30, 0.92);
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-size: 13px;
             font-weight: 500;
             white-space: nowrap;
-            animation: toastIn 0.3s ease-out, toastOut 0.3s 1.8s ease-in forwards;
+            animation: toastIn 0.3s ease-out, toastOut 0.3s 2s ease-in forwards;
+            text-align: center;
         }
+
         @keyframes toastIn {
             from {
                 opacity: 0;
@@ -505,6 +762,7 @@
                 transform: translateY(0) scale(1);
             }
         }
+
         @keyframes toastOut {
             from {
                 opacity: 1;
@@ -519,72 +777,293 @@
         .opening-animation {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            padding: 8px;
+            gap: 16px;
+            padding: 12px;
         }
+
         .opening-dot {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: linear-gradient(135deg, #f57c00, #e53935);
-            animation: bounce 0.6s ease-in-out infinite;
+            animation: bounce 0.65s ease-in-out infinite;
         }
+
         .opening-dot:nth-child(2) {
-            animation-delay: 0.12s;
+            animation-delay: 0.15s;
         }
+
         .opening-dot:nth-child(3) {
-            animation-delay: 0.24s;
+            animation-delay: 0.3s;
         }
+
         @keyframes bounce {
             0%,
             100% {
                 transform: translateY(0) scale(1);
             }
             40% {
-                transform: translateY(-16px) scale(1.08);
+                transform: translateY(-20px) scale(1.1);
             }
             60% {
-                transform: translateY(-5px) scale(0.94);
+                transform: translateY(-8px) scale(0.92);
             }
         }
-        .footer-note {
-            text-align: center;
-            padding: 16px;
-            font-size: 11px;
-            color: #aaa;
+
+        .scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: grab;
+            border-radius: 14px;
+            touch-action: none;
         }
 
-        @media (max-width:400px) {
+        .scratch-canvas:active {
+            cursor: grabbing;
+        }
+
+        .reveal-flash {
+            animation: revealFlash 0.5s ease-out;
+        }
+
+        @keyframes revealFlash {
+            0% {
+                filter: brightness(2);
+                transform: scale(1.04);
+            }
+            100% {
+                filter: brightness(1);
+                transform: scale(1);
+            }
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 99990;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: overlayIn 0.25s ease;
+        }
+
+        @keyframes overlayIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .settings-panel {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px 20px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: panelIn 0.3s ease;
+        }
+
+        @keyframes panelIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .settings-panel h3 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+        }
+
+        .setting-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            border-radius: 28px;
+            transition: all 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: #2979ff;
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            justify-content: center;
+        }
+
+        .settings-btn-action {
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .settings-btn-action:active {
+            transform: scale(0.95);
+        }
+
+        .btn-test-sound {
+            background: #f5f5f5;
+            color: #444;
+        }
+
+        .btn-close-settings {
+            background: #1d1d1f;
+            color: #fff;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .stat-summary {
+            background: #fff;
+            margin: 10px 10px;
+            padding: 14px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 13px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (max-width: 400px) {
             .redball,
             .blueball {
-                width: 22px;
-                height: 22px;
+                width: 24px;
+                height: 24px;
                 font-size: 11px;
             }
             .btn-red,
-            .btn-blue {
-                padding: 3px 6px;
+            .btn-blue,
+            .btn-range {
+                padding: 4px 8px;
                 font-size: 10px;
             }
             .ok,
             .err,
-            .none-result {
-                padding: 3px 7px;
+            .none-result,
+            .kill-ok,
+            .kill-err {
+                padding: 4px 8px;
                 font-size: 10px;
             }
             .td {
                 font-size: 11px;
-                gap: 1px;
+            }
+            .td-col-kill {
+                font-size: 9px;
             }
             .tr {
-                padding: 9px 0;
+                padding: 10px 0;
             }
             .algo-tab {
-                padding: 5px 9px;
+                padding: 6px 10px;
                 font-size: 11px;
             }
             .rec-card .rec-value {
+                font-size: 34px;
+            }
+            .rec-card .rec-value.number-range {
                 font-size: 28px;
+            }
+            .settings-panel {
+                width: 94%;
+                padding: 18px 14px;
+            }
+            .mode-switch-btn {
+                font-size: 11px;
+                padding: 8px 6px;
+            }
+            .th {
+                font-size: 11px;
+            }
+            .kill-tag-sm {
+                padding: 2px 5px;
+                font-size: 9px;
             }
         }
     </style>
@@ -597,18 +1076,24 @@
             <div class="tab" data-panel="trend">走势</div>
             <div class="tab" data-panel="stats">统计</div>
             <div class="tab" data-panel="record">记录</div>
+            <div class="settings-btn" id="settingsBtn" title="设置">⚙</div>
         </div>
-
         <div class="panel active" id="predict-panel">
+            <div class="mode-switch-row" id="modeSwitchRow">
+                <div class="mode-switch-btn active" data-mode="combo" id="modeBtnCombo"><span class="mode-icon">🔮</span>组合预测</div>
+                <div class="mode-switch-btn" data-mode="number" id="modeBtnNumber"><span class="mode-icon">🎯</span>数字预测</div>
+            </div>
             <div class="algo-tabs" id="algoTabs"></div>
-
             <div class="rec-card" id="recCard">
-                <div class="rec-label">⚡ 遗漏必补 · 下一期预测</div>
+                <div class="rec-label" id="recLabel">动态博弈杀组 · 下一期预测</div>
                 <div class="rec-value" id="recTarget">--</div>
                 <div class="rec-sub" id="recDetail"><span>置信度 --%</span><span>连缺 -- 期</span></div>
-                <div class="current-algo-tag" id="currentAlgoTag">🎯遗漏回补</div>
+                <div class="kill-section" id="killSection" style="display:none;">
+                    <div class="kill-label">🚫 杀组排除</div>
+                    <div id="killTags"></div>
+                </div>
+                <div class="current-algo-tag" id="currentAlgoTag">集成学习</div>
             </div>
-
             <div class="info-card">
                 <div class="info-row">
                     <div><div style="font-size:11px;color:#999;">当前期号</div><div class="issue-no" id="issue">--</div></div>
@@ -616,45 +1101,38 @@
                     <div style="font-size:11px;color:#999;"><span class="api-dot" id="apiDot"></span><span id="apiTip">连接中</span></div>
                 </div>
             </div>
-
-            <div class="info-card" id="resultCard">
-                <div style="font-weight:600;margin-bottom:8px;font-size:15px;">🎯 最新开奖结果</div>
-                <div id="openingAnim" class="opening-animation" style="display:none;">
-                    <div class="opening-dot"></div><div class="opening-dot"></div><div class="opening-dot"></div>
-                </div>
-                <div id="resultDisplay">
-                    <div style="text-align:center;margin-bottom:6px;">
-                        <span id="n1ball" class="redball" style="width:34px;height:34px;font-size:16px;">-</span>
-                        <span id="n2ball" class="redball" style="width:34px;height:34px;font-size:16px;">-</span>
-                        <span id="n3ball" class="redball" style="width:34px;height:34px;font-size:16px;">-</span>
-                        <span style="font-size:18px;margin:0 4px;">=</span>
-                        <span id="sumBall" class="blueball" style="width:38px;height:38px;font-size:18px;">-</span>
+            <div class="info-card" id="resultCard" style="position:relative;">
+                <div style="font-weight:700;margin-bottom:10px;font-size:16px;">🎯 最新开奖结果</div>
+                <div id="openingAnim" class="opening-animation" style="display:none;"><div class="opening-dot"></div><div class="opening-dot"></div><div class="opening-dot"></div></div>
+                <div id="resultDisplay" style="position:relative;">
+                    <div style="text-align:center;margin-bottom:8px;position:relative;" id="resultNumbersContainer">
+                        <span id="n1ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
+                        <span id="n2ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
+                        <span id="n3ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
+                        <span style="font-size:22px;margin:0 6px;">=</span>
+                        <span id="sumBall" class="blueball" style="width:42px;height:42px;font-size:20px;">-</span>
                     </div>
-                    <div style="text-align:center;font-size:13px;color:#666;" id="sumExpr"></div>
-                    <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap;">
-                        <span style="font-size:11px;background:#f5f5f5;padding:3px 8px;border-radius:10px;" id="comboTag">-</span>
-                        <span style="font-size:11px;background:#f5f5f5;padding:3px 8px;border-radius:10px;" id="dxTag">-</span>
-                        <span style="font-size:11px;background:#f5f5f5;padding:3px 8px;border-radius:10px;" id="dsTag">-</span>
+                    <div style="text-align:center;font-size:14px;color:#666;" id="sumExpr"></div>
+                    <div style="display:flex;gap:6px;justify-content:center;margin-top:10px;">
+                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="comboTag">-</span>
+                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="dxTag">-</span>
+                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="dsTag">-</span>
                     </div>
                 </div>
             </div>
-
             <div class="info-card" id="algoDetailCard">
-                <div style="font-weight:600;margin-bottom:6px;font-size:14px;" id="algoDetailTitle">🤖 算法预测</div>
+                <div style="font-weight:700;margin-bottom:8px;font-size:15px;" id="algoDetailTitle">🤖 算法预测</div>
                 <div id="algoDetailContent"></div>
             </div>
-
-            <div class="table-header">
-                <div class="thead">
-                    <div class="th">期号</div>
-                    <div class="th">号码</div>
-                    <div class="th">预测</div>
-                    <div class="th">结果</div>
-                </div>
-            </div>
-            <div class="table-card">
-                <div class="tbody" id="predictTableBody"></div>
-            </div>
+            <div class="table-header"><div class="thead">
+                <div class="th th-col-period">期号</div>
+                <div class="th th-col-nums">号码</div>
+                <div class="th th-col-pred" id="predictColHeader">预测</div>
+                <div class="th th-col-kill">杀组</div>
+                <div class="th th-col-predres">预测结果</div>
+                <div class="th th-col-killres">杀组结果</div>
+            </div></div>
+            <div class="table-card"><div class="tbody" id="predictTableBody"></div></div>
             <div class="btn-group">
                 <button class="btn-sm primary" onclick="window.loadData(true)">🔄 强制刷新</button>
                 <button class="btn-sm" onclick="window.filterTable('all')">全部</button>
@@ -663,70 +1141,74 @@
                 <button class="btn-sm" onclick="window.filterTable('豹子')">豹子</button>
             </div>
         </div>
-
         <div class="panel" id="trend-panel">
-            <div class="info-card">
-                <div style="font-weight:600;margin-bottom:8px;font-size:15px;">📊 走势分析</div>
-                <div id="trendAnalysis" style="font-size:13px;color:#666;"></div>
-            </div>
-            <div class="info-card">
-                <div style="font-weight:600;margin-bottom:8px;font-size:15px;">📈 最近走势图</div>
-                <div id="trendStrip" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
-            </div>
-            <div class="table-header">
-                <div class="thead">
-                    <div class="th">期号</div>
-                    <div class="th">号码</div>
-                    <div class="th">和值</div>
-                    <div class="th">形态</div>
-                </div>
-            </div>
-            <div class="table-card">
-                <div class="tbody" id="trendTableBody"></div>
-            </div>
+            <div class="info-card"><div style="font-weight:700;margin-bottom:10px;font-size:16px;">📊 走势分析</div><div id="trendAnalysis"></div></div>
+            <div class="info-card"><div style="font-weight:700;margin-bottom:10px;font-size:16px;">📈 最近走势图</div><div id="trendStrip" style="display:flex;flex-wrap:wrap;gap:5px;"></div></div>
+            <div class="table-header"><div class="thead"><div class="th">期号</div><div class="th">号码</div><div class="th">和值</div><div class="th">形态</div></div></div>
+            <div class="table-card"><div class="tbody" id="trendTableBody"></div></div>
         </div>
-
         <div class="panel" id="stats-panel">
+            <div class="stat-summary" id="statsSummary">加载中...</div>
             <div class="stat-card"><div class="stat-title">🎯 回补预警</div><div id="compensationAlerts"></div></div>
             <div class="stat-card"><div class="stat-title">📊 遗漏统计</div><div id="missStats"></div></div>
             <div class="stat-card"><div class="stat-title">📋 概率分布</div><div id="probStats"></div></div>
             <div class="stat-card"><div class="stat-title">🏆 模型胜率排行</div><div id="modelWinrate"></div></div>
         </div>
-
         <div class="panel" id="record-panel">
+            <div class="stat-summary" id="recordSummary">加载中...</div>
             <div class="btn-group">
                 <button class="btn-sm success" onclick="window.loadPredictHistoryUI()">🔄 刷新</button>
                 <button class="btn-sm" onclick="window.clearPredictHistoryUI()" style="background:#e53935;color:#fff;border-color:transparent;">🗑️ 清空</button>
                 <button class="btn-sm primary" onclick="window.exportRecords()">📤 导出</button>
             </div>
-            <div class="table-header">
-                <div class="thead">
-                    <div class="th">期号</div>
-                    <div class="th">算法</div>
-                    <div class="th">预测</div>
-                    <div class="th">结果</div>
-                </div>
-            </div>
-            <div class="table-card">
-                <div class="tbody" id="recordTableBody"></div>
-            </div>
-            <div style="text-align:center;padding:8px;font-size:11px;color:#999;" id="recordCount"></div>
+            <div class="table-header"><div class="thead">
+                <div class="th th-col-period">期号</div>
+                <div class="th th-col-nums">算法</div>
+                <div class="th th-col-pred">预测</div>
+                <div class="th th-col-kill">杀组</div>
+                <div class="th th-col-predres">预测结果</div>
+                <div class="th th-col-killres">杀组结果</div>
+            </div></div>
+            <div class="table-card"><div class="tbody" id="recordTableBody"></div></div>
+            <div style="text-align:center;padding:12px;font-size:12px;color:#999;" id="recordCount"></div>
         </div>
-
-        <div class="footer-note">🐟 PC28预测 · 遗漏补齐算法 v9.1 · 13算法协同<br>仅供娱乐参考，不构成投资建议</div>
+        <div class="footer-note">🐟 PC28预测 · 动态博弈杀组 v12.3 · 冷热+单双平衡+反趋势 · 仅供娱乐参考</div>
     </div>
-
+    <div class="settings-overlay" id="settingsOverlay" style="display:none;">
+        <div class="settings-panel">
+            <h3>⚙️ 设置</h3>
+            <div class="setting-row">
+                <span class="setting-label">🔔 开奖铃音</span>
+                <label class="toggle-switch"><input type="checkbox" id="toggleSound" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">🎴 咪牌刮奖</span>
+                <label class="toggle-switch"><input type="checkbox" id="toggleScratch" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">📱 咪牌提示</span>
+                <span style="font-size:11px;color:#999;">刮开涂层 / 双击快速揭示</span>
+            </div>
+            <div class="settings-actions">
+                <button class="settings-btn-action btn-test-sound" id="btnTestSound">🔔 测试铃音</button>
+                <button class="settings-btn-action btn-close-settings" id="btnCloseSettings">✓ 关闭</button>
+            </div>
+        </div>
+    </div>
     <script>
         (function() {
             "use strict";
-
             const API_URLS = [
                 'https://pc28.help/api/kj.json?nbr=50',
                 'https://pc28.help/api/kj.xml?nbr=50',
                 'https://pc28.help/api/keno.json?nbr=50'
             ];
-            const STORAGE_KEY = 'ys_pc28_v8_records';
-            
+            const STORAGE_KEY = 'ys_pc28_v12_records';
+            const SETTINGS_KEY = 'pc28_v12_settings';
+            const COMBOS = ['大单', '大双', '小单', '小双'];
+            const MAX_RANGE_SPAN = 6;
+
+            // 全局状态
             let historyData = [];
             let latestPeriod = '';
             let countdownSeconds = 210;
@@ -735,34 +1217,62 @@
             let autoRefresh = null;
             let openingPolling = null;
             let currentApiIndex = 0;
-            let currentAlgoKey = 'missingTrend';
+            let currentAlgoKey = 'ensemble';
             let currentFilter = 'all';
+            let predictMode = 'combo';
+            let currentNumberAlgoKey = 'rangeEnsemble';
             let predictions = {};
+            let numberPredictions = {};
             let algoWinRates = {};
+            let numberAlgoWinRates = {};
             let comboMissCount = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
-            
             let pendingRow = null;
-            const combos = ['大单', '大双', '小单', '小双'];
-            const algoNames = {
-                missingTrend: '🎯遗漏回补',
-                markov: '🔗马尔可夫',
-                ewma: '📊指数加权',
-                montecarlo: '🎲蒙特卡洛',
-                bayesian: '📐贝叶斯',
-                kalman: '📡卡尔曼',
-                sumZone: '🎯和值区间',
-                hotCold: '🔥冷热追踪',
-                spanAnalysis: '📏跨度走势',
-                oddEven: '⚖️奇偶平衡',
-                bigSmall: '📈大小轮动',
-                patternCycle: '🔄形态周期',
-                smartExclude: '🧠智能排除'
-            };
-            
-            let sortedAlgoKeys = Object.keys(algoNames);
-            let _algoRecentPerf = {};
-            Object.keys(algoNames).forEach(k => _algoRecentPerf[k] = { hits: 0, total: 0, weight: 1.0 });
+            let _globalDoubleHistory = [];
+            let _lastEnsemblePrediction = null;
+            let _lastNumberPrediction = null;
+            let scratchRevealed = false;
+            let audioCtx = null;
+            let settings = { soundEnabled: true, scratchEnabled: true };
 
+            // 动态杀组状态
+            let currentGlobalKillGroup = null;
+            let killGroupStreak = 0;
+            let recentKillGroups = [];
+            const MAX_RECENT_KILL = 2;
+            const MAX_STREAK_BEFORE_SWITCH = 3;
+            const SWITCH_PROBABILITY = 0.5;
+
+            // 算法名称映射
+            const algoNames = {
+                ensemble: '集成学习',
+                missingTrend: '遗漏回补',
+                markov: '马尔可夫',
+                ewma: '指数加权',
+                montecarlo: '蒙特卡洛',
+                bayesian: '贝叶斯',
+                kalman: '卡尔曼',
+                sumZone: '和值区间',
+                hotCold: '冷热追踪',
+                spanAnalysis: '跨度走势',
+                oddEven: '奇偶平衡',
+                bigSmall: '大小轮动',
+                patternCycle: '形态周期',
+                smartExclude: '智能排除'
+            };
+            const algoKeys = Object.keys(algoNames);
+            let sortedAlgoKeys = [...algoKeys];
+
+            const numberAlgoNames = {
+                rangeEnsemble: '集成范围',
+                rangeMA: '移动平均',
+                rangeTrend: '趋势分析',
+                rangeFreq: '区间频率',
+                rangeKalman: '卡尔曼滤波'
+            };
+            const numberAlgoKeys = Object.keys(numberAlgoNames);
+            let sortedNumberAlgoKeys = [...numberAlgoKeys];
+
+            // 回补预警配置
             const compensationAlerts = {
                 duizi: { level: 0, due: 0, message: '', probability: 0, expectedDue: 7 },
                 shunzi: { level: 0, due: 0, message: '', probability: 0, expectedDue: 22 },
@@ -772,236 +1282,1290 @@
                 lastUpdate: 0
             };
 
-            const $ = id => document.getElementById(id);
+            // DOM 工具
+            const $ = function(id) {
+                return document.getElementById(id);
+            };
 
             function toast(msg, type) {
-                const container = $('toastContainer');
+                var container = $('toastContainer');
                 if (!container) return;
-                const el = document.createElement('div');
+                var el = document.createElement('div');
                 el.className = 'toast';
                 el.textContent = msg;
-                if (type === 'success') el.style.background = 'linear-gradient(135deg,#2e7d32,#43a047)';
-                if (type === 'error') el.style.background = 'linear-gradient(135deg,#e53935,#f57c00)';
+                if (type === 'success') {
+                    el.style.background = 'linear-gradient(135deg,#2e7d32,#43a047)';
+                } else if (type === 'error') {
+                    el.style.background = 'linear-gradient(135deg,#e53935,#f57c00)';
+                }
                 container.appendChild(el);
-                setTimeout(() => { if (el.parentNode) el.remove(); }, 2200);
+                setTimeout(function() {
+                    if (el.parentNode) el.remove();
+                }, 2400);
             }
 
+            // 基础计算函数
             function sumToCombo(s) {
                 return (s > 13 ? '大' : '小') + (s % 2 === 0 ? '双' : '单');
             }
 
             function getPattern(n) {
-                const [a, b, c] = n;
+                var a = n[0],
+                    b = n[1],
+                    c = n[2];
                 if (a === b && b === c) return '豹子';
                 if (a === b || b === c || a === c) return '对子';
-                const s = [...n].sort((x, y) => x - y);
-                return s[2] - s[1] === 1 && s[1] - s[0] === 1 ? '顺子' : '杂六';
+                var sorted = [a, b, c].sort(function(x, y) { return x - y; });
+                if (sorted[2] - sorted[1] === 1 && sorted[1] - sorted[0] === 1) return '顺子';
+                return '杂六';
             }
 
             function getSumInfo(s, n) {
-                const dx = s > 13 ? '大' : '小';
-                const ds = s % 2 === 0 ? '双' : '单';
+                var dx = s > 13 ? '大' : '小';
+                var ds = s % 2 === 0 ? '双' : '单';
+                var pattern = getPattern(n);
                 return {
-                    dx,
-                    ds,
+                    dx: dx,
+                    ds: ds,
                     combo: dx + ds,
-                    pattern: getPattern(n),
+                    pattern: pattern,
                     isBig: s > 13,
-                    isDuiZi: getPattern(n) === '对子',
-                    isShunZi: getPattern(n) === '顺子',
-                    isBaoZi: getPattern(n) === '豹子',
+                    isDuiZi: pattern === '对子',
+                    isShunZi: pattern === '顺子',
+                    isBaoZi: pattern === '豹子',
                     isSum13: s === 13,
                     isSum14: s === 14
                 };
             }
 
             function fmtTime(s) {
-                const m = Math.floor(s / 60);
-                const se = s % 60;
-                return `${m.toString().padStart(2, '0')}:${se.toString().padStart(2, '0')}`;
+                var m = Math.floor(s / 60);
+                var sec = s % 60;
+                return m.toString().padStart(2, '0') + ':' + sec.toString().padStart(2, '0');
             }
 
             function formatBlue(v) {
                 if (typeof v === 'string') return v;
-                if (typeof v === 'number') return v < 10 ? `0${v}` : `${v}`;
-                return `${v}`;
+                if (typeof v === 'number') return v < 10 ? '0' + v : '' + v;
+                return '' + v;
             }
 
-            function freshRandom(seed) {
-                const x = Math.sin(seed || Date.now()) * 10000;
-                return (x - Math.floor(x) + Math.random()) / 2;
+            function seededRandom(seed) {
+                var s = seed | 0;
+                s = (s * 1664525 + 1013904223) & 0x7fffffff;
+                return (s >>> 0) / 0x7fffffff;
             }
 
-            function generateRandomDouble(avoidKeys = []) {
-                const keys = [];
-                for (let i = 0; i < combos.length; i++) {
-                    for (let j = i + 1; j < combos.length; j++) {
-                        keys.push([combos[i], combos[j]].sort().join('+'));
-                    }
-                }
-                const candidates = keys.filter(k => !avoidKeys.includes(k));
-                const chosen = candidates.length ? candidates[Math.floor(freshRandom(Date.now()) * candidates.length)] : keys[0];
-                return chosen.split('+');
-            }
-
-            function genericPredict(seq, sums, algoSeed) {
-                const miss = {};
-                combos.forEach(c => {
-                    let cnt = 0;
-                    for (let i = 0; i < seq.length; i++) {
-                        if (seq[i] === c) break;
+            function getComboMissArray(comboSeq) {
+                var miss = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    var cnt = 0;
+                    for (var j = 0; j < comboSeq.length; j++) {
+                        if (comboSeq[j] === c) break;
                         cnt++;
                     }
                     miss[c] = cnt;
-                });
-                const maxMiss = Math.max(...Object.values(miss), 1);
-                const probs = {};
-                let total = 0;
-                combos.forEach(c => {
-                    let w = (miss[c] / maxMiss) * 0.5 + freshRandom(algoSeed + (miss[c] || 0)) * 0.5;
-                    probs[c] = w;
-                    total += w;
-                });
-                combos.forEach(c => probs[c] /= total);
-                const sorted = Object.entries(probs).sort((a, b) => b[1] - a[1]);
-                let double = sorted.slice(0, 2).map(c => c[0]);
-                const avoidKeys = (window._globalDoubleHistory || []).slice(-2);
-                if (avoidKeys.includes([...double].sort().join('+'))) {
-                    double = generateRandomDouble(avoidKeys);
+                }
+                return miss;
+            }
+
+            function normalizeProbs(probs) {
+                var total = 0;
+                var keys = Object.keys(probs);
+                for (var i = 0; i < keys.length; i++) {
+                    total += probs[keys[i]];
+                }
+                if (total === 0) {
+                    for (var j = 0; j < COMBOS.length; j++) {
+                        probs[COMBOS[j]] = 0.25;
+                    }
+                } else {
+                    for (var k = 0; k < COMBOS.length; k++) {
+                        probs[COMBOS[k]] = probs[COMBOS[k]] / total;
+                    }
+                }
+                return probs;
+            }
+
+            function pickDoubleFromProbs(probs, seed, forceVariety) {
+                if (forceVariety === undefined) forceVariety = false;
+                var entries = Object.entries(probs).sort(function(a, b) { return b[1] - a[1]; });
+                var double = [entries[0][0], entries[1][0]];
+                if (forceVariety && _lastEnsemblePrediction) {
+                    if (double.indexOf(_lastEnsemblePrediction) !== -1) {
+                        var alt = COMBOS.filter(function(c) { return double.indexOf(c) === -1 && c !== _lastEnsemblePrediction; });
+                        if (alt.length >= 1) double[1] = alt[0];
+                        else double[1] = COMBOS.find(function(c) { return c !== double[0]; }) || double[1];
+                    }
+                }
+                var key = double.slice().sort().join('+');
+                if (_globalDoubleHistory.slice(-4).indexOf(key) !== -1) {
+                    var alt2 = COMBOS.filter(function(c) { return double.indexOf(c) === -1; });
+                    if (alt2.length >= 2) double = [alt2[0], alt2[1]];
+                    else if (alt2.length === 1) double[1] = alt2[0];
                 }
                 if (double[0] === double[1]) {
-                    const other = combos.find(c => c !== double[0]) || combos[1];
-                    double[1] = other;
+                    var others = COMBOS.filter(function(c) { return c !== double[0]; });
+                    double[1] = others[Math.floor(seededRandom(seed) * others.length)];
                 }
-                const single = double.includes(sorted[0][0]) ? sorted[0][0] : double[0];
-                if (!window._globalDoubleHistory) window._globalDoubleHistory = [];
-                window._globalDoubleHistory.push([...double].sort().join('+'));
-                if (window._globalDoubleHistory.length > 6) window._globalDoubleHistory.shift();
-                
+                _globalDoubleHistory.push(double.slice().sort().join('+'));
+                if (_globalDoubleHistory.length > 10) _globalDoubleHistory.shift();
+                return { double: double, single: double[0] };
+            }
+
+            function clampSum(v) {
+                return Math.max(0, Math.min(27, Math.round(v)));
+            }
+
+            function constrainRange(min, max, center) {
+                if (max - min > MAX_RANGE_SPAN) {
+                    var halfSpan = Math.floor(MAX_RANGE_SPAN / 2);
+                    var newMin = clampSum(center - halfSpan);
+                    var newMax = clampSum(center + halfSpan);
+                    if (newMax - newMin > MAX_RANGE_SPAN) newMax = clampSum(newMin + MAX_RANGE_SPAN);
+                    if (newMax - newMin < 2) newMax = clampSum(newMin + 3);
+                    return { min: newMin, max: newMax, center: clampSum(Math.round((newMin + newMax) / 2)) };
+                }
+                return { min: min, max: max, center: center };
+            }
+
+            /* ========== 四维冷热加权 ========== */
+            function calcColdHotWeight(historyArr) {
+                var count = { "大单": 0, "大双": 0, "小单": 0, "小双": 0 };
+                historyArr.forEach(function(item) {
+                    if (count[item.group] !== undefined) count[item.group]++;
+                });
+                var weight = {};
+                var keys = Object.keys(count);
+                for (var i = 0; i < keys.length; i++) {
+                    weight[keys[i]] = count[keys[i]] * 1.0;
+                }
+                var last5 = historyArr.slice(-5);
+                last5.forEach(function(item) {
+                    weight[item.group] += 0.35;
+                });
+                var sortArr = Object.entries(weight).sort(function(x, y) { return y[1] - x[1]; });
+                return { count: count, weight: weight, hotRank: sortArr };
+            }
+
+            /* ========== 动态博弈杀组选择器 ========== */
+            function selectDynamicKillGroup(historyArr) {
+                if (!historyArr || historyArr.length < 5) return null;
+                var hot = calcColdHotWeight(historyArr);
+                var recent10 = historyArr.slice(-10);
+                var danCount = recent10.filter(function(x) { return x.group.indexOf('单') !== -1; }).length;
+                var shuangCount = recent10.length - danCount;
+                var danRatio = danCount / recent10.length;
+                var candidates = hot.hotRank.map(function(x) { return x[0]; });
+                if (danRatio >= 0.65) {
+                    candidates = candidates.filter(function(g) { return g.indexOf('双') !== -1; });
+                } else if (shuangCount / recent10.length >= 0.65) {
+                    candidates = candidates.filter(function(g) { return g.indexOf('单') !== -1; });
+                }
+                if (candidates.length === 0) candidates = hot.hotRank.map(function(x) { return x[0]; });
+                var available = candidates.filter(function(g) { return recentKillGroups.indexOf(g) === -1; });
+                if (available.length === 0) {
+                    recentKillGroups = [];
+                    available = candidates.slice();
+                }
+                var selected = available[0];
+                if (currentGlobalKillGroup && available.indexOf(currentGlobalKillGroup) !== -1) {
+                    if (killGroupStreak >= MAX_STREAK_BEFORE_SWITCH || Math.random() < SWITCH_PROBABILITY) {
+                        var others = available.filter(function(g) { return g !== currentGlobalKillGroup; });
+                        if (others.length > 0) selected = others[Math.floor(Math.random() * others.length)];
+                    } else {
+                        selected = currentGlobalKillGroup;
+                    }
+                } else {
+                    if (available.length > 1 && Math.random() < 0.3) selected = available[1];
+                }
+                recentKillGroups.push(selected);
+                if (recentKillGroups.length > MAX_RECENT_KILL) recentKillGroups.shift();
+                if (currentGlobalKillGroup !== selected) killGroupStreak = 0;
+                currentGlobalKillGroup = selected;
+                return selected;
+            }
+
+            function isKillHitCombo(killGroup, actualCombo) {
+                if (!killGroup) return null;
+                return killGroup !== actualCombo;
+            }
+
+            function updateKillGroupState(actualCombo) {
+                if (!currentGlobalKillGroup) return;
+                var hit = isKillHitCombo(currentGlobalKillGroup, actualCombo);
+                if (hit === true) killGroupStreak++;
+                else if (hit === false) killGroupStreak = 0;
+            }
+
+            /* ========== 14个组合预测算法 ========== */
+            function predictMissingTrend(cs, ss) {
+                var miss = getComboMissArray(cs);
+                var maxMiss = Math.max.apply(null, Object.values(miss)) || 1;
+                var probs = {};
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    probs[c] = Math.pow(miss[c] / maxMiss, 2.5) * 0.82 + 0.18 * (miss[c] / (maxMiss + 1));
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 101);
+                r.conf = 0.52 + Math.min(0.43, maxMiss / 18);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictMarkov(cs, ss) {
+                var idx = { 大单: 0, 大双: 1, 小单: 2, 小双: 3 };
+                var trans = [
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0]
+                ];
+                for (var i = 1; i < cs.length; i++) {
+                    var prev = idx[cs[i]];
+                    var curr = idx[cs[i - 1]];
+                    if (prev !== undefined && curr !== undefined) trans[prev][curr]++;
+                }
+                var lastIdx = idx[cs[0]] || 0;
+                var row = trans[lastIdx];
+                var rowSum = row.reduce(function(a, b) { return a + b; }, 0);
+                var probs = {};
+                for (var j = 0; j < COMBOS.length; j++) {
+                    var c = COMBOS[j];
+                    probs[c] = rowSum > 0 ? (row[j] + 2.0) / (rowSum + 8) : 0.25;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 202);
+                r.conf = 0.45 + Math.min(0.38, rowSum / 15);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictEwma(cs, ss) {
+                var probs = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                var alpha = 0.48;
+                var weight = 1;
+                var len = Math.min(cs.length, 20);
+                for (var i = 0; i < len; i++) {
+                    var c = cs[i];
+                    if (probs[c] !== undefined) probs[c] += weight;
+                    weight *= (1 - alpha);
+                }
+                for (var j = 0; j < COMBOS.length; j++) {
+                    probs[COMBOS[j]] = 1 / (probs[COMBOS[j]] + 0.7);
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 303);
+                r.conf = 0.47 + Math.min(0.36, cs.length / 24);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictMontecarlo(cs, ss) {
+                var freq = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 };
+                var slice = cs.slice(0, 24);
+                for (var i = 0; i < slice.length; i++) {
+                    var c = slice[i];
+                    if (freq[c] !== undefined) freq[c]++;
+                }
+                var total = Object.values(freq).reduce(function(a, b) { return a + b; }, 0);
+                var probs = {};
+                for (var j = 0; j < COMBOS.length; j++) {
+                    probs[COMBOS[j]] = freq[COMBOS[j]] / total;
+                }
+                for (var sim = 0; sim < 500; sim++) {
+                    var rnd = seededRandom(404 + sim);
+                    var cum = 0;
+                    for (var k = 0; k < COMBOS.length; k++) {
+                        cum += probs[COMBOS[k]];
+                        if (rnd <= cum) {
+                            probs[COMBOS[k]] += 0.0015;
+                            break;
+                        }
+                    }
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 405);
+                r.conf = 0.43 + Math.min(0.41, cs.length / 20);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictBayesian(cs, ss) {
+                var prior = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 };
+                var like = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 };
+                var slice = cs.slice(0, 22);
+                for (var i = 0; i < slice.length; i++) {
+                    var c = slice[i];
+                    if (like[c] !== undefined) like[c] += (22 - i) / 22;
+                }
+                var probs = {};
+                for (var j = 0; j < COMBOS.length; j++) {
+                    probs[COMBOS[j]] = prior[COMBOS[j]] * like[COMBOS[j]];
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 505);
+                r.conf = 0.48 + Math.min(0.35, cs.length / 22);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictKalman(cs, ss) {
+                var miss = getComboMissArray(cs);
+                var values = Object.values(miss);
+                var avg = values.reduce(function(a, b) { return a + b; }, 0) / 4;
+                var probs = {};
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    var innov = miss[c] - avg;
+                    probs[c] = 0.25 + innov * 0.085;
+                    if (probs[c] < 0.02) probs[c] = 0.02;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 606);
+                var maxMiss = Math.max.apply(null, values);
+                r.conf = 0.46 + Math.min(0.38, Math.abs(maxMiss - avg) / 7.5);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictSumZone(cs, ss) {
+                var probs = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                if (ss.length >= 5) {
+                    var recentAvg = ss.slice(0, 5).reduce(function(a, b) { return a + b; }, 0) / 5;
+                    var globalAvg = ss.reduce(function(a, b) { return a + b; }, 0) / ss.length;
+                    var trend = recentAvg - globalAvg;
+                    if (trend > 1.8) {
+                        probs['小单'] += 0.45;
+                        probs['小双'] += 0.40;
+                    } else if (trend < -1.8) {
+                        probs['大单'] += 0.45;
+                        probs['大双'] += 0.40;
+                    } else {
+                        for (var i = 0; i < COMBOS.length; i++) {
+                            probs[COMBOS[i]] = 0.25;
+                        }
+                    }
+                } else {
+                    for (var j = 0; j < COMBOS.length; j++) {
+                        probs[COMBOS[j]] = 0.25;
+                    }
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 707);
+                var firstThreeAvg = ss.slice(0, 3).reduce(function(a, b) { return a + b; }, 0) / 3;
+                r.conf = 0.41 + Math.min(0.43, Math.abs(firstThreeAvg - 13.5) / 3.8);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictHotCold(cs, ss) {
+                var freq = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                var slice = cs.slice(0, 14);
+                for (var i = 0; i < slice.length; i++) {
+                    var c = slice[i];
+                    if (freq[c] !== undefined) freq[c]++;
+                }
+                var probs = {};
+                for (var j = 0; j < COMBOS.length; j++) {
+                    var key = COMBOS[j];
+                    if (freq[key] >= 3) probs[key] = 0.12 + (freq[key] - 2) * 0.09;
+                    else probs[key] = 0.42 - freq[key] * 0.11;
+                    if (probs[key] < 0.03) probs[key] = 0.03;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 808);
+                var maxFreq = Math.max.apply(null, Object.values(freq));
+                r.conf = 0.44 + Math.min(0.39, maxFreq / 5);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictSpanAnalysis(cs, ss) {
+                var miss = getComboMissArray(cs);
+                var totalMiss = Object.values(miss).reduce(function(a, b) { return a + b; }, 0);
+                var probs = {};
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    probs[c] = totalMiss > 0 ? 1 - (miss[c] / (totalMiss + 1.6)) : 0.25;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 909);
+                var maxMiss = Math.max.apply(null, Object.values(miss));
+                r.conf = 0.45 + Math.min(0.38, maxMiss / 15);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictOddEven(cs, ss) {
+                var odd = cs.filter(function(c) { return c.indexOf('单') !== -1; }).length;
+                var even = cs.length - odd;
+                var total = cs.length || 1;
+                var ob = even / total;
+                var eb = odd / total;
+                var probs = {};
+                probs['大单'] = ob * 0.58;
+                probs['小单'] = ob * 0.42;
+                probs['大双'] = eb * 0.58;
+                probs['小双'] = eb * 0.42;
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 1010);
+                r.conf = 0.48 + Math.min(0.35, Math.abs(odd - even) / Math.max(total, 1));
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictBigSmall(cs, ss) {
+                var big = cs.filter(function(c) { return c.indexOf('大') !== -1; }).length;
+                var small = cs.length - big;
+                var total = cs.length || 1;
+                var bb = small / total;
+                var sb = big / total;
+                var probs = {};
+                probs['大单'] = bb * 0.58;
+                probs['大双'] = bb * 0.42;
+                probs['小单'] = sb * 0.58;
+                probs['小双'] = sb * 0.42;
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 1111);
+                r.conf = 0.48 + Math.min(0.35, Math.abs(big - small) / Math.max(total, 1));
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictPatternCycle(cs, ss) {
+                var miss = getComboMissArray(cs);
+                var maxMiss = Math.max.apply(null, Object.values(miss)) || 1;
+                var probs = {};
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    var phase = (miss[c] % 10) / 10;
+                    probs[c] = 0.22 + phase * 0.68 + (miss[c] / (maxMiss + 3.2)) * 0.20;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 1212);
+                r.conf = 0.43 + Math.min(0.41, maxMiss / 17);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            function predictSmartExclude(cs, ss) {
+                var freq = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                var slice = cs.slice(0, 11);
+                for (var i = 0; i < slice.length; i++) {
+                    var c = slice[i];
+                    if (freq[c] !== undefined) freq[c]++;
+                }
+                var probs = {};
+                for (var j = 0; j < COMBOS.length; j++) {
+                    var key = COMBOS[j];
+                    if (freq[key] >= 3) probs[key] = 0.09 + (4 - freq[key]) * 0.13;
+                    else probs[key] = 0.39 + (3 - freq[key]) * 0.14;
+                    if (probs[key] < 0.02) probs[key] = 0.02;
+                }
+                normalizeProbs(probs);
+                var r = pickDoubleFromProbs(probs, 1313);
+                var maxFreq = Math.max.apply(null, Object.values(freq));
+                r.conf = 0.46 + Math.min(0.38, (11 - maxFreq) / 9);
+                r.allProbs = probs;
+                r.prob = probs[r.single];
+                r.secondProb = Object.values(probs).sort(function(a, b) { return b - a; })[1] || 0;
+                return r;
+            }
+
+            var basePredictFns = {
+                missingTrend: predictMissingTrend,
+                markov: predictMarkov,
+                ewma: predictEwma,
+                montecarlo: predictMontecarlo,
+                bayesian: predictBayesian,
+                kalman: predictKalman,
+                sumZone: predictSumZone,
+                hotCold: predictHotCold,
+                spanAnalysis: predictSpanAnalysis,
+                oddEven: predictOddEven,
+                bigSmall: predictBigSmall,
+                patternCycle: predictPatternCycle,
+                smartExclude: predictSmartExclude
+            };
+
+            function getAlgoWeight(algoKey) {
+                var records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var recent = records.slice(0, 50).filter(function(r) { return r.algorithm === algoKey; });
+                if (recent.length < 15) return 0.6;
+                var hits = recent.filter(function(r) { return r.hit; }).length;
+                var rate = hits / recent.length;
+                return 0.25 + rate * 0.75;
+            }
+
+            function predictEnsemble(cs, ss) {
+                var weights = {};
+                var totalWeight = 0;
+                var keys = Object.keys(basePredictFns);
+                for (var i = 0; i < keys.length; i++) {
+                    var k = keys[i];
+                    weights[k] = getAlgoWeight(k);
+                    totalWeight += weights[k];
+                }
+                var avgProbs = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                for (var j = 0; j < keys.length; j++) {
+                    var key = keys[j];
+                    var prediction = basePredictFns[key](cs, ss);
+                    var w = weights[key] / totalWeight;
+                    for (var m = 0; m < COMBOS.length; m++) {
+                        avgProbs[COMBOS[m]] += prediction.allProbs[COMBOS[m]] * w;
+                    }
+                }
+                normalizeProbs(avgProbs);
+                for (var n = 0; n < COMBOS.length; n++) {
+                    var c = COMBOS[n];
+                    avgProbs[c] = avgProbs[c] * 0.85 + 0.15 * seededRandom(Date.now() + c.charCodeAt(0));
+                }
+                normalizeProbs(avgProbs);
+                var forceVariety = (_lastEnsemblePrediction !== null);
+                var result = pickDoubleFromProbs(avgProbs, 9999, forceVariety);
+                _lastEnsemblePrediction = result.single;
+                result.conf = 0.62 + Math.min(0.33, totalWeight / keys.length);
+                result.allProbs = avgProbs;
+                result.prob = avgProbs[result.single];
+                result.secondProb = Object.values(avgProbs).sort(function(a, b) { return b - a; })[1] || 0;
+                return result;
+            }
+
+            var predictFns = {};
+            var baseKeys = Object.keys(basePredictFns);
+            for (var i = 0; i < baseKeys.length; i++) {
+                predictFns[baseKeys[i]] = basePredictFns[baseKeys[i]];
+            }
+            predictFns['ensemble'] = predictEnsemble;
+
+            /* ========== 5个数字预测算法 ========== */
+            function predictRangeMA(ss) {
+                if (ss.length < 3) return { min: 8, max: 14, center: 11, conf: 0.4 };
+                var alpha = 0.55;
+                var ewma = ss[0];
+                var n = Math.min(ss.length, 20);
+                for (var i = 1; i < n; i++) {
+                    ewma = alpha * ss[i] + (1 - alpha) * ewma;
+                }
+                var sumSq = 0;
+                var mean = 0;
+                for (var j = 0; j < n; j++) {
+                    mean += ss[j];
+                }
+                mean /= n;
+                for (var k = 0; k < n; k++) {
+                    sumSq += (ss[k] - mean) * (ss[k] - mean);
+                }
+                var std = Math.sqrt(sumSq / n) || 2.5;
+                var halfWidth = Math.max(2, Math.round(std * 1.6));
+                var center = clampSum(Math.round(ewma));
+                var min = clampSum(center - halfWidth);
+                var max = clampSum(center + halfWidth);
+                var constrained = constrainRange(min, max, center);
                 return {
-                    double,
-                    single,
-                    prob: sorted[0][1],
-                    secondProb: sorted[1]?.[1] || 0,
-                    allProbs: probs,
-                    conf: 0.4 + freshRandom(algoSeed + 1000) * 0.4
+                    min: constrained.min,
+                    max: constrained.max,
+                    center: constrained.center,
+                    conf: 0.45 + Math.min(0.4, n / 28)
                 };
             }
 
-            const predictFns = {};
-            Object.keys(algoNames).forEach((k, i) => {
-                predictFns[k] = (seq, sums) => genericPredict(seq, sums, i * 100);
-            });
-
-            function getPredictionForSlice(historySlice) {
-                if (!historySlice || historySlice.length < 2) {
-                    const rand = combos.sort(() => freshRandom(Date.now()) - 0.5).slice(0,2);
-                    return { double: rand, single: rand[0] };
+            function predictRangeTrend(ss) {
+                if (ss.length < 5) return { min: 7, max: 13, center: 10, conf: 0.38 };
+                var n = Math.min(ss.length, 18);
+                var recent = ss.slice(0, n).reverse();
+                var sx = 0,
+                    sy = 0,
+                    sxx = 0,
+                    sxy = 0;
+                for (var i = 0; i < n; i++) {
+                    sx += i;
+                    sy += recent[i];
+                    sxx += i * i;
+                    sxy += i * recent[i];
                 }
-                const cs = historySlice.map(d => d.combo);
-                const ss = historySlice.map(d => d.sum);
+                var slope = (n * sxy - sx * sy) / (n * sxx - sx * sx + 0.001);
+                var intercept = (sy - slope * sx) / n;
+                var predicted = intercept + slope * n;
+                var residuals = 0;
+                for (var j = 0; j < n; j++) {
+                    var est = intercept + slope * j;
+                    residuals += (recent[j] - est) * (recent[j] - est);
+                }
+                var rmse = Math.sqrt(residuals / n) || 3;
+                var halfWidth = Math.max(2, Math.round(rmse * 1.5));
+                var center = clampSum(Math.round(predicted));
+                var min = clampSum(center - halfWidth);
+                var max = clampSum(center + halfWidth);
+                var constrained = constrainRange(min, max, center);
+                return {
+                    min: constrained.min,
+                    max: constrained.max,
+                    center: constrained.center,
+                    conf: 0.42 + Math.min(0.38, Math.abs(slope) / 1.5)
+                };
+            }
+
+            function predictRangeFreq(ss) {
+                if (ss.length < 4) return { min: 6, max: 12, center: 9, conf: 0.35 };
+                var hist = new Array(28).fill(0);
+                var n = Math.min(ss.length, 30);
+                for (var i = 0; i < n; i++) {
+                    var v = clampSum(ss[i]);
+                    hist[v] += (n - i) / n;
+                }
+                var bestStart = 0,
+                    bestEnd = 6,
+                    bestDensity = 0;
+                for (var w = 3; w <= MAX_RANGE_SPAN; w++) {
+                    for (var start = 0; start <= 27 - w; start++) {
+                        var end = start + w;
+                        var sum = 0;
+                        for (var k = start; k <= end; k++) {
+                            sum += hist[k];
+                        }
+                        var density = sum / (w + 1);
+                        if (density > bestDensity) {
+                            bestDensity = density;
+                            bestStart = start;
+                            bestEnd = end;
+                        }
+                    }
+                }
+                var center = Math.round((bestStart + bestEnd) / 2);
+                var constrained = constrainRange(bestStart, bestEnd, center);
+                return {
+                    min: constrained.min,
+                    max: constrained.max,
+                    center: constrained.center,
+                    conf: 0.40 + Math.min(0.42, bestDensity / 2)
+                };
+            }
+
+            function predictRangeKalman(ss) {
+                if (ss.length < 3) return { min: 7, max: 13, center: 10, conf: 0.4 };
+                var est = ss[0] || 13.5;
+                var p = 9;
+                var Q = 2.5;
+                var R = 8;
+                var n = Math.min(ss.length, 22);
+                for (var i = 1; i < n; i++) {
+                    var z = ss[i];
+                    p = p + Q;
+                    var k = p / (p + R);
+                    est = est + k * (z - est);
+                    p = (1 - k) * p;
+                }
+                p = p + Q;
+                var uncertainty = Math.sqrt(p) || 3;
+                var halfWidth = Math.max(2, Math.round(uncertainty * 1.55));
+                var center = clampSum(Math.round(est));
+                var min = clampSum(center - halfWidth);
+                var max = clampSum(center + halfWidth);
+                var constrained = constrainRange(min, max, center);
+                return {
+                    min: constrained.min,
+                    max: constrained.max,
+                    center: constrained.center,
+                    conf: 0.44 + Math.min(0.39, n / 25)
+                };
+            }
+
+            function predictRangeEnsemble(ss) {
+                if (ss.length < 3) return { min: 8, max: 14, center: 11, conf: 0.5 };
+                var r1 = predictRangeMA(ss);
+                var r2 = predictRangeTrend(ss);
+                var r3 = predictRangeFreq(ss);
+                var r4 = predictRangeKalman(ss);
+                var allResults = [r1, r2, r3, r4];
+                var voteHist = new Array(28).fill(0);
+                allResults.forEach(function(r) {
+                    for (var v = r.min; v <= r.max; v++) {
+                        if (v >= 0 && v <= 27) voteHist[v] += 1;
+                    }
+                });
+                var bestStart = 0,
+                    bestEnd = 6,
+                    bestScore = 0;
+                for (var w = 2; w <= MAX_RANGE_SPAN; w++) {
+                    for (var start = 0; start <= 27 - w; start++) {
+                        var end = start + w;
+                        var sumVotes = 0;
+                        for (var i = start; i <= end; i++) {
+                            sumVotes += voteHist[i];
+                        }
+                        var score = sumVotes / (w + 1);
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestStart = start;
+                            bestEnd = end;
+                        }
+                    }
+                }
+                var centers = allResults.map(function(r) { return r.center; });
+                var avgCenter = Math.round(centers.reduce(function(a, b) { return a + b; }, 0) / centers.length);
+                var rawCenter = clampSum(Math.round((avgCenter + Math.round((bestStart + bestEnd) / 2)) / 2));
+                var constrained = constrainRange(bestStart, bestEnd, rawCenter);
+                var conf = 0.52 + Math.min(0.38, bestScore / 3.5);
+                var finalMin = constrained.min;
+                var finalMax = constrained.max;
+                var finalCenter = constrained.center;
+                if (_lastNumberPrediction) {
+                    var lastRange = _lastNumberPrediction;
+                    var overlap = Math.max(0, Math.min(finalMax, lastRange.max) - Math.max(finalMin, lastRange.min));
+                    if (overlap > (finalMax - finalMin) * 0.7) {
+                        var shift = (seededRandom(Date.now() + 7777) > 0.5 ? 1 : -1) * Math.max(1, Math.round((finalMax - finalMin) * 0.25));
+                        finalMin = clampSum(finalMin + shift);
+                        finalMax = clampSum(finalMax + shift);
+                        if (finalMax - finalMin < 3) finalMax = clampSum(finalMin + 4);
+                        if (finalMax - finalMin > MAX_RANGE_SPAN) {
+                            var reConstrained = constrainRange(finalMin, finalMax, clampSum(Math.round((finalMin + finalMax) / 2)));
+                            finalMin = reConstrained.min;
+                            finalMax = reConstrained.max;
+                            finalCenter = reConstrained.center;
+                        }
+                    }
+                }
+                _lastNumberPrediction = { min: finalMin, max: finalMax, center: finalCenter };
+                return { min: finalMin, max: finalMax, center: finalCenter, conf: conf };
+            }
+
+            var numberPredictFns = {
+                rangeMA: predictRangeMA,
+                rangeTrend: predictRangeTrend,
+                rangeFreq: predictRangeFreq,
+                rangeKalman: predictRangeKalman,
+                rangeEnsemble: predictRangeEnsemble
+            };
+
+            function getPredictionForSlice(hs) {
+                if (!hs || hs.length < 2) {
+                    var rd = COMBOS.sort(function() { return seededRandom(Date.now()) - 0.5; }).slice(0, 2);
+                    return { double: rd, single: rd[0] };
+                }
+                var cs = hs.map(function(d) { return d.combo; });
+                var ss = hs.map(function(d) { return d.sum; });
                 try {
-                    const result = predictFns[currentAlgoKey](cs, ss);
+                    var result = predictFns[currentAlgoKey](cs, ss);
                     return { double: result.double, single: result.single };
                 } catch (e) {
-                    const rand = combos.sort(() => freshRandom(Date.now()) - 0.5).slice(0,2);
-                    return { double: rand, single: rand[0] };
+                    var rd2 = COMBOS.sort(function() { return seededRandom(Date.now()) - 0.5; }).slice(0, 2);
+                    return { double: rd2, single: rd2[0] };
+                }
+            }
+
+            function getNumberPredictionForSlice(hs) {
+                if (!hs || hs.length < 2) return { min: 8, max: 14, center: 11, conf: 0.4 };
+                var ss = hs.map(function(d) { return d.sum; });
+                try {
+                    var result = numberPredictFns[currentNumberAlgoKey](ss);
+                    var constrained = constrainRange(result.min, result.max, result.center);
+                    return { min: constrained.min, max: constrained.max, center: constrained.center, conf: result.conf || 0.4 };
+                } catch (e) {
+                    return { min: 8, max: 14, center: 11, conf: 0.4 };
                 }
             }
 
             function runAllPredictions() {
                 if (historyData.length < 2) return;
-                const cs = historyData.map(d => d.combo).reverse();
-                const ss = historyData.map(d => d.sum).reverse();
-                
-                Object.keys(predictFns).forEach((k, i) => {
+                var cs = historyData.map(function(d) { return d.combo; });
+                var ss = historyData.map(function(d) { return d.sum; });
+                currentGlobalKillGroup = selectDynamicKillGroup(historyData.map(function(d) { return { group: d.combo }; }));
+                algoKeys.forEach(function(k) {
                     try {
-                        const result = predictFns[k](cs, ss);
-                        predictions[k] = result;
+                        predictions[k] = predictFns[k](cs, ss);
                     } catch (e) {
-                        const rand = combos.sort(() => freshRandom(Date.now() + i) - 0.5).slice(0,2);
                         predictions[k] = {
-                            double: rand,
-                            single: rand[0],
+                            double: [COMBOS[0], COMBOS[1]],
+                            single: COMBOS[0],
                             conf: 0.5,
-                            prob: 0.45,
-                            secondProb: 0.2,
-                            allProbs: { 大单: 0.25, 大双: 0.25, 小单: 0.25, 小双: 0.25 }
+                            prob: 0.4,
+                            secondProb: 0.2
                         };
                     }
                 });
-                
-                const currentP = predictions[currentAlgoKey];
-                const next = getNextPeriod();
-                if (next && currentP) {
-                    pendingRow = { period: next, double: currentP.double, single: currentP.single };
+                numberAlgoKeys.forEach(function(k) {
+                    try {
+                        var raw = numberPredictFns[k](ss);
+                        var constrained = constrainRange(raw.min, raw.max, raw.center);
+                        numberPredictions[k] = {
+                            min: constrained.min,
+                            max: constrained.max,
+                            center: constrained.center,
+                            conf: raw.conf || 0.4
+                        };
+                    } catch (e) {
+                        numberPredictions[k] = { min: 8, max: 14, center: 11, conf: 0.4 };
+                    }
+                });
+                var nextPeriod = getNextPeriod();
+                if (nextPeriod) {
+                    if (predictMode === 'combo') {
+                        var currentP = predictions[currentAlgoKey];
+                        if (currentP) {
+                            pendingRow = {
+                                period: nextPeriod,
+                                double: [currentP.double[0], currentP.double[1]],
+                                single: currentP.single,
+                                mode: 'combo',
+                                killGroup: currentGlobalKillGroup
+                            };
+                        }
+                    } else {
+                        var currentNP = numberPredictions[currentNumberAlgoKey];
+                        if (currentNP) {
+                            pendingRow = {
+                                period: nextPeriod,
+                                rangeMin: currentNP.min,
+                                rangeMax: currentNP.max,
+                                rangeCenter: currentNP.center,
+                                mode: 'number',
+                                killGroup: currentGlobalKillGroup
+                            };
+                        }
+                    }
                 }
-                
                 updateAlgoWinRates();
+                updateNumberAlgoWinRates();
                 updateCurrentAlgoUI();
                 updateTopPredictCard();
-                renderPredictTable();
+                renderPredictTable(currentFilter === 'all' ? null : currentFilter);
                 renderTrendTable();
                 updateStatsPanels();
                 updateModelWinrateUI();
                 loadPredictHistoryUI();
+                updateSummaryStats();
             }
 
             function getNextPeriod() {
                 if (!latestPeriod) return '待开奖';
-                const num = parseInt(latestPeriod);
-                if (!isNaN(num)) return String(num + 1);
-                return '待开奖';
+                var num = parseInt(latestPeriod);
+                return isNaN(num) ? '待开奖' : String(num + 1);
+            }
+
+            function getKillCombos() {
+                return currentGlobalKillGroup ? [currentGlobalKillGroup] : [];
+            }
+
+            // 工具：根据杀组内容返回 btn-red 或 btn-blue
+            function killColorClass(killGroup) {
+                return killGroup.indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
             }
 
             function updateCurrentAlgoUI() {
-                const p = predictions[currentAlgoKey];
-                if (!p) {
-                    $('algoDetailContent').innerHTML = '<div style="text-align:center;padding:12px;color:#999;">数据加载中...</div>';
-                    return;
+                var adc = $('algoDetailContent');
+                if (!adc) return;
+                if (predictMode === 'combo') {
+                    var p = predictions[currentAlgoKey];
+                    if (!p) {
+                        adc.innerHTML = '<div style="text-align:center;padding:14px;color:#999;">数据加载中...</div>';
+                        return;
+                    }
+                    var wr = algoWinRates[currentAlgoKey] ? ' <span style="font-size:11px;color:#2e7d32;">' + algoWinRates[currentAlgoKey].toFixed(1) + '%</span>' : '';
+                    $('algoDetailTitle').innerHTML = algoNames[currentAlgoKey] + ' ' + wr;
+                    var doubleBtns = p.double.map(function(c) {
+                        var cls = c.indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                        return '<span class="' + cls + '">' + c + '</span>';
+                    }).join(' ');
+                    var html = '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">';
+                    html += '<div><span style="font-size:12px;color:#999;">双门</span> ' + doubleBtns + '</div>';
+                    html += '<div><span style="font-size:12px;color:#999;">单门</span><span style="background:#1d1d1f;color:#fff;padding:6px 18px;border-radius:8px;font-size:17px;font-weight:700;">' + p.single + '</span></div></div>';
+                    html += '<div class="confidence-bar"><div class="confidence-fill" style="width:' + (p.conf * 100).toFixed(0) + '%;"></div></div>';
+                    html += '<div style="font-size:12px;color:#999;">置信度: ' + (p.conf * 100).toFixed(1) + '% | 领先: ' + ((p.prob - p.secondProb) * 100).toFixed(1) + '%</div>';
+                    if (currentGlobalKillGroup) {
+                        var killCls = killColorClass(currentGlobalKillGroup);
+                        html += '<div style="margin-top:6px;font-size:11px;color:#fff;display:inline-block;padding:2px 10px;border-radius:10px;background:' + (killCls === 'btn-red' ? '#e53935' : '#1976d2') + ';">杀组: ' + currentGlobalKillGroup + ' (连续' + killGroupStreak + '期)</div>';
+                    }
+                    adc.innerHTML = html;
+                    $('currentAlgoTag').textContent = algoNames[currentAlgoKey];
+                    $('predictColHeader').textContent = '预测';
+                } else {
+                    var np = numberPredictions[currentNumberAlgoKey];
+                    if (!np) {
+                        adc.innerHTML = '<div style="text-align:center;padding:14px;color:#999;">数据加载中...</div>';
+                        return;
+                    }
+                    var wr2 = numberAlgoWinRates[currentNumberAlgoKey] ? ' <span style="font-size:11px;color:#2e7d32;">' + numberAlgoWinRates[currentNumberAlgoKey].toFixed(1) + '%</span>' : '';
+                    $('algoDetailTitle').innerHTML = numberAlgoNames[currentNumberAlgoKey] + ' ' + wr2;
+                    var html = '<div style="text-align:center;margin-bottom:10px;"><span style="background:#1d1d1f;color:#ffd60a;padding:8px 22px;border-radius:10px;font-size:22px;font-weight:800;">' + np.min + '-' + np.max + '</span><span style="margin-left:8px;font-size:13px;color:#999;">中心:' + np.center + '</span></div>';
+                    html += '<div class="confidence-bar"><div class="confidence-fill" style="width:' + (np.conf * 100).toFixed(0) + '%;"></div></div>';
+                    html += '<div style="font-size:12px;color:#999;">置信度: ' + (np.conf * 100).toFixed(1) + '% | 范围宽度: ' + (np.max - np.min) + '</div>';
+                    if (currentGlobalKillGroup) {
+                        var killCls2 = killColorClass(currentGlobalKillGroup);
+                        html += '<div style="margin-top:6px;font-size:11px;color:#fff;display:inline-block;padding:2px 10px;border-radius:10px;background:' + (killCls2 === 'btn-red' ? '#e53935' : '#1976d2') + ';">杀组: ' + currentGlobalKillGroup + ' (连续' + killGroupStreak + '期)</div>';
+                    }
+                    adc.innerHTML = html;
+                    $('currentAlgoTag').textContent = numberAlgoNames[currentNumberAlgoKey];
+                    $('predictColHeader').textContent = '预测范围';
                 }
-                const wr = algoWinRates[currentAlgoKey] 
-                    ? ` <span style="font-size:10px;color:#2e7d32;">🏆${algoWinRates[currentAlgoKey].toFixed(1)}%</span>` 
-                    : '';
-                $('algoDetailTitle').innerHTML = `🤖 ${algoNames[currentAlgoKey] || currentAlgoKey}${wr}`;
-                const doubleBtns = p.double.map(c => `<span class="${c.includes('大')?'btn-red':'btn-blue'}">${c}</span>`).join(' ');
-                let html = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px;">
-                    <div><span style="font-size:11px;color:#999;">双门</span> ${doubleBtns}</div>
-                    <div><span style="font-size:11px;color:#999;">⭐单门</span> <span style="background:#1d1d1f;color:#fff;padding:5px 14px;border-radius:4px;font-size:15px;font-weight:600;">${p.single}</span></div>
-                </div>`;
-                html += `<div class="confidence-bar"><div class="confidence-fill" style="width:${(p.conf * 100).toFixed(0)}%;"></div></div>`;
-                html += `<div style="font-size:11px;color:#999;">置信度: ${(p.conf * 100).toFixed(1)}% | 领先: ${((p.prob - p.secondProb) * 100).toFixed(1)}%</div>`;
-                if (p.allProbs) {
-                    const sp = Object.entries(p.allProbs).sort((a, b) => b[1] - a[1]);
-                    html += `<div style="margin-top:8px;font-size:11px;color:#666;">${sp.map(([c, v]) => `${c} ${(v * 100).toFixed(0)}%`).join(' · ')}</div>`;
-                }
-                $('algoDetailContent').innerHTML = html;
-                // 同步更新顶部算法标签
-                $('currentAlgoTag').textContent = algoNames[currentAlgoKey] || currentAlgoKey;
             }
 
             function updateTopPredictCard() {
                 if (historyData.length < 2) return;
-                const votes = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
-                Object.keys(predictFns).forEach(k => {
-                    const p = predictions[k];
-                    if (p && p.single) votes[p.single] += 1;
-                });
-                const sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
-                let target = sortedVotes[0][0];
-                const conf = Math.min(85, 50 + sortedVotes[0][1] * 3 + Math.floor(freshRandom(Date.now()) * 15));
-                const miss = comboMissCount[target] || 0;
-                $('recTarget').textContent = target;
-                $('recDetail').innerHTML = `<span>置信度 ${conf}%</span><span>连缺 ${miss} 期</span><span>v9.1</span>`;
+                if (predictMode === 'combo') {
+                    var votes = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                    algoKeys.forEach(function(k) {
+                        var p = predictions[k];
+                        if (p && p.single) {
+                            var wr = (algoWinRates[k] || 25) / 100;
+                            votes[p.single] += 1 * (0.5 + wr);
+                        }
+                    });
+                    var sortedVotes = Object.entries(votes).sort(function(a, b) { return b[1] - a[1]; });
+                    var target = sortedVotes[0][0];
+                    var total = Object.values(votes).reduce(function(a, b) { return a + b; }, 0);
+                    var conf = Math.min(92, 50 + (sortedVotes[0][1] / Math.max(total, 1)) * 42);
+                    var miss = comboMissCount[target] || 0;
+                    $('recLabel').textContent = '动态博弈杀组 · 下一期预测';
+                    $('recTarget').textContent = target;
+                    $('recTarget').classList.remove('number-range');
+                    $('recDetail').innerHTML = '<span>置信度 ' + conf.toFixed(0) + '%</span><span>连缺 ' + miss + ' 期</span><span>' + sortedVotes[0][1].toFixed(1) + '票</span>';
+                    var kills = getKillCombos();
+                    if (kills.length > 0) {
+                        $('killSection').style.display = 'block';
+                        $('killTags').innerHTML = kills.map(function(k) {
+                            var cls = killColorClass(k);
+                            return '<span class="kill-tag ' + cls + '">' + k + '</span>';
+                        }).join(' ');
+                    } else {
+                        $('killSection').style.display = 'none';
+                    }
+                } else {
+                    var votesNum = {};
+                    for (var v = 0; v <= 27; v++) votesNum[v] = 0;
+                    numberAlgoKeys.forEach(function(k) {
+                        var np = numberPredictions[k];
+                        if (np) {
+                            var wr = (numberAlgoWinRates[k] || 25) / 100;
+                            for (var v = np.min; v <= np.max; v++) {
+                                if (v >= 0 && v <= 27) votesNum[v] += 1 * (0.5 + wr);
+                            }
+                        }
+                    });
+                    var sortedVotesNum = Object.entries(votesNum).sort(function(a, b) { return b[1] - a[1]; });
+                    var maxV = sortedVotesNum[0][1];
+                    var threshold = maxV * 0.55;
+                    var rangeMin = 27,
+                        rangeMax = 0;
+                    for (var v = 0; v <= 27; v++) {
+                        if (votesNum[v] >= threshold) {
+                            rangeMin = Math.min(rangeMin, v);
+                            rangeMax = Math.max(rangeMax, v);
+                        }
+                    }
+                    if (rangeMin > rangeMax) { rangeMin = 8; rangeMax = 14; }
+                    var constrained = constrainRange(rangeMin, rangeMax, Math.round((rangeMin + rangeMax) / 2));
+                    rangeMin = constrained.min;
+                    rangeMax = constrained.max;
+                    var totalVotes = Object.values(votesNum).reduce(function(a, b) { return a + b; }, 0);
+                    var conf = Math.min(90, 45 + (maxV / Math.max(totalVotes, 1)) * 45);
+                    $('recLabel').textContent = '数字预测 · 和值范围';
+                    $('recTarget').textContent = rangeMin + '-' + rangeMax;
+                    $('recTarget').classList.add('number-range');
+                    $('recDetail').innerHTML = '<span>置信度 ' + conf.toFixed(0) + '%</span><span>中心 ~' + Math.round((rangeMin + rangeMax) / 2) + '</span><span>' + maxV.toFixed(1) + '票</span>';
+                    var kills = getKillCombos();
+                    if (kills.length > 0) {
+                        $('killSection').style.display = 'block';
+                        $('killTags').innerHTML = kills.map(function(k) {
+                            var cls = killColorClass(k);
+                            return '<span class="kill-tag ' + cls + '">' + k + '</span>';
+                        }).join(' ');
+                    } else {
+                        $('killSection').style.display = 'none';
+                    }
+                }
+            }
+
+            function renderPredictTable(filter) {
+                var tb = $('predictTableBody');
+                if (!tb) return;
+                var filteredData = filter ? historyData.filter(function(x) { return x.pattern === filter; }) : historyData.slice();
+                var html = '';
+                var pendingConsumed = false;
+                if (pendingRow && filteredData.length > 0 && filteredData[0].period === pendingRow.period) {
+                    var r = filteredData[0];
+                    var killStr = pendingRow.killGroup ? '<span class="kill-tag-sm ' + killColorClass(pendingRow.killGroup) + '">' + pendingRow.killGroup + '</span>' : '-';
+                    var killHit = pendingRow.killGroup ? isKillHitCombo(pendingRow.killGroup, r.combo) : null;
+                    if (pendingRow.mode === 'combo') {
+                        var hit = pendingRow.double.indexOf(r.combo) !== -1;
+                        html += buildRow(r.period, r.numbers, r.sum, { type: 'combo', double: pendingRow.double, killInfo: killStr, killHit: killHit }, hit);
+                    } else {
+                        var hit2 = r.sum >= pendingRow.rangeMin && r.sum <= pendingRow.rangeMax;
+                        html += buildRow(r.period, r.numbers, r.sum, { type: 'number', rangeMin: pendingRow.rangeMin, rangeMax: pendingRow.rangeMax, killInfo: killStr, killHit: killHit }, hit2);
+                    }
+                    pendingConsumed = true;
+                    filteredData = filteredData.slice(1);
+                }
+                if (pendingRow && !pendingConsumed && !filter) {
+                    html += buildPendingRow(pendingRow);
+                }
+                var maxRows = filter ? Math.min(filteredData.length, 24) : Math.min(filteredData.length, 23);
+                for (var i = 0; i < maxRows; i++) {
+                    var row = filteredData[i];
+                    var prevHistory = historyData.filter(function(item) { return parseInt(item.period) < parseInt(row.period); });
+                    var killStr2 = '-';
+                    var killHit2 = null;
+                    if (prevHistory.length >= 5) {
+                        var kg = selectDynamicKillGroup(prevHistory.map(function(d) { return { group: d.combo }; }));
+                        if (kg) {
+                            killStr2 = '<span class="kill-tag-sm ' + killColorClass(kg) + '">' + kg + '</span>';
+                            killHit2 = isKillHitCombo(kg, row.combo);
+                        }
+                    }
+                    if (predictMode === 'combo') {
+                        var pred = getPredictionForSlice(prevHistory);
+                        var hit3 = pred.double.indexOf(row.combo) !== -1;
+                        html += buildRow(row.period, row.numbers, row.sum, { type: 'combo', double: pred.double, killInfo: killStr2, killHit: killHit2 }, hit3);
+                    } else {
+                        var np = getNumberPredictionForSlice(prevHistory);
+                        var hit4 = row.sum >= np.min && row.sum <= np.max;
+                        html += buildRow(row.period, row.numbers, row.sum, { type: 'number', rangeMin: np.min, rangeMax: np.max, killInfo: killStr2, killHit: killHit2 }, hit4);
+                    }
+                }
+                if (!html) html = '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>';
+                tb.innerHTML = html;
+            }
+
+            function buildPendingRow(pRow) {
+                var killStr = pRow.killGroup ? '<span class="kill-tag-sm ' + killColorClass(pRow.killGroup) + '">' + pRow.killGroup + '</span>' : '-';
+                if (pRow.mode === 'combo') {
+                    var cls0 = pRow.double[0].indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                    var cls1 = pRow.double[1].indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                    return '<div class="tr" style="background:#fffde7;">' +
+                        '<div class="td td-col-period">' + pRow.period + '</div>' +
+                        '<div class="td td-col-nums"><div class="ball-group"><span class="redball">-</span><span class="redball">-</span><span class="redball">-</span><span class="blueball">-</span></div></div>' +
+                        '<div class="td td-col-pred"><span class="' + cls0 + '">' + pRow.double[0] + '</span><span class="' + cls1 + '">' + pRow.double[1] + '</span></div>' +
+                        '<div class="td td-col-kill">' + killStr + '</div>' +
+                        '<div class="td td-col-predres"><span class="none-result">待开</span></div>' +
+                        '<div class="td td-col-killres"><span class="none-result">待开</span></div>' +
+                        '</div>';
+                } else {
+                    return '<div class="tr" style="background:#fffde7;">' +
+                        '<div class="td td-col-period">' + pRow.period + '</div>' +
+                        '<div class="td td-col-nums"><div class="ball-group"><span class="redball">-</span><span class="redball">-</span><span class="redball">-</span><span class="blueball">-</span></div></div>' +
+                        '<div class="td td-col-pred"><span class="btn-range">' + pRow.rangeMin + '-' + pRow.rangeMax + '</span></div>' +
+                        '<div class="td td-col-kill">' + killStr + '</div>' +
+                        '<div class="td td-col-predres"><span class="none-result">待开</span></div>' +
+                        '<div class="td td-col-killres"><span class="none-result">待开</span></div>' +
+                        '</div>';
+                }
+            }
+
+            function buildRow(period, nums, sum, predInfo, hit) {
+                var n1 = nums[0],
+                    n2 = nums[1],
+                    n3 = nums[2];
+                var bf = formatBlue(sum);
+                var rh = hit ? '<span class="ok">中</span>' : '<span class="err">错</span>';
+                var killResHtml;
+                if (predInfo.killHit === null || predInfo.killHit === undefined) {
+                    killResHtml = '<span class="none-result">--</span>';
+                } else if (predInfo.killHit === true) {
+                    killResHtml = '<span class="kill-ok">杀中</span>';
+                } else {
+                    killResHtml = '<span class="kill-err">杀错</span>';
+                }
+                var killStr = predInfo.killInfo || '-';
+                if (predInfo.type === 'combo') {
+                    var cls0 = predInfo.double[0].indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                    var cls1 = predInfo.double[1].indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                    return '<div class="tr">' +
+                        '<div class="td td-col-period">' + period + '</div>' +
+                        '<div class="td td-col-nums"><div class="ball-group"><span class="redball">' + n1 + '</span><span class="redball">' + n2 + '</span><span class="redball">' + n3 + '</span><span class="blueball">' + bf + '</span></div></div>' +
+                        '<div class="td td-col-pred"><span class="' + cls0 + '">' + predInfo.double[0] + '</span><span class="' + cls1 + '">' + predInfo.double[1] + '</span></div>' +
+                        '<div class="td td-col-kill">' + killStr + '</div>' +
+                        '<div class="td td-col-predres">' + rh + '</div>' +
+                        '<div class="td td-col-killres">' + killResHtml + '</div>' +
+                        '</div>';
+                } else {
+                    return '<div class="tr">' +
+                        '<div class="td td-col-period">' + period + '</div>' +
+                        '<div class="td td-col-nums"><div class="ball-group"><span class="redball">' + n1 + '</span><span class="redball">' + n2 + '</span><span class="redball">' + n3 + '</span><span class="blueball">' + bf + '</span></div></div>' +
+                        '<div class="td td-col-pred"><span class="btn-range">' + predInfo.rangeMin + '-' + predInfo.rangeMax + '</span></div>' +
+                        '<div class="td td-col-kill">' + killStr + '</div>' +
+                        '<div class="td td-col-predres">' + rh + '</div>' +
+                        '<div class="td td-col-killres">' + killResHtml + '</div>' +
+                        '</div>';
+                }
+            }
+
+            function renderTrendTable() {
+                var tb = $('trendTableBody');
+                if (!tb) return;
+                if (!historyData.length) {
+                    tb.innerHTML = '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>';
+                    return;
+                }
+                tb.innerHTML = historyData.slice(0, 30).map(function(r) {
+                    var n1 = r.numbers[0],
+                        n2 = r.numbers[1],
+                        n3 = r.numbers[2],
+                        sv = r.sum;
+                    var bf = formatBlue(sv);
+                    var ps = r.pattern === '豹子' ? 'style="background:#7b1fa2;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;"' :
+                        (r.pattern === '对子' ? 'style="background:#f57c00;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;"' :
+                            'style="font-size:11px;color:#666;"');
+                    return '<div class="tr"><div class="td">' + r.period + '</div><div class="td"><div class="ball-group"><span class="redball">' + n1 + '</span><span class="redball">' + n2 + '</span><span class="redball">' + n3 + '</span><span class="blueball">' + bf + '</span></div></div><div class="td"><b style="color:' + (sv > 13 ? '#e53935' : '#1976d2') + ';">' + sv + '</b></div><div class="td"><span ' + ps + '>' + r.pattern + '</span></div></div>';
+                }).join('');
+                var strip = $('trendStrip');
+                if (strip) {
+                    var cs = historyData.slice(0, 20).map(function(r) { return r.combo; });
+                    strip.innerHTML = cs.map(function(c) {
+                        var bg = c.indexOf('大') !== -1 ? (c.indexOf('单') !== -1 ? '#e53935' : '#f57c00') : (c.indexOf('单') !== -1 ? '#1976d2' : '#2e7d32');
+                        return '<span style="display:inline-block;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:' + bg + ';">' + c + '</span>';
+                    }).join('');
+                }
+                var ta = $('trendAnalysis');
+                if (ta && historyData.length >= 10) {
+                    var bc = historyData.filter(function(d) { return d.sum > 13; }).length;
+                    var oc = historyData.filter(function(d) { return d.sum % 2 === 1; }).length;
+                    ta.innerHTML = '<div>大比例: ' + (bc / historyData.length * 100).toFixed(1) + '% | 单比例: ' + (oc / historyData.length * 100).toFixed(1) + '% | 样本: ' + historyData.length + '期</div>';
+                }
+            }
+
+            function updateCompensationFromHistory() {
+                var dd = 0,
+                    sd = 0,
+                    bd = 0,
+                    s13 = 0,
+                    s14 = 0;
+                for (var i = 0; i < historyData.length; i++) {
+                    var d = historyData[i];
+                    if (d.pattern === '对子' && dd === 0) dd = i;
+                    if (d.pattern === '顺子' && sd === 0) sd = i;
+                    if (d.pattern === '豹子' && bd === 0) bd = i;
+                    if (d.sum === 13 && s13 === 0) s13 = i;
+                    if (d.sum === 14 && s14 === 0) s14 = i;
+                }
+                updateCompAlert('duizi', dd || historyData.length || 60);
+                updateCompAlert('shunzi', sd || historyData.length || 60);
+                updateCompAlert('baozi', bd || historyData.length || 60);
+                updateCompAlert('sum13', s13 || historyData.length || 60);
+                updateCompAlert('sum14', s14 || historyData.length || 60);
+                renderCompensationAlerts();
+            }
+
+            function updateCompAlert(key, due) {
+                if (!compensationAlerts[key]) return;
+                compensationAlerts[key].due = due;
+                var ed = compensationAlerts[key].expectedDue;
+                if (due >= ed * 2.8) compensationAlerts[key].level = 3;
+                else if (due >= ed * 1.6) compensationAlerts[key].level = 2;
+                else if (due >= ed) compensationAlerts[key].level = 1;
+                else compensationAlerts[key].level = 0;
+                compensationAlerts[key].probability = Math.min(0.97, due / (ed * 3.2 + 1));
+                compensationAlerts[key].message = key + ' 已遗漏 ' + due + ' 期 (阈值: ' + ed + '期)' + (compensationAlerts[key].level >= 2 ? ' 高风险' : '');
+                compensationAlerts[key].lastUpdate = Date.now();
+            }
+
+            function renderCompensationAlerts() {
+                var el = $('compensationAlerts');
+                if (!el) return;
+                var items = ['duizi', 'shunzi', 'baozi', 'sum13', 'sum14'];
+                var labels = { duizi: '对子', shunzi: '顺子', baozi: '豹子', sum13: '和值13', sum14: '和值14' };
+                el.innerHTML = items.map(function(k) {
+                    var a = compensationAlerts[k];
+                    return '<div class="alert-item lv' + a.level + '"><div style="display:flex;justify-content:space-between;"><span style="font-weight:700;">' + labels[k] + '</span><span style="font-size:11px;color:#999;">遗漏' + a.due + '期</span></div><div style="font-size:12px;margin-top:4px;">' + a.message + '</div><div class="confidence-bar"><div class="confidence-fill" style="width:' + (a.probability * 100).toFixed(0) + '%;"></div></div><div style="font-size:10px;color:#999;">回补概率: ' + (a.probability * 100).toFixed(1) + '%</div></div>';
+                }).join('');
+            }
+
+            function updateStatsPanels() {
+                renderCompensationAlerts();
+                computeLocalMissing();
+                var me = $('missStats');
+                if (me) {
+                    me.innerHTML = COMBOS.map(function(c) {
+                        var color = comboMissCount[c] > 6 ? '#e53935' : '#333';
+                        return '<div class="stat-row"><span>' + c + '</span><span style="font-weight:700;color:' + color + ';">' + comboMissCount[c] + '期</span></div>';
+                    }).join('');
+                }
+                var pe = $('probStats');
+                if (pe && historyData.length) {
+                    var t = historyData.length;
+                    var bc = historyData.filter(function(d) { return d.sum > 13; }).length;
+                    var oc = historyData.filter(function(d) { return d.sum % 2 === 1; }).length;
+                    pe.innerHTML = '<div class="stat-row"><span>大</span><span>' + (bc / t * 100).toFixed(1) + '% (' + bc + '期)</span></div>' +
+                        '<div class="stat-row"><span>小</span><span>' + ((1 - bc / t) * 100).toFixed(1) + '% (' + (t - bc) + '期)</span></div>' +
+                        '<div class="stat-row"><span>单</span><span>' + (oc / t * 100).toFixed(1) + '% (' + oc + '期)</span></div>' +
+                        '<div class="stat-row"><span>双</span><span>' + ((1 - oc / t) * 100).toFixed(1) + '% (' + (t - oc) + '期)</span></div>';
+                }
+            }
+
+            function updateModelWinrateUI() {
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var allStats = [];
+                if (predictMode === 'combo') {
+                    allStats = algoKeys.map(function(k) {
+                        var ar = rs.filter(function(r) { return r.algorithm === k && (r.mode === 'combo' || !r.mode || r.doublePred); });
+                        var hits = ar.filter(function(r) { return r.hit; }).length;
+                        return {
+                            name: algoNames[k],
+                            rate: ar.length ? (hits / ar.length * 100).toFixed(1) : '—',
+                            hits: hits,
+                            total: ar.length,
+                            key: k,
+                            type: 'combo'
+                        };
+                    }).sort(function(a, b) { return (parseFloat(b.rate) || 0) - (parseFloat(a.rate) || 0); });
+                } else {
+                    allStats = numberAlgoKeys.map(function(k) {
+                        var ar = rs.filter(function(r) { return r.algorithm === k && r.mode === 'number'; });
+                        var hits = ar.filter(function(r) { return r.hit; }).length;
+                        return {
+                            name: numberAlgoNames[k],
+                            rate: ar.length ? (hits / ar.length * 100).toFixed(1) : '—',
+                            hits: hits,
+                            total: ar.length,
+                            key: k,
+                            type: 'number'
+                        };
+                    }).sort(function(a, b) { return (parseFloat(b.rate) || 0) - (parseFloat(a.rate) || 0); });
+                }
+                var el = $('modelWinrate');
+                if (el) {
+                    el.innerHTML = allStats.map(function(s, i) {
+                        var medal = i === 0 ? '1' : (i === 1 ? '2' : (i === 2 ? '3' : ''));
+                        var note = s.total < 8 ? ' <span style="font-size:10px;color:#999;">样本少</span>' : '';
+                        return '<div class="stat-row"><span>' + medal + ' ' + s.name + note + '</span><span style="font-weight:700;">' + s.rate + '% (' + s.hits + '/' + s.total + ')</span></div>';
+                    }).join('');
+                }
             }
 
             function computeLocalMissing() {
-                const miss = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
+                var miss = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
                 if (!historyData.length) return miss;
-                for (let c of combos) {
-                    let cnt = 0;
-                    for (let d of historyData) {
-                        if (d.combo === c) break;
+                for (var i = 0; i < COMBOS.length; i++) {
+                    var c = COMBOS[i];
+                    var cnt = 0;
+                    for (var j = 0; j < historyData.length; j++) {
+                        if (historyData[j].combo === c) break;
                         cnt++;
                     }
                     miss[c] = cnt;
@@ -1010,296 +2574,431 @@
                 return miss;
             }
 
-            function updateAlgoWinRates() {
-                const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                const rates = {};
-                Object.keys(algoNames).forEach(k => {
-                    const ar = rs.filter(r => r.algorithm === k);
-                    const h = ar.filter(r => r.hit).length;
-                    rates[k] = ar.length ? (h / ar.length * 100) : 0;
-                });
-                algoWinRates = rates;
-                sortedAlgoKeys = Object.keys(algoNames).sort((a, b) => (algoWinRates[b] || 0) - (algoWinRates[a] || 0));
-                renderAlgoTabs();
-            }
-
-            function renderAlgoTabs() {
-                const container = $('algoTabs');
-                if (!container) return;
-                container.innerHTML = sortedAlgoKeys.map((k, i) => {
-                    const wr = algoWinRates[k] || 0;
-                    const cls = k === currentAlgoKey ? 'algo-tab active' : (wr >= 45 ? 'algo-tab win-high' : 'algo-tab');
-                    const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : ''));
-                    return `<span class="${cls}" data-algo="${k}" onclick="window.switchAlgo('${k}')">${medal}${algoNames[k]} ${wr.toFixed(0)}%</span>`;
-                }).join('');
-            }
-
-            function renderPredictTable(filter = null) {
-                const tb = $('predictTableBody');
-                if (!tb) return;
-                
-                let d = filter ? historyData.filter(x => x.pattern === filter) : [...historyData];
-                if (!d.length && !pendingRow) {
-                    tb.innerHTML = '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>';
-                    return;
-                }
-                
-                let rowsHtml = '';
-                
-                if (pendingRow && d.length > 0 && d[0].period === pendingRow.period) {
-                    const r = d[0];
-                    const hit = pendingRow.double.includes(r.combo);
-                    rowsHtml += buildRow(r.period, r.numbers, r.sum, pendingRow.double, hit);
-                    pendingRow = null;
-                    d = d.slice(1);
-                } else if (pendingRow) {
-                    rowsHtml += buildPendingRow(pendingRow.period, pendingRow.double);
-                }
-                
-                for (let i = 0; i < Math.min(d.length, 24); i++) {
-                    const r = d[i];
-                    const prevHistory = historyData.filter(item => parseInt(item.period) < parseInt(r.period));
-                    const pred = getPredictionForSlice(prevHistory);
-                    const hit = pred.double.includes(r.combo);
-                    rowsHtml += buildRow(r.period, r.numbers, r.sum, pred.double, hit);
-                }
-                
-                tb.innerHTML = rowsHtml;
-            }
-
-            function buildPendingRow(period, doublePred) {
-                const cls0 = doublePred[0].includes('大') ? 'btn-red' : 'btn-blue';
-                const cls1 = doublePred[1].includes('大') ? 'btn-red' : 'btn-blue';
-                return `<div class="tr" style="background:#fffde7;">
-                    <div class="td">${period}</div>
-                    <div class="td"><div class="ball-group">
-                        <span class="redball">-</span><span class="redball">-</span><span class="redball">-</span>
-                        <span class="blueball">-</span>
-                    </div></div>
-                    <div class="td"><span class="${cls0}">${doublePred[0]}</span><span class="${cls1}">${doublePred[1]}</span></div>
-                    <div class="td"><span class="none-result">-</span></div>
-                </div>`;
-            }
-
-            function buildRow(period, numbers, sum, doublePred, hit) {
-                const n1 = numbers[0], n2 = numbers[1], n3 = numbers[2];
-                const blueFormatted = formatBlue(sum);
-                const resHtml = hit ? '<span class="ok">中</span>' : '<span class="err">错</span>';
-                const cls0 = doublePred[0].includes('大') ? 'btn-red' : 'btn-blue';
-                const cls1 = doublePred[1].includes('大') ? 'btn-red' : 'btn-blue';
-                return `<div class="tr">
-                    <div class="td">${period}</div>
-                    <div class="td"><div class="ball-group">
-                        <span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span>
-                        <span class="blueball">${blueFormatted}</span>
-                    </div></div>
-                    <div class="td"><span class="${cls0}">${doublePred[0]}</span><span class="${cls1}">${doublePred[1]}</span></div>
-                    <div class="td">${resHtml}</div>
-                </div>`;
-            }
-
-            function renderTrendTable() {
-                const tb = $('trendTableBody');
-                if (!tb) return;
-                if (!historyData.length) {
-                    tb.innerHTML = '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>';
-                    return;
-                }
-                tb.innerHTML = historyData.slice(0, 30).map(r => {
-                    const n1 = r.numbers[0], n2 = r.numbers[1], n3 = r.numbers[2], sv = r.sum;
-                    const blueFormatted = formatBlue(sv);
-                    const patternStyle = r.pattern === '豹子' 
-                        ? 'style="background:#7b1fa2;color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;"'
-                        : (r.pattern === '对子' 
-                            ? 'style="background:#f57c00;color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;"'
-                            : 'style="font-size:11px;color:#666;"');
-                    return `<div class="tr">
-                        <div class="td">${r.period}</div>
-                        <div class="td"><div class="ball-group">
-                            <span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span>
-                            <span class="blueball">${blueFormatted}</span>
-                        </div></div>
-                        <div class="td"><b style="color:${sv > 13 ? '#e53935' : '#1976d2'};">${sv}</b></div>
-                        <div class="td"><span ${patternStyle}>${r.pattern}</span></div>
-                    </div>`;
-                }).join('');
-                
-                const strip = $('trendStrip');
-                if (strip) {
-                    const cs = historyData.slice(0, 20).map(r => r.combo);
-                    strip.innerHTML = cs.map(c => {
-                        const bg = c.includes('大') ? (c.includes('单') ? '#e53935' : '#f57c00') 
-                                                      : (c.includes('单') ? '#1976d2' : '#2e7d32');
-                        return `<span style="display:inline-block;padding:3px 7px;border-radius:4px;font-size:11px;font-weight:500;color:#fff;background:${bg};">${c}</span>`;
-                    }).join('');
-                }
-                
-                const ta = $('trendAnalysis');
-                if (ta && historyData.length >= 10) {
-                    const bigCount = historyData.filter(d => d.sum > 13).length;
-                    const oddCount = historyData.filter(d => d.sum % 2 === 1).length;
-                    const total = historyData.length;
-                    ta.innerHTML = `<div>大比例: ${(bigCount/total*100).toFixed(1)}% | 单比例: ${(oddCount/total*100).toFixed(1)}%</div>`;
-                }
-            }
-
-            function updateCompensationFromHistory() {
-                let dd = 0, sd = 0, bd = 0, s13 = 0, s14 = 0;
-                for (let i = 0; i < historyData.length; i++) {
-                    const d = historyData[i];
-                    if (d.pattern === '对子' && dd === 0) dd = i;
-                    if (d.pattern === '顺子' && sd === 0) sd = i;
-                    if (d.pattern === '豹子' && bd === 0) bd = i;
-                    if (d.sum === 13 && s13 === 0) s13 = i;
-                    if (d.sum === 14 && s14 === 0) s14 = i;
-                }
-                updateCompAlert('duizi', dd || 60);
-                updateCompAlert('shunzi', sd || 60);
-                updateCompAlert('baozi', bd || 60);
-                updateCompAlert('sum13', s13 || 60);
-                updateCompAlert('sum14', s14 || 60);
-                renderCompensationAlerts();
-            }
-
-            function updateCompAlert(key, due) {
-                if (!compensationAlerts[key]) return;
-                compensationAlerts[key].due = due;
-                const ed = compensationAlerts[key].expectedDue;
-                if (due >= ed * 2.8) compensationAlerts[key].level = 3;
-                else if (due >= ed * 1.6) compensationAlerts[key].level = 2;
-                else if (due >= ed) compensationAlerts[key].level = 1;
-                else compensationAlerts[key].level = 0;
-                compensationAlerts[key].probability = Math.min(0.95, due / (ed * 3.2 + 1));
-                compensationAlerts[key].message = `${key} 已遗漏 ${due} 期 (阈值: ${ed}期)${compensationAlerts[key].level >= 2 ? ' ⚡高风险' : ''}`;
-                compensationAlerts[key].lastUpdate = Date.now();
-            }
-
-            function renderCompensationAlerts() {
-                const el = $('compensationAlerts');
-                if (!el) return;
-                const items = ['duizi', 'shunzi', 'baozi', 'sum13', 'sum14'];
-                const labels = { duizi: '🔲 对子', shunzi: '📈 顺子', baozi: '🔥 豹子', sum13: '1️⃣3️⃣ 和值13', sum14: '1️⃣4️⃣ 和值14' };
-                el.innerHTML = items.map(k => {
-                    const a = compensationAlerts[k];
-                    return `<div class="alert-item lv${a.level}">
-                        <div style="display:flex;justify-content:space-between;">
-                            <span style="font-weight:600;">${labels[k]}</span>
-                            <span style="font-size:11px;color:#999;">遗漏${a.due}期</span>
-                        </div>
-                        <div style="font-size:12px;margin-top:3px;">${a.message}</div>
-                        <div class="confidence-bar"><div class="confidence-fill" style="width:${(a.probability * 100).toFixed(0)}%;"></div></div>
-                        <div style="font-size:10px;color:#999;">回补概率: ${(a.probability * 100).toFixed(1)}%</div>
-                    </div>`;
-                }).join('');
-            }
-
-            function updateStatsPanels() {
-                renderCompensationAlerts();
-                computeLocalMissing();
-                const me = $('missStats');
-                if (me) {
-                    me.innerHTML = combos.map(c => {
-                        const color = comboMissCount[c] > 6 ? '#e53935' : '#333';
-                        return `<div class="stat-row"><span>${c}</span><span style="font-weight:600;color:${color};">${comboMissCount[c]}期</span></div>`;
-                    }).join('');
-                }
-                const pe = $('probStats');
-                if (pe && historyData.length) {
-                    const total = historyData.length;
-                    const bigCount = historyData.filter(d => d.sum > 13).length;
-                    const oddCount = historyData.filter(d => d.sum % 2 === 1).length;
-                    pe.innerHTML = `
-                        <div class="stat-row"><span>📈 大</span><span>${(bigCount / total * 100).toFixed(1)}%</span></div>
-                        <div class="stat-row"><span>📉 小</span><span>${((1 - bigCount / total) * 100).toFixed(1)}%</span></div>
-                        <div class="stat-row"><span>⚖️ 单</span><span>${(oddCount / total * 100).toFixed(1)}%</span></div>
-                        <div class="stat-row"><span>⚖️ 双</span><span>${((1 - oddCount / total) * 100).toFixed(1)}%</span></div>
-                    `;
-                }
-            }
-
-            function updateModelWinrateUI() {
-                const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                const st = Object.keys(algoNames).map(k => {
-                    const ar = rs.filter(r => r.algorithm === k);
-                    const h = ar.filter(r => r.hit).length;
-                    return {
-                        name: algoNames[k],
-                        rate: ar.length ? (h / ar.length * 100).toFixed(1) : '—',
-                        hits: h,
-                        total: ar.length,
-                        key: k
-                    };
-                }).sort((a, b) => (parseFloat(b.rate) || 0) - (parseFloat(a.rate) || 0));
-                const el = $('modelWinrate');
-                if (el) {
-                    el.innerHTML = st.map((s, i) => {
-                        const m = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : ''));
-                        return `<div class="stat-row"><span>${m} ${s.name}</span><span style="font-weight:600;">${s.rate}% (${s.hits}/${s.total})</span></div>`;
-                    }).join('');
-                }
+            function updateSummaryStats() {
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var total = rs.length;
+                var hits = rs.filter(function(r) { return r.hit; }).length;
+                var rate = total ? (hits / total * 100).toFixed(1) : '0.0';
+                var statsEl = $('statsSummary');
+                if (statsEl) statsEl.innerHTML = '<span>总预测: ' + total + '次</span><span>命中: ' + hits + '次</span><span>命中率: ' + rate + '%</span>';
+                var recEl = $('recordSummary');
+                if (recEl) recEl.innerHTML = '<span>总记录: ' + total + '条</span><span>命中: ' + hits + '条</span><span>命中率: ' + rate + '%</span>';
             }
 
             function savePredictRecord(period, ap, nums, sum, time) {
-                const ac = getSumInfo(sum, nums).combo;
-                Object.keys(predictions).forEach(a => {
-                    const p = predictions[a];
+                var ac = getSumInfo(sum, nums).combo;
+                updateKillGroupState(ac);
+                var kg = currentGlobalKillGroup;
+                algoKeys.forEach(function(a) {
+                    var p = predictions[a];
                     if (!p) return;
-                    const hit = p.double.includes(ac) || p.single === ac;
-                    const r = {
+                    var hit = p.double.indexOf(ac) !== -1 || p.single === ac;
+                    var kh = kg ? isKillHitCombo(kg, ac) : null;
+                    var record = {
                         algorithm: a,
-                        period,
+                        period: period,
                         numbers: nums.join('+'),
-                        sum,
+                        sum: sum,
                         actualCombo: ac,
                         actualPattern: ap,
-                        hit,
+                        hit: !!hit,
                         time: time || new Date().toLocaleString(),
-                        doublePred: p.double,
-                        singlePred: p.single
+                        doublePred: [p.double[0], p.double[1]],
+                        singlePred: p.single,
+                        mode: 'combo',
+                        killGroup: kg,
+                        killHit: kh
                     };
                     try {
-                        let rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                        if (!rs.some(x => x.period === period && x.algorithm === a)) {
-                            rs.unshift(r);
+                        var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                        if (!rs.some(function(x) { return x.period === period && x.algorithm === a && (x.mode === 'combo' || !x.mode); })) {
+                            rs.unshift(record);
+                            if (rs.length > 500) rs = rs.slice(0, 500);
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(rs));
+                        }
+                    } catch (e) {}
+                });
+                numberAlgoKeys.forEach(function(a) {
+                    var np = numberPredictions[a];
+                    if (!np) return;
+                    var hit = sum >= np.min && sum <= np.max;
+                    var kh = kg ? isKillHitCombo(kg, ac) : null;
+                    var record = {
+                        algorithm: a,
+                        period: period,
+                        numbers: nums.join('+'),
+                        sum: sum,
+                        actualCombo: ac,
+                        actualPattern: ap,
+                        hit: !!hit,
+                        time: time || new Date().toLocaleString(),
+                        rangeMin: np.min,
+                        rangeMax: np.max,
+                        rangeCenter: np.center,
+                        mode: 'number',
+                        killGroup: kg,
+                        killHit: kh
+                    };
+                    try {
+                        var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                        if (!rs.some(function(x) { return x.period === period && x.algorithm === a && x.mode === 'number'; })) {
+                            rs.unshift(record);
                             if (rs.length > 500) rs = rs.slice(0, 500);
                             localStorage.setItem(STORAGE_KEY, JSON.stringify(rs));
                         }
                     } catch (e) {}
                 });
                 updateAlgoWinRates();
+                updateNumberAlgoWinRates();
             }
 
             function loadPredictHistoryUI() {
-                const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                const tb = $('recordTableBody');
-                const ce = $('recordCount');
-                if (ce) ce.innerText = `共${rs.length}条记录`;
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var tb = $('recordTableBody');
+                var ce = $('recordCount');
+                if (ce) ce.innerText = '共 ' + rs.length + ' 条记录';
                 if (!tb) return;
                 if (!rs.length) {
                     tb.innerHTML = '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无记录</div></div>';
                     return;
                 }
-                tb.innerHTML = rs.slice(0, 60).map(r => {
-                    const al = algoNames[r.algorithm] || r.algorithm;
-                    const cls0 = (r.doublePred || [])[0]?.includes('大') ? 'btn-red' : 'btn-blue';
-                    const cls1 = (r.doublePred || [])[1]?.includes('大') ? 'btn-red' : 'btn-blue';
-                    return `<div class="tr">
-                        <div class="td" style="font-size:11px;">${r.period}</div>
-                        <div class="td" style="font-size:11px;">${al}</div>
-                        <div class="td"><span class="${cls0}">${(r.doublePred || [])[0] || '--'}</span><span class="${cls1}">${(r.doublePred || [])[1] || '--'}</span></div>
-                        <div class="td">${r.hit ? '<span class="ok">中</span>' : '<span class="err">错</span>'}</div>
-                    </div>`;
+                tb.innerHTML = rs.slice(0, 60).map(function(r) {
+                    var isCombo = r.mode === 'combo' || (!r.mode && r.doublePred);
+                    var al = isCombo ? (algoNames[r.algorithm] || r.algorithm) : (numberAlgoNames[r.algorithm] || r.algorithm);
+                    var predHtml = '';
+                    var killHtml = r.killGroup ? '<span class="kill-tag-sm ' + killColorClass(r.killGroup) + '">' + r.killGroup + '</span>' : '-';
+                    var killResHtml = '<span class="none-result">--</span>';
+                    if (r.killHit !== null && r.killHit !== undefined) {
+                        killResHtml = r.killHit ? '<span class="kill-ok">杀中</span>' : '<span class="kill-err">杀错</span>';
+                    }
+                    if (isCombo && r.doublePred) {
+                        var dp = r.doublePred || [];
+                        var cls0 = (dp[0] || '').indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                        var cls1 = (dp[1] || '').indexOf('大') !== -1 ? 'btn-red' : 'btn-blue';
+                        predHtml = '<span class="' + cls0 + '">' + (dp[0] || '--') + '</span><span class="' + cls1 + '">' + (dp[1] || '--') + '</span>';
+                    } else if (!isCombo && r.rangeMin !== undefined) {
+                        predHtml = '<span class="btn-range">' + r.rangeMin + '-' + r.rangeMax + '</span>';
+                    } else {
+                        predHtml = '<span style="color:#999;">--</span>';
+                    }
+                    return '<div class="tr">' +
+                        '<div class="td td-col-period" style="font-size:11px;">' + r.period + '</div>' +
+                        '<div class="td td-col-nums" style="font-size:11px;">' + al + '</div>' +
+                        '<div class="td td-col-pred">' + predHtml + '</div>' +
+                        '<div class="td td-col-kill">' + killHtml + '</div>' +
+                        '<div class="td td-col-predres">' + (r.hit ? '<span class="ok">中</span>' : '<span class="err">错</span>') + '</div>' +
+                        '<div class="td td-col-killres">' + killResHtml + '</div>' +
+                        '</div>';
                 }).join('');
+            }
+
+            function initAudioContext() {
+                if (!audioCtx) {
+                    try {
+                        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                return audioCtx;
+            }
+
+            function playBellSound() {
+                if (!settings.soundEnabled) return;
+                var ctx = initAudioContext();
+                if (!ctx) return;
+                var frequencies = [880, 1100, 1320];
+                var now = ctx.currentTime;
+                frequencies.forEach(function(freq, i) {
+                    var osc = ctx.createOscillator();
+                    var gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    var t = now + i * 0.12;
+                    gain.gain.setValueAtTime(0.25, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+                    osc.start(t);
+                    osc.stop(t + 0.6);
+                });
+            }
+
+            function initScratchCanvas() {
+                var card = $('resultCard');
+                if (!card) return;
+                var oldCanvas = card.querySelector('canvas.scratch-canvas');
+                if (oldCanvas) oldCanvas.remove();
+                var canvas = document.createElement('canvas');
+                canvas.className = 'scratch-canvas';
+                card.appendChild(canvas);
+                var rect = card.getBoundingClientRect();
+                var dpr = window.devicePixelRatio || 1;
+                var w = rect.width;
+                var h = rect.height;
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                var ctx = canvas.getContext('2d');
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+                drawScratchCoating(ctx, w, h);
+                scratchRevealed = false;
+                canvas.style.display = 'block';
+                bindScratchEvents(canvas);
+            }
+
+            function drawScratchCoating(ctx, w, h) {
+                var grad = ctx.createLinearGradient(0, 0, w, h);
+                grad.addColorStop(0, '#c9c9c9');
+                grad.addColorStop(0.3, '#d5d5d5');
+                grad.addColorStop(0.6, '#bdbdbd');
+                grad.addColorStop(1, '#c5c5c5');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                for (var i = 0; i < w * h / 200; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                for (var j = 0; j < w * h / 350; j++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 1.5 + 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = 'rgba(80,80,80,0.85)';
+                ctx.font = 'bold ' + Math.min(w / 8, 22) + 'px "' + getComputedStyle(document.body).fontFamily + '"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('👆 刮开查看结果', w / 2, h / 2 - 10);
+                ctx.fillStyle = 'rgba(100,100,100,0.6)';
+                ctx.font = Math.min(w / 18, 12) + 'px "' + getComputedStyle(document.body).fontFamily + '"';
+                ctx.fillText('双击快速揭示', w / 2, h / 2 + 22);
+            }
+
+            function bindScratchEvents(canvas) {
+                var isScratching = false;
+                var start = function(e) {
+                    if (settings.scratchEnabled && !scratchRevealed) {
+                        isScratching = true;
+                        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+                        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+                        scratchAt(canvas, cx, cy);
+                        e.preventDefault();
+                    }
+                };
+                var move = function(e) {
+                    if (isScratching && settings.scratchEnabled && !scratchRevealed) {
+                        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+                        var cy = e.touches ? e.touches[0].clientY : e.clientY;
+                        scratchAt(canvas, cx, cy);
+                        e.preventDefault();
+                    }
+                };
+                var end = function() {
+                    isScratching = false;
+                };
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('mousemove', move);
+                canvas.addEventListener('mouseup', end);
+                canvas.addEventListener('mouseleave', end);
+                canvas.addEventListener('touchstart', start, { passive: false });
+                canvas.addEventListener('touchmove', move, { passive: false });
+                canvas.addEventListener('touchend', end);
+                canvas.addEventListener('touchcancel', end);
+                canvas.addEventListener('dblclick', function(e) {
+                    if (settings.scratchEnabled && !scratchRevealed) {
+                        revealScratch(canvas);
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            function scratchAt(canvas, clientX, clientY) {
+                if (!canvas || scratchRevealed) return;
+                var rect = canvas.getBoundingClientRect();
+                var x = clientX - rect.left;
+                var y = clientY - rect.top;
+                var ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                var brush = Math.max(10, rect.width / 28);
+                ctx.arc(x, y, brush, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function revealScratch(canvas) {
+                if (scratchRevealed) return;
+                scratchRevealed = true;
+                var ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                canvas.style.display = 'none';
+                var card = $('resultCard');
+                if (card) {
+                    card.classList.add('reveal-flash');
+                    setTimeout(function() { card.classList.remove('reveal-flash'); }, 500);
+                }
+            }
+
+            function showScratchCoating() {
+                if (!settings.scratchEnabled || isOpening) return;
+                scratchRevealed = false;
+                initScratchCanvas();
+            }
+
+            function hideScratchCoating() {
+                var canvas = document.querySelector('#resultCard canvas.scratch-canvas');
+                if (canvas) {
+                    canvas.style.display = 'none';
+                    scratchRevealed = true;
+                }
+            }
+
+            function loadSettings() {
+                try {
+                    var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+                    if (saved && typeof saved.soundEnabled === 'boolean') settings.soundEnabled = saved.soundEnabled;
+                    if (saved && typeof saved.scratchEnabled === 'boolean') settings.scratchEnabled = saved.scratchEnabled;
+                } catch (e) {}
+                $('toggleSound').checked = settings.soundEnabled;
+                $('toggleScratch').checked = settings.scratchEnabled;
+            }
+
+            function saveSettings() {
+                try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {}
+            }
+
+            function openSettings() {
+                $('toggleSound').checked = settings.soundEnabled;
+                $('toggleScratch').checked = settings.scratchEnabled;
+                $('settingsOverlay').style.display = 'flex';
+                $('settingsBtn').classList.add('has-update');
+                setTimeout(function() { $('settingsBtn').classList.remove('has-update'); }, 600);
+            }
+
+            function closeSettings() {
+                $('settingsOverlay').style.display = 'none';
+            }
+
+            function setupSettingsEvents() {
+                $('settingsBtn').addEventListener('click', openSettings);
+                $('btnCloseSettings').addEventListener('click', closeSettings);
+                $('settingsOverlay').addEventListener('click', function(e) { if (e.target === this) closeSettings(); });
+                $('toggleSound').addEventListener('change', function() {
+                    settings.soundEnabled = this.checked;
+                    saveSettings();
+                    if (settings.soundEnabled) {
+                        initAudioContext();
+                        toast('🔔 铃音已开启', 'success');
+                    } else {
+                        toast('🔕 铃音已关闭', 'success');
+                    }
+                });
+                $('toggleScratch').addEventListener('change', function() {
+                    settings.scratchEnabled = this.checked;
+                    saveSettings();
+                    if (settings.scratchEnabled) {
+                        toast('🎴 咪牌刮奖已开启', 'success');
+                        if (!isOpening && !scratchRevealed && historyData.length > 0) showScratchCoating();
+                    } else {
+                        hideScratchCoating();
+                        toast('咪牌刮奖已关闭', 'success');
+                    }
+                });
+                $('btnTestSound').addEventListener('click', function() {
+                    initAudioContext();
+                    playBellSound();
+                    toast('🔔 铃音测试中...', 'success');
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && $('settingsOverlay').style.display === 'flex') closeSettings();
+                });
+            }
+
+            function setupModeSwitch() {
+                $('modeBtnCombo').addEventListener('click', function() {
+                    if (predictMode === 'combo') return;
+                    predictMode = 'combo';
+                    $('modeBtnCombo').classList.add('active');
+                    $('modeBtnNumber').classList.remove('active');
+                    currentAlgoKey = 'ensemble';
+                    if (historyData.length >= 2) {
+                        var nextPeriod = getNextPeriod();
+                        var p = predictions[currentAlgoKey];
+                        if (p && nextPeriod) {
+                            pendingRow = {
+                                period: nextPeriod,
+                                double: [p.double[0], p.double[1]],
+                                single: p.single,
+                                mode: 'combo',
+                                killGroup: currentGlobalKillGroup
+                            };
+                        }
+                    }
+                    updateAlgoWinRates();
+                    renderAlgoTabs();
+                    updateCurrentAlgoUI();
+                    updateTopPredictCard();
+                    updateModelWinrateUI();
+                    renderPredictTable(currentFilter === 'all' ? null : currentFilter);
+                    loadPredictHistoryUI();
+                    $('predictColHeader').textContent = '预测';
+                    toast('🔮 切换到组合预测模式', 'success');
+                });
+                $('modeBtnNumber').addEventListener('click', function() {
+                    if (predictMode === 'number') return;
+                    predictMode = 'number';
+                    $('modeBtnNumber').classList.add('active');
+                    $('modeBtnCombo').classList.remove('active');
+                    currentNumberAlgoKey = 'rangeEnsemble';
+                    if (historyData.length >= 2) {
+                        var nextPeriod = getNextPeriod();
+                        var np2 = numberPredictions[currentNumberAlgoKey];
+                        if (np2 && nextPeriod) {
+                            pendingRow = {
+                                period: nextPeriod,
+                                rangeMin: np2.min,
+                                rangeMax: np2.max,
+                                rangeCenter: np2.center,
+                                mode: 'number',
+                                killGroup: currentGlobalKillGroup
+                            };
+                        }
+                    }
+                    updateNumberAlgoWinRates();
+                    renderAlgoTabs();
+                    updateCurrentAlgoUI();
+                    updateTopPredictCard();
+                    updateModelWinrateUI();
+                    renderPredictTable(currentFilter === 'all' ? null : currentFilter);
+                    loadPredictHistoryUI();
+                    $('predictColHeader').textContent = '预测范围';
+                    toast('🎯 切换到数字预测模式', 'success');
+                });
             }
 
             function setApiLoading() {
                 $('apiTip').innerText = '连接API...';
                 $('apiDot').style.background = '#f57c00';
             }
+
             function setApiSuccess() {
                 $('apiTip').innerText = '✅已同步';
                 $('apiDot').style.background = '#2e7d32';
             }
+
             function setApiError(msg) {
                 $('apiTip').innerText = '❌' + msg;
                 $('apiDot').style.background = '#e53935';
@@ -1307,7 +3006,7 @@
 
             function startCountdown() {
                 if (timer) clearInterval(timer);
-                timer = setInterval(() => {
+                timer = setInterval(function() {
                     if (isOpening) return;
                     if (countdownSeconds <= 0) {
                         isOpening = true;
@@ -1316,6 +3015,7 @@
                         $('count').classList.add('opening');
                         $('openingAnim').style.display = 'flex';
                         $('resultDisplay').style.display = 'none';
+                        hideScratchCoating();
                         startOpeningPolling();
                     } else {
                         countdownSeconds--;
@@ -1327,173 +3027,249 @@
 
             function startOpeningPolling() {
                 if (openingPolling) clearInterval(openingPolling);
-                openingPolling = setInterval(() => loadData(false, true), 1400);
+                openingPolling = setInterval(function() { loadData(false, true); }, 1400);
             }
 
-            function startAutoRefresh(i = 7500) {
+            function startAutoRefresh(interval) {
+                if (interval === undefined) interval = 7500;
                 if (autoRefresh) clearInterval(autoRefresh);
-                autoRefresh = setInterval(() => {
-                    if (!isOpening) loadData(false, false);
-                }, i);
+                autoRefresh = setInterval(function() { if (!isOpening) loadData(false, false); }, interval);
             }
 
             async function tryFetchApi(index) {
-                const url = API_URLS[index];
+                var url = API_URLS[index];
                 try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 6000);
-                    const response = await fetch(url, { signal: controller.signal, mode: 'cors' });
-                    clearTimeout(timeoutId);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const text = await response.text();
-                    try { return JSON.parse(text); } catch (e) {}
-                    if (text.includes('<xml>') || text.includes('<row')) {
-                        const parser = new DOMParser();
-                        const xml = parser.parseFromString(text, 'text/xml');
-                        const rows = xml.querySelectorAll('row');
+                    var ctrl = new AbortController();
+                    var tid = setTimeout(function() { ctrl.abort(); }, 6000);
+                    var resp = await fetch(url, { signal: ctrl.signal, mode: 'cors' });
+                    clearTimeout(tid);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    var text = await resp.text();
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {}
+                    if (text.indexOf('<xml>') !== -1 || text.indexOf('<row') !== -1) {
+                        var parser = new DOMParser();
+                        var xml = parser.parseFromString(text, 'text/xml');
+                        var rows = xml.querySelectorAll('row');
                         if (rows.length) {
-                            const data = Array.from(rows).map(row => ({
-                                nbr: row.getAttribute('nbr') || '',
-                                number: row.getAttribute('number') || '',
-                                num: row.getAttribute('num') || '',
-                                date: row.getAttribute('date') || '',
-                                time: row.getAttribute('time') || ''
-                            }));
-                            return { data };
+                            var data = Array.from(rows).map(function(row) {
+                                return {
+                                    nbr: row.getAttribute('nbr') || '',
+                                    number: row.getAttribute('number') || '',
+                                    num: row.getAttribute('num') || '',
+                                    date: row.getAttribute('date') || '',
+                                    time: row.getAttribute('time') || ''
+                                };
+                            });
+                            return { data: data };
                         }
                     }
-                    throw new Error('无法解析响应内容');
-                } catch (error) {
-                    console.warn(`API ${index + 1} 失败:`, error.message);
+                    throw new Error('无法解析响应');
+                } catch (err) {
+                    console.warn('API ' + (index + 1) + ' 失败:', err.message);
                     return null;
                 }
             }
 
-            async function loadData(manual = false, isPolling = false) {
+            async function loadData(manual, isPolling) {
+                if (manual === undefined) manual = false;
+                if (isPolling === undefined) isPolling = false;
                 if (!isPolling) setApiLoading();
-                let data = null;
-                for (let i = 0; i < API_URLS.length; i++) {
-                    const idx = (currentApiIndex + i) % API_URLS.length;
+                var data = null;
+                for (var i = 0; i < API_URLS.length; i++) {
+                    var idx = (currentApiIndex + i) % API_URLS.length;
                     data = await tryFetchApi(idx);
                     if (data) { currentApiIndex = idx; break; }
                 }
                 if (!data) { setApiError('所有API连接失败'); return; }
-                try {
-                    if (data?.data?.length) {
-                        const lt = data.data[0];
-                        const cp = lt.nbr;
-                        const numbers = lt.number.split('+').map(Number);
-                        const [n1, n2, n3] = numbers;
-                        const sv = parseInt(lt.num);
-                        const info = getSumInfo(sv, [n1, n2, n3]);
-                        const ts = `${lt.date} ${lt.time}`;
-                        const isNewPeriod = (latestPeriod && latestPeriod !== cp);
-                        
-                        if (isNewPeriod) {
-                            if (latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1, n2, n3], sv, ts);
-                            if (isOpening) {
-                                isOpening = false;
-                                if (openingPolling) { clearInterval(openingPolling); openingPolling = null; }
+                setApiSuccess();
+                if (data && data.data && data.data.length) {
+                    var lt = data.data[0];
+                    var cp = lt.nbr;
+                    var nums = lt.number.split('+').map(Number);
+                    var n1 = nums[0],
+                        n2 = nums[1],
+                        n3 = nums[2];
+                    var sv = parseInt(lt.num);
+                    var info = getSumInfo(sv, [n1, n2, n3]);
+                    var ts = lt.date + ' ' + lt.time;
+                    var isNewPeriod = (latestPeriod && latestPeriod !== cp);
+                    if (isNewPeriod) {
+                        if (latestPeriod) savePredictRecord(cp, info.pattern, [n1, n2, n3], sv, ts);
+                        if (isOpening) {
+                            isOpening = false;
+                            if (openingPolling) { clearInterval(openingPolling); openingPolling = null; }
+                        }
+                        $('timerLabel').innerText = '下期开奖倒计时';
+                        $('count').classList.remove('opening');
+                        $('openingAnim').style.display = 'none';
+                        $('resultDisplay').style.display = 'block';
+                        pendingRow = null;
+                        if (latestPeriod) playBellSound();
+                        scratchRevealed = false;
+                        if (settings.scratchEnabled) {
+                            initScratchCanvas();
+                        } else {
+                            var oldCanvas = document.querySelector('#resultCard canvas.scratch-canvas');
+                            if (oldCanvas) oldCanvas.remove();
+                        }
+                    }
+                    latestPeriod = cp;
+                    if (!isOpening) {
+                        $('openingAnim').style.display = 'none';
+                        $('resultDisplay').style.display = 'block';
+                        $('n1ball').innerText = n1;
+                        $('n2ball').innerText = n2;
+                        $('n3ball').innerText = n3;
+                        $('sumBall').innerText = formatBlue(sv);
+                        $('sumBall').style.background = sv > 13 ? '#e53935' : '#1976d2';
+                        $('sumBall').style.borderRadius = sv > 13 ? '8px' : '50%';
+                        $('issue').innerText = cp;
+                        $('sumExpr').innerHTML = n1 + '+' + n2 + '+' + n3 + '=' + sv;
+                        $('comboTag').innerHTML = '<span style="font-weight:700;">' + info.pattern + '</span>';
+                        $('dxTag').innerHTML = '<span style="color:' + (info.dx === '大' ? '#e53935' : '#1976d2') + ';font-weight:700;">' + info.dx + '</span>';
+                        $('dsTag').innerHTML = '<span style="font-weight:700;">' + info.ds + '</span>';
+                    }
+                    if (!isOpening && data.countdown) {
+                        var cd = data.countdown;
+                        if (cd === '00:00' || cd === '0:00') {
+                            if (!isOpening) {
+                                isOpening = true;
+                                $('timerLabel').innerText = '🔥开奖中';
+                                $('count').innerText = '开奖中';
+                                $('count').classList.add('opening');
+                                $('openingAnim').style.display = 'flex';
+                                $('resultDisplay').style.display = 'none';
+                                hideScratchCoating();
+                                startOpeningPolling();
                             }
-                            $('timerLabel').innerText = '下期开奖倒计时';
+                        } else {
+                            var parts = cd.split(':').map(Number);
+                            countdownSeconds = parts[0] * 60 + parts[1];
+                            $('count').innerText = fmtTime(countdownSeconds);
                             $('count').classList.remove('opening');
-                            $('openingAnim').style.display = 'none';
-                            $('resultDisplay').style.display = 'block';
                         }
-                        
-                        latestPeriod = cp;
-                        if (!isOpening) {
-                            $('openingAnim').style.display = 'none';
-                            $('resultDisplay').style.display = 'block';
-                            $('n1ball').innerText = n1;
-                            $('n2ball').innerText = n2;
-                            $('n3ball').innerText = n3;
-                            $('sumBall').innerText = formatBlue(sv);
-                            $('sumBall').style.background = sv > 13 ? '#e53935' : '#1976d2';
-                            $('sumBall').style.borderRadius = sv > 13 ? '6px' : '50%';
-                            $('issue').innerText = cp;
-                            $('sumExpr').innerHTML = `${n1}+${n2}+${n3}=${sv}`;
-                            $('comboTag').innerHTML = `<span style="font-weight:600;">${info.pattern}</span>`;
-                            $('dxTag').innerHTML = `<span style="color:${info.dx === '大' ? '#e53935' : '#1976d2'};font-weight:600;">${info.dx}</span>`;
-                            $('dsTag').innerHTML = `<span style="font-weight:600;">${info.ds}</span>`;
-                        }
-                        
-                        if (!isOpening && data.countdown) {
-                            const cd = data.countdown;
-                            if (cd === '00:00' || cd === '0:00') {
-                                if (!isOpening) {
-                                    isOpening = true;
-                                    $('timerLabel').innerText = '🔥开奖中';
-                                    $('count').innerText = '开奖中';
-                                    $('count').classList.add('opening');
-                                    $('openingAnim').style.display = 'flex';
-                                    $('resultDisplay').style.display = 'none';
-                                    startOpeningPolling();
-                                }
-                            } else {
-                                const [m, s] = cd.split(':').map(Number);
-                                countdownSeconds = m * 60 + s;
-                                $('count').innerText = fmtTime(countdownSeconds);
-                                $('count').classList.remove('opening');
-                            }
-                        }
-                        
-                        setApiSuccess();
-                        
-                        if (isNewPeriod || historyData.length === 0) {
-                            historyData = data.data.map(i => {
-                                const [a, b, c] = i.number.split('+').map(Number);
-                                const s2 = parseInt(i.num);
-                                const inf = getSumInfo(s2, [a, b, c]);
-                                return {
-                                    period: i.nbr,
-                                    numbers: [a, b, c],
-                                    sum: s2,
-                                    combo: inf.combo,
-                                    pattern: inf.pattern,
-                                    time: `${i.date} ${i.time}`,
-                                    isBig: s2 > 13,
-                                    isDuiZi: inf.isDuiZi,
-                                    isShunZi: inf.isShunZi,
-                                    isBaoZi: inf.isBaoZi,
-                                    isSum13: inf.isSum13,
-                                    isSum14: inf.isSum14
-                                };
-                            }).sort((a, b) => parseInt(b.period) - parseInt(a.period));
-                            
-                            renderPredictTable(currentFilter === 'all' ? null : currentFilter);
-                            renderTrendTable();
-                            runAllPredictions();
-                            updateCompensationFromHistory();
-                            updateStatsPanels();
-                            if (isNewPeriod) {
-                                setTimeout(() => { if (!isOpening) loadData(false); }, 1000);
-                            }
-                        }
+                    }
+                    if (isNewPeriod || historyData.length === 0) {
+                        historyData = data.data.map(function(i) {
+                            var abc = i.number.split('+').map(Number);
+                            var a = abc[0],
+                                b = abc[1],
+                                c = abc[2];
+                            var s2 = parseInt(i.num);
+                            var inf = getSumInfo(s2, [a, b, c]);
+                            return {
+                                period: i.nbr,
+                                numbers: [a, b, c],
+                                sum: s2,
+                                combo: inf.combo,
+                                pattern: inf.pattern,
+                                time: i.date + ' ' + i.time,
+                                isBig: s2 > 13,
+                                isDuiZi: inf.isDuiZi,
+                                isShunZi: inf.isShunZi,
+                                isBaoZi: inf.isBaoZi,
+                                isSum13: inf.isSum13,
+                                isSum14: inf.isSum14
+                            };
+                        }).sort(function(a, b) { return parseInt(b.period) - parseInt(a.period); });
+                        runAllPredictions();
+                        updateCompensationFromHistory();
+                        updateStatsPanels();
                         updateModelWinrateUI();
                         loadPredictHistoryUI();
-                    } else {
-                        setApiError('数据格式错误');
+                        updateSummaryStats();
                     }
-                } catch (e) {
-                    console.error(e);
-                    setApiError('解析失败');
                 }
             }
 
-            // 修复后的算法切换函数：防止重复点击同一算法产生混乱
-            window.switchAlgo = function(k) {
-                if (k === currentAlgoKey) return;  // 已经是当前算法，不再重复操作
-                currentAlgoKey = k;
-                renderAlgoTabs();
-                updateCurrentAlgoUI();
-                if (predictions[k] && latestPeriod) {
-                    pendingRow = { period: getNextPeriod(), double: predictions[k].double, single: predictions[k].single };
+            function updateAlgoWinRates() {
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var rates = {};
+                algoKeys.forEach(function(k) {
+                    var ar = rs.filter(function(r) { return r.algorithm === k && (r.mode === 'combo' || !r.mode || r.doublePred); });
+                    var hits = ar.filter(function(r) { return r.hit; }).length;
+                    rates[k] = ar.length ? (hits / ar.length * 100) : 0;
+                });
+                algoWinRates = rates;
+                sortedAlgoKeys = algoKeys.slice().sort(function(a, b) { return (algoWinRates[b] || 0) - (algoWinRates[a] || 0); });
+                if (predictMode === 'combo') renderAlgoTabs();
+            }
+
+            function updateNumberAlgoWinRates() {
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var rates = {};
+                numberAlgoKeys.forEach(function(k) {
+                    var ar = rs.filter(function(r) { return r.algorithm === k && r.mode === 'number'; });
+                    var hits = ar.filter(function(r) { return r.hit; }).length;
+                    rates[k] = ar.length ? (hits / ar.length * 100) : 0;
+                });
+                numberAlgoWinRates = rates;
+                sortedNumberAlgoKeys = numberAlgoKeys.slice().sort(function(a, b) { return (numberAlgoWinRates[b] || 0) - (numberAlgoWinRates[a] || 0); });
+                if (predictMode === 'number') renderAlgoTabs();
+            }
+
+            function renderAlgoTabs() {
+                var container = $('algoTabs');
+                if (!container) return;
+                if (predictMode === 'combo') {
+                    container.innerHTML = sortedAlgoKeys.map(function(k, i) {
+                        var wr = algoWinRates[k] || 0;
+                        var cls = k === currentAlgoKey ? 'algo-tab active' : (wr >= 45 ? 'algo-tab win-high' : 'algo-tab');
+                        return '<span class="' + cls + '" data-algo="' + k + '" onclick="window.switchAlgo(\'' + k + '\')">' + algoNames[k] + ' ' + wr.toFixed(0) + '%</span>';
+                    }).join('');
                 } else {
-                    pendingRow = null;  // 没有预测则清空待开奖行
+                    container.innerHTML = sortedNumberAlgoKeys.map(function(k, i) {
+                        var wr = numberAlgoWinRates[k] || 0;
+                        var cls = k === currentNumberAlgoKey ? 'algo-tab active' : (wr >= 40 ? 'algo-tab win-high' : 'algo-tab');
+                        return '<span class="' + cls + '" data-algo="' + k + '" onclick="window.switchAlgo(\'' + k + '\')">' + numberAlgoNames[k] + ' ' + wr.toFixed(0) + '%</span>';
+                    }).join('');
                 }
-                renderPredictTable();
-                toast(`切换到: ${algoNames[k]}`, 'success');
+            }
+
+            window.switchAlgo = function(k) {
+                if (predictMode === 'combo') {
+                    if (k === currentAlgoKey) return;
+                    currentAlgoKey = k;
+                    if (predictions[k] && latestPeriod) {
+                        pendingRow = {
+                            period: getNextPeriod(),
+                            double: [predictions[k].double[0], predictions[k].double[1]],
+                            single: predictions[k].single,
+                            mode: 'combo',
+                            killGroup: currentGlobalKillGroup
+                        };
+                    } else {
+                        pendingRow = null;
+                    }
+                    renderAlgoTabs();
+                    updateCurrentAlgoUI();
+                    updateTopPredictCard();
+                    renderPredictTable(currentFilter === 'all' ? null : currentFilter);
+                    toast('切换到: ' + algoNames[k], 'success');
+                } else {
+                    if (k === currentNumberAlgoKey) return;
+                    currentNumberAlgoKey = k;
+                    if (numberPredictions[k] && latestPeriod) {
+                        var np2 = numberPredictions[k];
+                        pendingRow = {
+                            period: getNextPeriod(),
+                            rangeMin: np2.min,
+                            rangeMax: np2.max,
+                            rangeCenter: np2.center,
+                            mode: 'number',
+                            killGroup: currentGlobalKillGroup
+                        };
+                    } else {
+                        pendingRow = null;
+                    }
+                    renderAlgoTabs();
+                    updateCurrentAlgoUI();
+                    updateTopPredictCard();
+                    renderPredictTable(currentFilter === 'all' ? null : currentFilter);
+                    toast('切换到: ' + numberAlgoNames[k], 'success');
+                }
             };
 
             window.filterTable = function(t) {
@@ -1502,26 +3278,33 @@
             };
 
             window.clearPredictHistoryUI = function() {
-                if (confirm('清空所有预测记录？')) {
+                if (confirm('确定要清空所有预测记录吗？')) {
                     localStorage.removeItem(STORAGE_KEY);
                     loadPredictHistoryUI();
                     updateAlgoWinRates();
+                    updateNumberAlgoWinRates();
                     renderAlgoTabs();
                     updateModelWinrateUI();
+                    updateSummaryStats();
                     toast('🗑️ 记录已清空', 'success');
                 }
             };
 
             window.exportRecords = function() {
-                const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                let t = 'PC28预测记录 v9.1\n\n';
-                rs.forEach(r => {
-                    t += `${r.period} ${r.numbers} 算法:${algoNames[r.algorithm] || r.algorithm} 预测:${(r.doublePred || []).join('/')} 结果:${r.actualCombo} ${r.hit ? '命中' : '未中'}\n`;
+                var rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                var text = 'PC28预测记录 v12.3\n\n';
+                rs.forEach(function(r) {
+                    var isCombo = r.mode === 'combo' || (!r.mode && r.doublePred);
+                    var al = isCombo ? (algoNames[r.algorithm] || r.algorithm) : (numberAlgoNames[r.algorithm] || r.algorithm);
+                    var pred = isCombo ? (r.doublePred || []).join('/') : (r.rangeMin + '-' + r.rangeMax);
+                    var kill = r.killGroup || '-';
+                    var kr = r.killHit === true ? '杀中' : (r.killHit === false ? '杀错' : '--');
+                    text += r.period + ' ' + r.numbers + ' 算法:' + al + ' 预测:' + pred + ' 杀组:' + kill + ' 结果:' + (r.actualCombo || r.sum) + ' 预测' + (r.hit ? '命中' : '未中') + ' 杀组' + kr + '\n';
                 });
-                const b = new Blob([t], { type: 'text/plain;charset=utf-8' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(b);
-                a.download = `pc28_records_${new Date().toISOString().slice(0, 10)}.txt`;
+                var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'pc28_records_' + new Date().toISOString().slice(0, 10) + '.txt';
                 a.click();
                 toast('⬇️ 导出成功', 'success');
             };
@@ -1530,26 +3313,43 @@
             window.loadData = loadData;
 
             function initTabs() {
-                const tc = $('mainTabs');
-                tc.querySelectorAll('.tab').forEach(s => s.addEventListener('click', function() {
-                    tc.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-                    this.classList.add('active');
-                    const pid = this.dataset.panel;
-                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-                    const panel = $(pid + '-panel');
-                    if (panel) {
-                        panel.classList.add('active');
-                        if (pid === 'trend') renderTrendTable();
-                        if (pid === 'stats') { updateCompensationFromHistory(); updateStatsPanels(); updateModelWinrateUI(); }
-                        if (pid === 'record') loadPredictHistoryUI();
-                    }
-                }));
+                var tc = $('mainTabs');
+                var tabElements = tc.querySelectorAll('.tab');
+                for (var i = 0; i < tabElements.length; i++) {
+                    tabElements[i].addEventListener('click', function() {
+                        var allTabs = tc.querySelectorAll('.tab');
+                        for (var j = 0; j < allTabs.length; j++) {
+                            allTabs[j].classList.remove('active');
+                        }
+                        this.classList.add('active');
+                        var panelId = this.dataset.panel;
+                        var panels = document.querySelectorAll('.panel');
+                        for (var k = 0; k < panels.length; k++) {
+                            panels[k].classList.remove('active');
+                        }
+                        var panel = $(panelId + '-panel');
+                        if (panel) {
+                            panel.classList.add('active');
+                            if (panelId === 'trend') renderTrendTable();
+                            if (panelId === 'stats') {
+                                updateCompensationFromHistory();
+                                updateStatsPanels();
+                                updateModelWinrateUI();
+                                updateSummaryStats();
+                            }
+                            if (panelId === 'record') loadPredictHistoryUI();
+                        }
+                    });
+                }
             }
 
             function init() {
+                loadSettings();
                 initTabs();
+                setupModeSwitch();
                 renderAlgoTabs();
                 updateCurrentAlgoUI();
+                setupSettingsEvents();
                 startCountdown();
                 startAutoRefresh(7500);
                 loadData();
@@ -1557,7 +3357,28 @@
                 updateCompensationFromHistory();
                 updateStatsPanels();
                 updateModelWinrateUI();
-                setInterval(() => { updateCompensationFromHistory(); updateStatsPanels(); }, 30000);
+                updateSummaryStats();
+                $('predictColHeader').textContent = '预测';
+                setInterval(function() {
+                    updateCompensationFromHistory();
+                    updateStatsPanels();
+                }, 30000);
+                var initAudio = function() {
+                    initAudioContext();
+                    document.removeEventListener('click', initAudio);
+                    document.removeEventListener('touchstart', initAudio);
+                };
+                document.addEventListener('click', initAudio, { once: true });
+                document.addEventListener('touchstart', initAudio, { once: true });
+                var resizeDebounce;
+                window.addEventListener('resize', function() {
+                    clearTimeout(resizeDebounce);
+                    resizeDebounce = setTimeout(function() {
+                        if (settings.scratchEnabled && !isOpening && !scratchRevealed && historyData.length > 0 && $('resultDisplay').style.display !== 'none') {
+                            showScratchCoating();
+                        }
+                    }, 400);
+                });
             }
 
             if (document.readyState === 'loading') {
